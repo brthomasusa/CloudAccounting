@@ -1,2 +1,2 @@
 # CloudAccounting
-An ASP.NET Core implementation Apex Cloud Accounting.
+An ASP.NET Core implementation of Apex Cloud Accounting. This is from the book 'Cloud Computing Oracle Application Express' by Riaz Ahmed. The book, and it's source code, describes a complete double-entry account application developed using Oracle Application Express 5. Amazing how few errors and typos were in the book (ISBN-13: 978-1-4842-2501-1) and source code. Following Mr Ahmed's excellent instructions, I first developed the app using Oracle 11g Express and Application Express 5.14 and then began the porting process.
