@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="CloudAccounting.DataContext/CloudAccounting.DataContext.csproj" />
+  <Project Path="CloudAccounting.EntityModels/CloudAccounting.EntityModels.csproj" />
+  <Project Path="CloudAccounting.IntegrationTestsWebApi/CloudAccounting.IntegrationTestsWebApi.csproj" />
+  <Project Path="CloudAccounting.MinApi/CloudAccounting.MinApi.csproj" />
+  <Project Path="CloudAccounting.Repositories/CloudAccounting.Repositories.csproj" />
+  <Project Path="CloudAccounting.UnitTestWebApi/CloudAccounting.UnitTestWebApi.csproj" />
+  <Project Path="CloudAccounting.WebApi/CloudAccounting.WebApi.csproj" />
+</Solution>

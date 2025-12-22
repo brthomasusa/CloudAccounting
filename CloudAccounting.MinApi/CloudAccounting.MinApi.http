@@ -1,0 +1,6 @@
+@CloudAccounting.MinApi_HostAddress = http://localhost:5265
+
+GET {{CloudAccounting.MinApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

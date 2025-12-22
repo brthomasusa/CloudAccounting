@@ -1,0 +1,64 @@
+<Project>
+
+  <!--Last updated package versions: November 11, 2025.-->
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <Net10>10.0.0</Net10>
+  </PropertyGroup>
+  
+  <ItemGroup Label="For EF Core.">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(Net10)" />
+    <PackageVersion Include="Oracle.EntityFrameworkCore" Version="10.23.26000" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.0" />    
+  </ItemGroup>
+  
+  <ItemGroup Label="For testing.">
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.56.0" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+  </ItemGroup>
+  
+  <ItemGroup Label="For ASP.NET Core websites.">
+    <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(Net10)" />
+  </ItemGroup>
+
+  <ItemGroup Label="For caching.">
+    <!-- <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(Net10)" /> -->
+  </ItemGroup>
+
+  <ItemGroup Label="For ASP.NET Core web services.">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(Net10)" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.10.3" />
+    <PackageVersion Include="Refit" Version="8.0.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(Net10)" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="For OData web services.">
+    <PackageVersion Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
+  </ItemGroup>
+  
+  <ItemGroup Label="For FastEndpoints web services.">
+    <PackageVersion Include="FastEndpoints" Version="7.1.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.JsonPatch" Version="$(Net10)" />
+    <PackageVersion Include="Microsoft.AspNetCore.JsonPatch.SystemTextJson" Version="$(Net10)" />
+  </ItemGroup>
+  
+  <ItemGroup Label="For Umbraco CMS.">
+    <PackageVersion Include="Umbraco.Cms" Version="17.0.0-rc1" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+  </ItemGroup>
+
+</Project>
