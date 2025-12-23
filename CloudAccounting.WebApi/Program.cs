@@ -4,7 +4,8 @@ using Scalar.AspNetCore;                        // To use MapScalarApiReference 
 using CloudAccounting.DataContext;
 using CloudAccounting.Repositories.Interface;
 using CloudAccounting.Repositories.Repository;
-using CloudAccounting.WebApi.Extensions;        // To use AddUriVersioning method.
+using CloudAccounting.WebApi.Extensions;
+using Microsoft.AspNetCore.Mvc.Formatters;        // To use AddUriVersioning method.
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,14 +29,33 @@ builder.Services.AddDbContext<CloudAccountingContext>(options =>
 
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 
-builder.Services.AddControllers()
-    .AddXmlDataContractSerializerFormatters()
-    .AddXmlSerializerFormatters();
+builder.Services.AddControllers(options =>
+{
+    WriteLine("Default output formatters:");
+
+    foreach (IOutputFormatter formatter in options.OutputFormatters)
+    {
+        OutputFormatter? mediaFormatter = formatter as OutputFormatter;
+
+        if (mediaFormatter is null)
+        {
+            WriteLine($" {formatter.GetType().Name}");
+        }
+        else // OutputFormatter class has SupportedMediaTypes.
+        {
+            WriteLine(" {0}, Media types: {1}",
+              arg0: mediaFormatter.GetType().Name,
+              arg1: string.Join(", ",
+              mediaFormatter.SupportedMediaTypes));
+        }
+    }
+})
+.AddXmlDataContractSerializerFormatters()
+.AddXmlSerializerFormatters();
 
 builder.Services.AddOpenApi();
 
 builder.Services.AddMemoryCache();
-
 builder.Services.AddResponseCaching();
 
 builder.Services.AddHttpLogging(options =>

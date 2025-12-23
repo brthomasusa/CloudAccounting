@@ -1,5 +1,6 @@
 ﻿namespace CloudAccounting.EntityModels.Entities;
 
+
 public partial class FiscalYear
 {
     public int CompanyCode { get; set; }

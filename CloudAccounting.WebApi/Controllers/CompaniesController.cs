@@ -13,6 +13,8 @@ namespace CloudAccounting.WebApi.Controllers
         private readonly ICompanyRepository _repo = repo;
 
         [HttpGet]
+        // GET: api/v1/companies
+        // this will always return a list of companies (but it might be empty)        
         [ProducesResponseType(200, Type = typeof(IEnumerable<Company>))]
         public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
         {
