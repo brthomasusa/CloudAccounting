@@ -1,9 +1,3 @@
-using System.Text.Json;
-using CloudAccounting.DataContext;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace CloudAccounting.IntegrationTestsWebApi;
 
 public abstract class TestBase : IDisposable

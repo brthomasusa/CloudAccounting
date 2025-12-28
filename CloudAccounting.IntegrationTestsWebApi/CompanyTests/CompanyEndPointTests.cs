@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
-using CloudAccounting.EntityModels.Entities;
-using CloudAccounting.IntegrationTestsWebApi.TestData;
-using System.Text.Json;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.WebUtilities;
+using CloudAccounting.Application.ViewModels.Company;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {
@@ -14,32 +13,24 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
         private const string relativePath = "/api/v1/companies";
 
-        public class CompanyInnerClass(WebApplicationFactory<Program> webApplicationFactory) : CompanyEndPointTests(webApplicationFactory)
+        public class TestClass(WebApplicationFactory<Program> webApplicationFactory) : CompanyEndPointTests(webApplicationFactory)
         {
-            [Fact]
-            public async Task Get_Companies_ReturnsSuccessStatusCode()
-            {
-                // Act
-                HttpResponseMessage response = await _httpClient.GetAsync(relativePath);
-
-                // Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-
             [Fact]
             public async Task Get_Companies_ReturnsTwoCompanies()
             {
                 // Act
+                var queryParams = new Dictionary<string, string?>
+                {
+                    ["pageNumber"] = "1",
+                    ["pageSize"] = "5"
+                };
 
-
-                using HttpResponseMessage response = await _httpClient.GetAsync(relativePath);
-                response.EnsureSuccessStatusCode();
-
-                List<Company>? companies = await response.Content.ReadFromJsonAsync<List<Company>>(_options);
+                List<CompanyDetailVm>? response = await _httpClient
+                    .GetFromJsonAsync<List<CompanyDetailVm>>(QueryHelpers.AddQueryString($"{relativePath}", queryParams));
 
                 // Assert
-                Assert.NotNull(companies);
-                Assert.Equal(2, companies.Count);
+                int count = response!.Count;
+                Assert.Equal(2, count);
             }
 
             [Fact]
@@ -56,6 +47,19 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 // Assert
                 Assert.NotNull(company);
                 Assert.Equal("BTechnical Consulting", company.CompanyName);
+            }
+
+            [Fact]
+            public async Task Get_CompaniesById_ReturnsNotFoundResult()
+            {
+                // Arrange
+                const int companyId = 3;
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/{companyId}");
+
+                // Assert
+                Assert.False(response.IsSuccessStatusCode);
             }
 
             [Fact]

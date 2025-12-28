@@ -1,4 +1,4 @@
-using CloudAccounting.EntityModels.Entities;
+using CloudAccounting.Core.Models;
 
 namespace CloudAccounting.IntegrationTestsWebApi.TestData
 {
