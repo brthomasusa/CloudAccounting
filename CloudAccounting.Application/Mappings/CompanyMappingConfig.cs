@@ -1,4 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
+using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Core.Models;
 
 namespace CloudAccounting.Application.Mappings;
@@ -28,5 +29,17 @@ public class CompanyMappingConfig : IRegister
             .Map(dest => dest.Phone, src => src.Phone)
             .Map(dest => dest.Fax, src => src.Fax)
             .Map(dest => dest.Currency, src => src.Currency);
+
+        // Map CreateCompanyCommand to Company
+        config.NewConfig<CreateCompanyCommand, Company>()
+            .Map(dest => dest.CompanyCode, src => src.CompanyCode)
+            .Map(dest => dest.CompanyName, src => src.CompanyName)
+            .Map(dest => dest.Address, src => src.Address)
+            .Map(dest => dest.City, src => src.City)
+            .Map(dest => dest.Zipcode, src => src.Zipcode)
+            .Map(dest => dest.Phone, src => src.Phone)
+            .Map(dest => dest.Fax, src => src.Fax)
+            .Map(dest => dest.Currency, src => src.Currency);
+
     }
 }

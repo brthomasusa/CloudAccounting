@@ -11,7 +11,7 @@ public class GetCompanyById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("companies/{companyCode:int}", GetCompanyByCompanyCode);
+        app.MapGet("companies/{companyCode:int}", GetCompanyByCompanyCode).WithName("GetCompanyByCompanyCode");
     }
 
     public static async Task<IResult> GetCompanyByCompanyCode(int companyCode, ISender sender, ILogger<GetCompanyById> logger)

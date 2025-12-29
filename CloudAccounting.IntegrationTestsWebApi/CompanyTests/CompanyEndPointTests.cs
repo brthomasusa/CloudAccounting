@@ -4,13 +4,14 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using CloudAccounting.Application.ViewModels.Company;
+using CloudAccounting.Application.UseCases.CreateCompany;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {
-    public class CompanyEndPointTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+    public class CompanyEndPointTests(WebApplicationFactory<Program> factory) : TestBase, IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly HttpClient _httpClient = factory.CreateClient();
-        private readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
+
         private const string relativePath = "/api/v1/companies";
 
         public class TestClass(WebApplicationFactory<Program> webApplicationFactory) : CompanyEndPointTests(webApplicationFactory)
@@ -67,8 +68,8 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             {
                 // Arrange
                 string uri = $"{relativePath}";
-                Company company = CompanyTestData.GetCompanyForCreate();
-                var jsonCompany = JsonSerializer.Serialize(company);
+                CreateCompanyCommand command = CompanyTestData.GetCreateCompanyCommand();
+                var jsonCompany = JsonSerializer.Serialize(command);
                 var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
 
                 // Act
@@ -76,11 +77,10 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                var newCompany = JsonSerializer.Deserialize<Company>(content, _options);
+                CompanyDetailVm? newCompany = JsonSerializer.Deserialize<CompanyDetailVm>(content, _options);
 
                 // Assert
-                Assert.Equal(company.CompanyName, newCompany!.CompanyName);
-                Assert.Equal(company.Address, newCompany!.Address);
+                Assert.Equal(command.CompanyName, newCompany!.CompanyName);
             }
 
             [Fact]
