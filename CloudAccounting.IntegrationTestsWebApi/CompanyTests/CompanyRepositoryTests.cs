@@ -4,16 +4,20 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {
     public class CompanyRepositoryTests : TestBase
     {
+        private readonly ICompanyRepository _companyRepo;
+
+        public CompanyRepositoryTests()
+            => _companyRepo = new CompanyRepository(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
+
         [Fact]
         public async Task RetrieveAllAsync_CompanyRepository_ReturnsTwoCompanies()
         {
             // Arrange
             int pageNumber = 1;
             int pageSize = 5;
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
 
             // Act
-            Result<List<Company>> result = await repo.RetrieveAllAsync(pageNumber, pageSize);
+            Result<List<Company>> result = await _companyRepo.RetrieveAllAsync(pageNumber, pageSize);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -24,12 +28,10 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task RetrieveAsync_CompanyRepository_ReturnsOneCompany()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
-            CancellationToken token = new();
             int companyCode = 1;
 
             // Act
-            Result<Company> result = await repo.RetrieveAsync(companyCode, token, true);
+            Result<Company> result = await _companyRepo.RetrieveAsync(companyCode, new CancellationToken(), true);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -40,14 +42,13 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task RetrieveAsync_CompanyRepository_TestIfRetrievedCompanyWasCached()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             CancellationToken token = new();
             int companyCode = 1;
             string cacheKey = $"company-{companyCode}";
             _memoryCache!.TryGetValue(cacheKey, out Company? beforeCached);
 
             // Act
-            Result<Company> result = await repo.RetrieveAsync(companyCode, token, false);
+            Result<Company> result = await _companyRepo.RetrieveAsync(companyCode, token, false);
             _memoryCache!.TryGetValue(cacheKey, out Company? afterCached);
 
             // Assert
@@ -60,12 +61,11 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task RetrieveAsync_CompanyRepository_ReturnsNotFound()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             CancellationToken token = new();
             int companyCode = 3;
 
             // Act
-            Result<Company> result = await repo.RetrieveAsync(companyCode, token, true);
+            Result<Company> result = await _companyRepo.RetrieveAsync(companyCode, token, true);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -76,11 +76,10 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task Create_CompanyRepository_CreatesAndReturnsOneCompany()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             Company companyToCreate = CompanyTestData.GetCompanyForCreate();
 
             // Act
-            Result<Company> result = await repo.CreateAsync(companyToCreate);
+            Result<Company> result = await _companyRepo.CreateAsync(companyToCreate);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -91,11 +90,10 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task Update_CompanyRepository_UpdatesAndReturnsOneCompany()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             Company companyToUpdate = CompanyTestData.GetCompanyForUpdate();
 
             // Act
-            Result<Company> result = await repo.UpdateAsync(companyToUpdate);
+            Result<Company> result = await _companyRepo.UpdateAsync(companyToUpdate);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -106,12 +104,11 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task Delete_CompanyRepository_DeletesOneCompanyAndReturnsTrue()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             int companyCode = 2;
 
             // Act
-            Result result = await repo.DeleteAsync(companyCode);
-            Result<Company> deletedCompanyResult = await repo.RetrieveAsync(companyCode, new CancellationToken(), false);
+            Result result = await _companyRepo.DeleteAsync(companyCode);
+            Result<Company> deletedCompanyResult = await _companyRepo.RetrieveAsync(companyCode, new CancellationToken(), false);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -122,11 +119,10 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public async Task IsUniqueCompanyName_CompanyRepository_ShouldReturnsTrue()
         {
             // Arrange
-            CompanyRepository repo = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
             string companyName = "Hello World";
 
             // Act
-            Result<bool> result = await repo.IsUniqueCompanyName(companyName);
+            Result<bool> result = await _companyRepo.IsUniqueCompanyName(companyName);
 
             // Assert
             Assert.True(result.IsSuccess);

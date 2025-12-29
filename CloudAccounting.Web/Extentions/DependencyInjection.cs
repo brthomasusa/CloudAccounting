@@ -85,10 +85,10 @@ public static class DependencyInjection
                 ?? throw new ArgumentNullException("Db connection string is null.");
 
         builder.Services
-            // Infrastructure.Data Layer
-            .AddScoped<ICompanyRepository, CompanyRepository>()
-            .AddDbContext<CloudAccountingContext>(options =>
-            options.UseOracle(connectionString));
+            // Infrastructure.Data Layer            
+            .AddDbContext<CloudAccountingContext>(options => options.UseOracle(connectionString))
+            .AddSingleton<DapperOracleContext>(_ => new DapperOracleContext(connectionString!))
+            .AddScoped<ICompanyRepository, CompanyRepository>();
     }
 
     public static void AddMediatr(this IServiceCollection services)

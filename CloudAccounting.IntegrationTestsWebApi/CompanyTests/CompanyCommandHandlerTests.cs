@@ -10,7 +10,7 @@ public class CompanyCommandHandlerTests : TestBase
 
     public CompanyCommandHandlerTests()
     {
-        _repository = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
+        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
     }
 
     [Fact]
@@ -21,11 +21,12 @@ public class CompanyCommandHandlerTests : TestBase
         CreateCompanyCommand command = TestData.CompanyTestData.GetCreateCompanyCommand();
 
         // Act
-        Result<int> result = await handler.Handle(command, new CancellationToken());
+        Result<CompanyDetailVm> result = await handler.Handle(command, new CancellationToken());
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.True(result.Value > 2);
+        Assert.True(result.Value.CompanyCode > 2);
+        Assert.Equal(command.CompanyName, result.Value.CompanyName);
     }
 
 }

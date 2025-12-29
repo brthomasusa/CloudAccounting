@@ -11,7 +11,7 @@ public class CompanyQueryHandlerTests : TestBase
 
     public CompanyQueryHandlerTests()
     {
-        _repository = new(_dbContext!, _memoryCache!, new NullLogger<CompanyRepository>());
+        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
     }
 
     [Fact]

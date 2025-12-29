@@ -1,6 +1,7 @@
+using CloudAccounting.Application.ViewModels.Company;
 namespace CloudAccounting.Application.UseCases.CreateCompany;
 
-public class CreateCompanyCommand : ICommand<int>
+public class CreateCompanyCommand : ICommand<CompanyDetailVm>
 {
     public int CompanyCode { get; set; }
 

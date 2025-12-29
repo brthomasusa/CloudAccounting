@@ -3,11 +3,17 @@ using Microsoft.EntityFrameworkCore;                    // To use ToArrayAsync.
 using Microsoft.Extensions.Caching.Memory;
 using CloudAccounting.Core.Exceptions;
 using CloudAccounting.Core.Models;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using CloudAccounting.Infrastructure.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
-    public class CompanyRepository(CloudAccountingContext ctx, IMemoryCache memoryCache, ILogger<CompanyRepository> logger)
+    public class CompanyRepository
+    (
+        CloudAccountingContext ctx,
+        IMemoryCache memoryCache,
+        ILogger<CompanyRepository> logger,
+        DapperOracleContext oracleContext
+    )
         : ICompanyRepository
     {
         private readonly IMemoryCache _memoryCache = memoryCache;
@@ -16,6 +22,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
         private readonly CloudAccountingContext _db = ctx;
         private readonly ILogger<CompanyRepository> _logger = logger;
+        private readonly DapperOracleContext oracleContext = oracleContext;
 
         public async Task<Result<Company>> CreateAsync(Company c)
         {
@@ -187,7 +194,11 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     new Error("CompanyRepository.IsUniqueCompanyName", errMsg)
                 );
             }
+        }
 
+        public async Task<Result<bool>> IsExistingCompany(int companyCode)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,7 +2,9 @@ namespace CloudAccounting.IntegrationTestsWebApi;
 
 public abstract class TestBase : IDisposable
 {
-    protected readonly CloudAccountingContext? _dbContext;
+    protected readonly CloudAccountingContext? _efCoreContext;
+    protected readonly DapperOracleContext? _dapperContext;
+
     protected readonly JsonSerializerOptions? _options;
     protected readonly IMemoryCache? _memoryCache;
 
@@ -13,7 +15,7 @@ public abstract class TestBase : IDisposable
             _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             string connectionString = "User Id=CLOUD_ACCTG_DEV;Password=Info33Gum;Data Source=rhel9-ws:1521/ORCL;";
-            string storedProc = "BEGIN reset_db_to_known_state; END;";
+
 
             var optionsBuilder = new DbContextOptionsBuilder<CloudAccountingContext>();
 
@@ -21,8 +23,11 @@ public abstract class TestBase : IDisposable
             .EnableSensitiveDataLogging()
             .EnableDetailedErrors();
 
-            _dbContext = new CloudAccountingContext(optionsBuilder.Options);
-            int rowsAffected = _dbContext.Database.ExecuteSqlRaw(storedProc);
+            _efCoreContext = new CloudAccountingContext(optionsBuilder.Options);
+            _dapperContext = new(connectionString);
+
+            string storedProc = "BEGIN reset_db_to_known_state; END;";
+            int rowsAffected = _efCoreContext.Database.ExecuteSqlRaw(storedProc);
 
             // Setup IMemoryCache
             var services = new ServiceCollection();
@@ -38,7 +43,7 @@ public abstract class TestBase : IDisposable
 
     public void Dispose()
     {
-        _dbContext!.Dispose();
+        _efCoreContext!.Dispose();
         _memoryCache!.Dispose();
 
         GC.SuppressFinalize(this);
