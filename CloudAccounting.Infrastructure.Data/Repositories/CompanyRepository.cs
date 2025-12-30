@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;     // To use EntityEntry<T>.
 using Microsoft.EntityFrameworkCore;                    // To use ToArrayAsync.
 using Microsoft.Extensions.Caching.Memory;
+using Oracle.ManagedDataAccess.Client;
+using System.Data;
+using Dapper;
 using CloudAccounting.Core.Exceptions;
 using CloudAccounting.Core.Models;
-using CloudAccounting.Infrastructure.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
@@ -12,7 +14,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         CloudAccountingContext ctx,
         IMemoryCache memoryCache,
         ILogger<CompanyRepository> logger,
-        DapperOracleContext oracleContext
+        DapperContext oracleContext
     )
         : ICompanyRepository
     {
@@ -22,7 +24,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
         private readonly CloudAccountingContext _db = ctx;
         private readonly ILogger<CompanyRepository> _logger = logger;
-        private readonly DapperOracleContext oracleContext = oracleContext;
+        private readonly DapperContext _oracleContext = oracleContext;
 
         public async Task<Result<Company>> CreateAsync(Company c)
         {
@@ -181,9 +183,16 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                Company? company = await _db.Companies.FirstOrDefaultAsync(c => c.CompanyName!.ToUpper() == companyName.ToUpper());
+                string sql = "SELECT is_unique_companyname(:CONAME) AS FROM DUAL";
 
-                return company is null;
+                var param = new { CONAME = companyName };
+
+                using var connection = _oracleContext.CreateConnection();
+
+                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
+
+                // 0 means the name is not unique; 1 means it is unique
+                return retval == 1;
             }
             catch (Exception ex)
             {
@@ -198,7 +207,28 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
         public async Task<Result<bool>> IsExistingCompany(int companyCode)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = "SELECT is_existing_company(:COCODE) AS CompanyExists FROM DUAL";
+
+                var param = new { COCODE = companyCode };
+
+                using var connection = _oracleContext.CreateConnection();
+
+                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
+
+                return retval == 1;
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.IsExistingCompany", errMsg)
+                );
+            }
+
         }
     }
 }

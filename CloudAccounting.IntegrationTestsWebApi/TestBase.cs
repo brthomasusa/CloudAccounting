@@ -3,7 +3,7 @@ namespace CloudAccounting.IntegrationTestsWebApi;
 public abstract class TestBase : IDisposable
 {
     protected readonly CloudAccountingContext? _efCoreContext;
-    protected readonly DapperOracleContext? _dapperContext;
+    protected readonly DapperContext? _dapperContext;
 
     protected readonly JsonSerializerOptions? _options;
     protected readonly IMemoryCache? _memoryCache;

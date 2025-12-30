@@ -128,5 +128,48 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             Assert.True(result.IsSuccess);
             Assert.True(result.Value);
         }
+
+        [Fact]
+        public async Task IsUniqueCompanyName_CompanyRepository_ShouldReturnsFalse()
+        {
+            // Arrange
+            string companyName = "BTechnical Consulting";
+
+            // Act
+            Result<bool> result = await _companyRepo.IsUniqueCompanyName(companyName);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.False(result.Value);
+        }
+
+        [Fact]
+        public async Task IsExistingCompany_CompanyRepository_ShouldReturnsTrue()
+        {
+            // Arrange
+            int companyCode = 1;
+
+            // Act
+            Result<bool> result = await _companyRepo.IsExistingCompany(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task IsExistingCompany_CompanyRepository_ShouldReturnsFalse()
+        {
+            // Arrange
+            int companyCode = 13;
+
+            // Act
+            Result<bool> result = await _companyRepo.IsExistingCompany(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.False(result.Value);
+        }
+
     }
 }

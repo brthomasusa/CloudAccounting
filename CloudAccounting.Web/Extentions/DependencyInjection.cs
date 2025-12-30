@@ -87,7 +87,7 @@ public static class DependencyInjection
         builder.Services
             // Infrastructure.Data Layer            
             .AddDbContext<CloudAccountingContext>(options => options.UseOracle(connectionString))
-            .AddSingleton<DapperOracleContext>(_ => new DapperOracleContext(connectionString!))
+            .AddSingleton<DapperContext>(_ => new DapperContext(connectionString!))
             .AddScoped<ICompanyRepository, CompanyRepository>();
     }
 
