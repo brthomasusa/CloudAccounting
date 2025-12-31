@@ -37,7 +37,7 @@ public class CreateCompanyValidator : AbstractValidator<CreateCompanyCommand>
 
     private async Task<bool> IsUniqueCompanyName(string companyName, CancellationToken cancellationToken)
     {
-        Result<bool> result = await _repository.IsUniqueCompanyName(companyName);
+        Result<bool> result = await _repository.IsUniqueCompanyNameForCreate(companyName);
         return result.Value;
     }
 }

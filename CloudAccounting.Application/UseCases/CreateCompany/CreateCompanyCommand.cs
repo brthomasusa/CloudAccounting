@@ -1,4 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
+
 namespace CloudAccounting.Application.UseCases.CreateCompany;
 
 public class CreateCompanyCommand : ICommand<CompanyDetailVm>

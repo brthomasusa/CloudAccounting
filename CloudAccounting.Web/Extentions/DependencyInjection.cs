@@ -7,6 +7,7 @@ using CloudAccounting.Application;
 using CloudAccounting.Application.Behaviors;
 using CloudAccounting.Application.Validators.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
+using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Core.Repositories;
 using CloudAccounting.Infrastructure.Data;
 using CloudAccounting.Infrastructure.Data.Repositories;
@@ -114,5 +115,6 @@ public static class DependencyInjection
     public static void RegisterValidators(this IServiceCollection services)
     {
         services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyValidator>();
+        services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyValidator>();
     }
 }

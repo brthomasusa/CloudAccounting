@@ -1,4 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
+
 namespace CloudAccounting.Application.UseCases.CreateCompany;
 
 public class CreateCompanyCommandHandler
@@ -22,7 +23,7 @@ public class CreateCompanyCommandHandler
         if (createCompanyResult.IsFailure)
         {
             return Result<CompanyDetailVm>.Failure<CompanyDetailVm>(
-                new Error("GetCompanyByIdQueryHandler.Handle", createCompanyResult.Error.Message)
+                new Error("CreateCommandHandler.Handle", createCompanyResult.Error.Message)
             );
         }
 

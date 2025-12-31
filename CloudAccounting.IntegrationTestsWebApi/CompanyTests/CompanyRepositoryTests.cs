@@ -116,13 +116,13 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyName_CompanyRepository_ShouldReturnsTrue()
+        public async Task IsUniqueCompanyNameForCreate_CompanyRepository_ShouldReturnsTrue()
         {
             // Arrange
             string companyName = "Hello World";
 
             // Act
-            Result<bool> result = await _companyRepo.IsUniqueCompanyName(companyName);
+            Result<bool> result = await _companyRepo.IsUniqueCompanyNameForCreate(companyName);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -130,18 +130,68 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyName_CompanyRepository_ShouldReturnsFalse()
+        public async Task IsUniqueCompanyNameForCreate_CompanyRepository_ShouldReturnsFalse()
         {
             // Arrange
             string companyName = "BTechnical Consulting";
 
             // Act
-            Result<bool> result = await _companyRepo.IsUniqueCompanyName(companyName);
+            Result<bool> result = await _companyRepo.IsUniqueCompanyNameForCreate(companyName);
 
             // Assert
             Assert.True(result.IsSuccess);
             Assert.False(result.Value);
         }
+
+        [Fact]
+        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsTrue_NameChange()
+        {
+            // Arrange
+            int companyCode = 1;
+            string companyName = "New World Importers";   // An update is being performed which changes the company name
+
+            // Act
+            Result<bool> result = await _companyRepo.IsUniqueCompanyNameForUpdate(companyCode, companyName);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsTrue_NoNameChange()
+        {
+            // Arrange
+            int companyCode = 1;
+            string companyName = "BTechnical Consulting";   // An update is being perform which does not involve changing the company name
+
+            // Act
+            Result<bool> result = await _companyRepo.IsUniqueCompanyNameForUpdate(companyCode, companyName);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsFalse_DupeName()
+        {
+            // Arrange
+            int companyCode = 1;
+            string companyName = "Computer Depot";  // Another company already has this name.
+
+            // Act
+            Result<bool> result = await _companyRepo.IsUniqueCompanyNameForUpdate(companyCode, companyName);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.False(result.Value);
+        }
+
+
+
+
+
 
         [Fact]
         public async Task IsExistingCompany_CompanyRepository_ShouldReturnsTrue()

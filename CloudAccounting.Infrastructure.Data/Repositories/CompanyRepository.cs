@@ -179,11 +179,11 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<Result<bool>> IsUniqueCompanyName(string companyName)
+        public async Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName)
         {
             try
             {
-                string sql = "SELECT is_unique_companyname(:CONAME) AS FROM DUAL";
+                string sql = "SELECT is_unique_companyname_for_create(:CONAME) AS FROM DUAL";
 
                 var param = new { CONAME = companyName };
 
@@ -201,6 +201,31 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 return Result<bool>.Failure<bool>(
                     new Error("CompanyRepository.IsUniqueCompanyName", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName)
+        {
+            try
+            {
+                string sql = "SELECT is_unique_companyname_for_update(:COCODE,:CONAME) FROM DUAL";
+
+                var param = new { COCODE = companyCode, CONAME = companyName };
+
+                using var connection = _oracleContext.CreateConnection();
+
+                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
+
+                return retval == 1;
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.IsExistingCompany", errMsg)
                 );
             }
         }
@@ -228,7 +253,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     new Error("CompanyRepository.IsExistingCompany", errMsg)
                 );
             }
-
         }
     }
 }

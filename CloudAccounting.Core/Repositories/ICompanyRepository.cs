@@ -15,7 +15,9 @@ public interface ICompanyRepository
 
     Task<Result> DeleteAsync(int id);
 
-    Task<Result<bool>> IsUniqueCompanyName(string companyName);
+    Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName);
+
+    Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName);
 
     Task<Result<bool>> IsExistingCompany(int companyCode);
 }

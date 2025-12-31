@@ -1,4 +1,5 @@
 using CloudAccounting.Application.UseCases.CreateCompany;
+using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Core.Models;
 
 namespace CloudAccounting.IntegrationTestsWebApi.TestData
@@ -15,7 +16,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.TestData
                 Zipcode = "75214",
                 Phone = "469-555-1234",
                 Fax = "469-555-2345",
-                Currency = "$"
+                Currency = "USD"
             };
 
         public static Company GetCompanyForUpdate()
@@ -28,7 +29,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.TestData
                 Zipcode = "75214",
                 Phone = "469-555-1234",
                 Fax = "469-555-2345",
-                Currency = "$"
+                Currency = "USD"
             };
 
         public static CreateCompanyCommand GetCreateCompanyCommand()
@@ -41,7 +42,20 @@ namespace CloudAccounting.IntegrationTestsWebApi.TestData
                 Zipcode = "75214",
                 Phone = "469-555-1234",
                 Fax = "469-555-2345",
-                Currency = "$"
+                Currency = "USD"
+            };
+
+        public static UpdateCompanyCommand GetUpdateCompanyCommand()
+            => new()
+            {
+                CompanyCode = 1,
+                CompanyName = "BTechnical Consulting",
+                Address = "12345 Mulholland Ave",
+                City = "Dallas",
+                Zipcode = "75214",
+                Phone = "469-555-1234",
+                Fax = "469-555-2345",
+                Currency = "USD"
             };
     }
 }
