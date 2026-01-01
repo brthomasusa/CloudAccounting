@@ -1,13 +1,12 @@
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
-using CloudAccounting.Application.UseCases.GetCompanyById;
 using CloudAccounting.SharedKernel.Utilities;
 using CloudAccounting.Web.Endpoints;
 using CloudAccounting.Web.Extentions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudAccounting.Web.EndPoints.Company.CreateCompany
+namespace CloudAccounting.Web.EndPoints.Company
 {
     public class CreateCompany : IEndpoint
     {
@@ -16,7 +15,7 @@ namespace CloudAccounting.Web.EndPoints.Company.CreateCompany
             app.MapPost("companies/", CreateCompanyFromCommand);
         }
 
-        public static async Task<IResult> CreateCompanyFromCommand([FromBody] CreateCompanyCommand command, ISender sender, ILogger<GetCompanyById> logger)
+        public static async Task<IResult> CreateCompanyFromCommand([FromBody] CreateCompanyCommand command, ISender sender, ILogger<CreateCompany> logger)
         {
             Result<CompanyDetailVm>? result = null;
 

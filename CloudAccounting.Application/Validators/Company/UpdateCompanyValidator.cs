@@ -12,12 +12,13 @@ namespace CloudAccounting.Application.Validators.Company
             _repository = repository;
 
             RuleFor(company => company.CompanyCode)
-                                      .GreaterThan(0).WithMessage("Missing company code.");
+                                      .GreaterThan(0).WithMessage("Missing company code.")
+                                      .MustAsync(ValidateCompanyCode).WithMessage("The company code is not valid.");
 
             RuleFor(company => company.CompanyName)
                                       .NotEmpty().WithMessage("The company name is required.")
                                       .MaximumLength(50).WithMessage("Max length of the company name is 50 characters.")
-                                      .MustAsync(CheckCompanyName!).WithMessage("Another company already has this name."); ;
+                                      .MustAsync(CheckCompanyName!).WithMessage("Another company already has this name.");
 
             RuleFor(company => company.Address)
                                       .MaximumLength(100).WithMessage("Max length of the address is 100 characters.");
@@ -36,6 +37,19 @@ namespace CloudAccounting.Application.Validators.Company
 
             RuleFor(company => company.Currency)
                                       .MaximumLength(3).WithMessage("Max length of the currency code is 3 characters.");
+        }
+
+        private async Task<bool> ValidateCompanyCode(int companyCode, CancellationToken cancellationToken)
+        {
+            Result<CloudAccounting.Core.Models.Company> result =
+                await _repository.RetrieveAsync(companyCode, new CancellationToken(), true);
+
+            if (result.IsFailure)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private async Task<bool> CheckCompanyName(UpdateCompanyCommand command, string companyName, CancellationToken cancellationToken)

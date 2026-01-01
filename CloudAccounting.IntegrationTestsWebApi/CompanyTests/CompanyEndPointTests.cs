@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
+using CloudAccounting.Application.UseCases.DeleteCompany;
+using CloudAccounting.Application.UseCases.UpdateCompany;
+using System.Net.Http.Headers;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {
@@ -77,39 +80,53 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                CompanyDetailVm? newCompany = JsonSerializer.Deserialize<CompanyDetailVm>(content, _options);
+                CompanyDetailVm? company = JsonSerializer.Deserialize<CompanyDetailVm>(content, _options);
 
                 // Assert
-                Assert.Equal(command.CompanyName, newCompany!.CompanyName);
+                Assert.Equal(command.CompanyName, company!.CompanyName);
             }
 
             [Fact]
             public async Task Update_Company()
             {
                 // Arrange        
-                Company company = CompanyTestData.GetCompanyForUpdate();
-                string uri = $"{relativePath}/{company.CompanyCode}";
-                var jsonCompany = JsonSerializer.Serialize(company);
+                UpdateCompanyCommand command = CompanyTestData.GetUpdateCompanyCommand();
+                string uri = $"{relativePath}"; ;
+                var jsonCompany = JsonSerializer.Serialize(command);
                 var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
 
                 // Act
                 using HttpResponseMessage response = await _httpClient.PutAsync(uri, requestContent);
                 response.EnsureSuccessStatusCode();
 
+                var content = await response.Content.ReadAsStringAsync();
+                CompanyDetailVm? company = JsonSerializer.Deserialize<CompanyDetailVm>(content, _options);
+
                 // Assert
                 Assert.True(response.IsSuccessStatusCode);
+                Assert.NotNull(company);
             }
 
             [Fact]
             public async Task Delete_Company()
             {
                 // Arrange  
-                int companyCode = 2;
-                string uri = $"{relativePath}/{companyCode}";
+                DeleteCompanyCommand command = new() { CompanyCode = 2 };
+                string uri = $"{relativePath}";
+
+                var memStream = new MemoryStream();
+                await JsonSerializer.SerializeAsync(memStream, command);
+                memStream.Seek(0, SeekOrigin.Begin);
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, uri);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                using var requestContent = new StreamContent(memStream);
+                request.Content = requestContent;
+                requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
                 // Act
-                using HttpResponseMessage response = await _httpClient.DeleteAsync(uri);
-                response.EnsureSuccessStatusCode();
+                using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
                 // Assert
                 Assert.True(response.IsSuccessStatusCode);

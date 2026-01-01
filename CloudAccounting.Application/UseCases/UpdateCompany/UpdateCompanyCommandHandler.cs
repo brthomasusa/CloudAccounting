@@ -18,14 +18,14 @@ namespace CloudAccounting.Application.UseCases.UpdateCompany
             Company company = _mapper.Map<Company>(command);
             Result<Company> updateCompanyResult = await _repository.UpdateAsync(company);
 
-            CompanyDetailVm companyDetail = _mapper.Map<CompanyDetailVm>(updateCompanyResult.Value);
-
             if (updateCompanyResult.IsFailure)
             {
                 return Result<CompanyDetailVm>.Failure<CompanyDetailVm>(
                     new Error("UpdateCompanyCommandHandler.Handle", updateCompanyResult.Error.Message)
                 );
             }
+
+            CompanyDetailVm companyDetail = _mapper.Map<CompanyDetailVm>(updateCompanyResult.Value);
 
             return companyDetail;
         }
