@@ -154,7 +154,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 _logger.LogError(ex, "{Message}", errMsg);
 
                 return Result<Company>.Failure<Company>(
-                    new Error("CompanyRepository.UpdateAsync", Helpers.GetInnerExceptionMessage(ex))
+                    new Error("CompanyRepository.UpdateAsync", errMsg)
                 );
             }
         }
