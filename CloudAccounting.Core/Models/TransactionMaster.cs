@@ -28,11 +28,5 @@ public partial class TransactionMaster
 
     public bool Closing { get; set; }
 
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
-
-    public virtual FiscalYear FiscalYearNavigation { get; set; } = null!;
-
     public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
-
-    public virtual Voucher VoucherNavigation { get; set; } = null!;
 }

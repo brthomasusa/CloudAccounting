@@ -18,17 +18,7 @@ public partial class Company
 
     public string? Currency { get; set; }
 
-    public virtual ICollection<BankOpeningStatement> BankOpeningStatements { get; set; } = [];
-
     public virtual ICollection<ChartOfAccounts> ChartOfAccounts { get; set; } = [];
 
-    public virtual ICollection<CostCenter> CostCenters { get; set; } = [];
-
     public virtual ICollection<FiscalYear> FiscalYears { get; set; } = [];
-
-    public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
-
-    public virtual ICollection<TransactionMaster> TransactionMasters { get; set; } = [];
-
-    public virtual ICollection<User> Users { get; set; } = [];
 }

@@ -106,7 +106,7 @@ public static class DependencyInjection
     public static void AddMappings(this IServiceCollection services)
     {
         var config = TypeAdapterConfig.GlobalSettings;
-        config.Scan(ApplicationAssembly.Instance);
+        config.Scan(ApplicationAssembly.Instance, InfrastructureAssembly.Instance);
         config.Default.NameMatchingStrategy(NameMatchingStrategy.IgnoreCase);
 
         services.AddSingleton(config);

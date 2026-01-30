@@ -1,6 +1,6 @@
-namespace CloudAccounting.Application.Models
+namespace CloudAccounting.Core.Models
 {
-    public record FiscalPeriodDto
+    public record FiscalPeriod
     (
         int MonthId,
         string MonthName,

@@ -16,7 +16,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CloudAccounting.Application\CloudAccounting.Application.csproj" />
+    <ProjectReference Include="..\CloudAccounting.Core\CloudAccounting.Core.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
