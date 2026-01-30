@@ -1,8 +1,9 @@
 <Solution>
   <Project Path="CloudAccounting.Application/CloudAccounting.Application.csproj" />
-  <Project Path="CloudAccounting.Core/CloudAccounting.Core.csproj" />/>
+  <Project Path="CloudAccounting.Core/CloudAccounting.Core.csproj" />/&gt;
   <Project Path="CloudAccounting.Infrastructure.Data/CloudAccounting.Infrastructure.Data.csproj" />
   <Project Path="CloudAccounting.IntegrationTestsWebApi/CloudAccounting.IntegrationTestsWebApi.csproj" />
   <Project Path="CloudAccounting.SharedKernel/CloudAccounting.SharedKernel.csproj" />
+  <Project Path="CloudAccounting.UnitTests/CloudAccounting.UnitTests.csproj" />
   <Project Path="CloudAccounting.Web/CloudAccounting.Web.csproj" />
 </Solution>

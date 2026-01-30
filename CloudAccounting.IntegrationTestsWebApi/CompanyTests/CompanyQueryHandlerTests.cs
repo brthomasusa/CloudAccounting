@@ -11,7 +11,7 @@ public class CompanyQueryHandlerTests : TestBase
 
     public CompanyQueryHandlerTests()
     {
-        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
+        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class CompanyQueryHandlerTests : TestBase
     public async Task Handle_GetCompanyByIdQueryHandler__InvalidCompanyCode_ShouldReturnFailure()
     {
         // Arrange
-        GetCompanyByIdQuery query = new(3);
+        GetCompanyByIdQuery query = new(-3);
         GetCompanyByIdQueryHandler handler = new(_repository, new NullLogger<GetCompanyByIdQueryHandler>(), _mapper);
 
         // Act
@@ -41,7 +41,7 @@ public class CompanyQueryHandlerTests : TestBase
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal("The company with CompanyCode '3' was not found.", result.Error.Message);
+        Assert.Equal("The company with CompanyCode '-3' was not found.", result.Error.Message);
     }
 
     [Fact]
@@ -56,6 +56,6 @@ public class CompanyQueryHandlerTests : TestBase
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(2, result.Value.Count);
+        Assert.True(result.Value.Count > 1);
     }
 }

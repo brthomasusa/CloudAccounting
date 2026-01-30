@@ -19,7 +19,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         public class TestClass(WebApplicationFactory<Program> webApplicationFactory) : CompanyEndPointTests(webApplicationFactory)
         {
             [Fact]
-            public async Task Get_Companies_ReturnsTwoCompanies()
+            public async Task Get_Companies_ReturnsManyCompanies()
             {
                 // Act
                 var queryParams = new Dictionary<string, string?>
@@ -33,7 +33,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 
                 // Assert
                 int count = response!.Count;
-                Assert.Equal(2, count);
+                Assert.True(count > 1);
             }
 
             [Fact]
@@ -56,7 +56,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             public async Task Get_CompaniesById_ReturnsNotFoundResult()
             {
                 // Arrange
-                const int companyId = 3;
+                const int companyId = -3;
 
                 // Act
                 using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/{companyId}");

@@ -9,10 +9,11 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
 public class CompanyValidatorTests : TestBase
 {
     private readonly ICompanyRepository _repository;
+    private readonly IMapper _mapper = AddMapsterForTests.GetMapper();
 
     public CompanyValidatorTests()
     {
-        _repository = new CompanyRepository(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
+        _repository = new CompanyRepository(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
     }
 
     [Fact]

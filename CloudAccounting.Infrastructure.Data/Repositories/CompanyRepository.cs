@@ -5,7 +5,8 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using Dapper;
 using CloudAccounting.Core.Exceptions;
-using CloudAccounting.Core.Models;
+using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
+using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
@@ -14,7 +15,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         CloudAccountingContext ctx,
         IMemoryCache memoryCache,
         ILogger<CompanyRepository> logger,
-        DapperContext oracleContext
+        DapperContext oracleContext,
+        IMapper mapper
     )
         : ICompanyRepository
     {
@@ -25,23 +27,27 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         private readonly CloudAccountingContext _db = ctx;
         private readonly ILogger<CompanyRepository> _logger = logger;
         private readonly DapperContext _oracleContext = oracleContext;
+        private readonly IMapper _mapper = mapper;
 
-        public async Task<Result<Company>> CreateAsync(Company c)
+        public async Task<Result<CompanyDomainModel>> CreateAsync(CompanyDomainModel c)
         {
             try
             {
-                EntityEntry<Company> added = await _db.Companies.AddAsync(c);
+                // Map company domain model to company data model
+                CompanyDataModel companyDataModel = _mapper.Map<CompanyDataModel>(c);
+
+                EntityEntry<CompanyDataModel> added = await _db.Companies.AddAsync(companyDataModel);
 
                 int affected = await _db.SaveChangesAsync();
 
                 if (affected == 1)
                 {
-                    _memoryCache.Set($"company-{c.CompanyCode}", c, _cacheEntryOptions);
+                    _memoryCache.Set($"company-{c.CompanyCode}", companyDataModel, _cacheEntryOptions);
 
-                    return c;
+                    return _mapper.Map<CompanyDomainModel>(companyDataModel);
                 }
 
-                return Result<Company>.Failure<Company>(
+                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
                     new Error("CompanyRepository.CreateAsync", "Create company operation failed!")
                 );
             }
@@ -50,17 +56,17 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<Company>.Failure<Company>(
+                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
                     new Error("CompanyRepository.CreateAsync", errMsg)
                 );
             }
         }
 
-        public async Task<Result<List<Company>>> RetrieveAllAsync(int pageNumber, int pageSize)
+        public async Task<Result<List<CompanyDomainModel>>> RetrieveAllAsync(int pageNumber, int pageSize)
         {
             try
             {
-                Result<List<Company>> paginatedResults =
+                Result<List<CompanyDataModel>> paginatedResults =
                     await _db.Companies
                              .OrderBy(c => c.CompanyName) // Primary sort
                              .Skip((pageNumber - 1) * pageSize)
@@ -69,12 +75,13 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 if (paginatedResults.IsSuccess)
                 {
-                    return paginatedResults;
+                    // List<CompanyDomainModel> companyDomainList = paginatedResults.Value.Adapt<List<CompanyDomainModel>>();
+                    return paginatedResults.Value.Adapt<List<CompanyDomainModel>>();
                 }
 
                 _logger.LogWarning("There was a problem retrieving a list of companies: {Message}", paginatedResults.Error.Message);
 
-                return Result<List<Company>>.Failure<List<Company>>(
+                return Result<List<CompanyDomainModel>>.Failure<List<CompanyDomainModel>>(
                     new Error("CompanyRepository.CreateAsync", paginatedResults.Error.Message)
                 );
             }
@@ -83,17 +90,17 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<List<Company>>.Failure<List<Company>>(
+                return Result<List<CompanyDomainModel>>.Failure<List<CompanyDomainModel>>(
                     new Error("CompanyRepository.CreateAsync", Helpers.GetInnerExceptionMessage(ex))
                 );
             }
         }
 
-        public async Task<Result<Company>> RetrieveAsync(int id, CancellationToken token, bool noTracking = false)
+        public async Task<Result<CompanyDomainModel>> RetrieveAsync(int id, CancellationToken token, bool noTracking = false)
         {
             try
             {
-                Company? company = null;
+                CompanyDataModel? company = null;
 
                 string cacheKey = $"company-{id}";
 
@@ -111,26 +118,26 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 if (company is null)
                 {
                     CompanyNotFoundException notFoundException = new(id);
-                    return Result<Company>.Failure<Company>(
+                    return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
                         new Error("CompanyRepository.RetrieveAsync", notFoundException.Message));
                 }
 
                 _memoryCache.Set(cacheKey, company, _cacheEntryOptions);
 
-                return company;
+                return _mapper.Map<CompanyDomainModel>(company);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<Company>.Failure<Company>(
+                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
                     new Error("CompanyRepository.RetrieveAsync", Helpers.GetInnerExceptionMessage(ex))
                 );
             }
         }
 
-        public async Task<Result<Company>> UpdateAsync(Company c)
+        public async Task<Result<CompanyDomainModel>> UpdateAsync(CompanyDomainModel c)
         {
             try
             {
@@ -146,14 +153,16 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 _memoryCache.Set($"company-{c.CompanyCode}", c, _cacheEntryOptions);
 
-                return await _db.Companies.FindAsync(c.CompanyCode);
+                CompanyDataModel? dataModel = await _db.Companies.FindAsync(c.CompanyCode);
+
+                return _mapper.Map<CompanyDomainModel>(dataModel!);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<Company>.Failure<Company>(
+                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
                     new Error("CompanyRepository.UpdateAsync", errMsg)
                 );
             }

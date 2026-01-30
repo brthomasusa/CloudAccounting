@@ -8,6 +8,8 @@
     <PackageReference Include="Oracle.EntityFrameworkCore" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" />
     <PackageReference Include="Dapper" />
+    <PackageReference Include="Mapster" />
+    <PackageReference Include="Mapster.DependencyInjection" />    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudAccounting.Core\CloudAccounting.Core.csproj" />

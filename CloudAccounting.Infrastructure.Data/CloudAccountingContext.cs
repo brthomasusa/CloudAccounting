@@ -1,7 +1,7 @@
 #pragma warning disable CS8604
 
 using Microsoft.EntityFrameworkCore;
-using CloudAccounting.Core.Models;
+using CloudAccounting.Infrastructure.Data.Models;
 using System.Reflection;
 
 namespace CloudAccounting.Infrastructure.Data;

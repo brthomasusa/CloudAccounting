@@ -12,7 +12,7 @@ public class CompanyCommandHandlerTests : TestBase
 
     public CompanyCommandHandlerTests()
     {
-        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!);
+        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
     }
 
     [Fact]
