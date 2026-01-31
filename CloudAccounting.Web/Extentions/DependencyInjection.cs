@@ -5,11 +5,13 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi;
 using CloudAccounting.Application;
 using CloudAccounting.Application.Behaviors;
+using CloudAccounting.Application.Services;
 using CloudAccounting.Application.Validators.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Core.Repositories;
+using CloudAccounting.Core.Services;
 using CloudAccounting.Infrastructure.Data;
 using CloudAccounting.Infrastructure.Data.Repositories;
 using CloudAccounting.Web.Endpoints;
@@ -71,8 +73,17 @@ public static class DependencyInjection
 
     public static void AddCustomSwagger(this IServiceCollection services) =>
         services.AddSwaggerGen(c =>
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "CloudAccounting", Version = "v1" })
-        );
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Description = "Cloud Accounting",
+                Title = "CloudAccounting API",
+                Version = "v1",
+                Contact = new OpenApiContact
+                {
+                    Name = "CloudAccounting"
+                }
+            }
+        ));
 
     public static void UseCustomSwagger(this WebApplication app)
     {
@@ -91,6 +102,13 @@ public static class DependencyInjection
             .AddDbContext<CloudAccountingContext>(options => options.UseOracle(connectionString))
             .AddSingleton<DapperContext>(_ => new DapperContext(connectionString!))
             .AddScoped<ICompanyRepository, CompanyRepository>();
+    }
+
+    public static void AddRepositoriesAndDomainServices(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<ICompanyService, CompanyService>();
     }
 
     public static void AddMediatr(this IServiceCollection services)
