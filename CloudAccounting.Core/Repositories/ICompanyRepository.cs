@@ -20,4 +20,8 @@ public interface ICompanyRepository
     Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName);
 
     Task<Result<bool>> IsExistingCompany(int companyCode);
+
+    Task<Result<bool>> CanCompanyBeDeleted(int companyCode);
+
+    Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber);
 }

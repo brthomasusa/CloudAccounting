@@ -1,12 +1,12 @@
-﻿// using CloudAccounting.Application.Models;
-using CloudAccounting.Core.Models;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-using Oracle.EntityFrameworkCore.Query.Internal;
+﻿using CloudAccounting.Core.Repositories;
+using CloudAccounting.Core.Services;
 
-namespace CloudAccounting.UnitTests;
+namespace CloudAccounting.UnitTests.CompanyTests;
 
 public class FiscalYearTests
 {
+    private ICompanyRepository _repository = Substitute.For<ICompanyRepository>();
+
     [Fact]
     public void Create_FiscalYear_Start_Jan()
     {
@@ -132,6 +132,40 @@ public class FiscalYearTests
         Assert.Equal(new DateTime(2025, 11, 1), lastPeriod!.StartDate);
         Assert.Equal(new DateTime(2025, 11, 30), lastPeriod!.EndDate);
     }
+
+    [Fact]
+    public async Task CompanyService_AddFiscalYear()
+    {
+        // Arrange
+        Company company = GetCompanyForCreate();
+        company.CompanyCode = 100;
+        CompanyService companyService = new(_repository);
+
+        int fiscalYearNumber = 2025;
+        int startMonthNumber = 2;
+
+        // Act
+        Result<FiscalYear> result = await companyService.AddFiscalYear(company, fiscalYearNumber, startMonthNumber);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotEmpty(result.Value.FiscalPeriods);
+        Assert.Equal(12, result.Value.FiscalPeriods.Count);
+        Assert.Equal(new DateTime(2026, 1, 31), result.Value.FiscalPeriods[11].EndDate);
+    }
+
+    public static Company GetCompanyForCreate()
+        => new()
+        {
+            CompanyCode = 0,
+            CompanyName = "New Company, Inc.",
+            Address = "12345 Munger Ave",
+            City = "Dallas",
+            Zipcode = "75214",
+            Phone = "469-555-1234",
+            Fax = "469-555-2345",
+            Currency = "USD"
+        };
 
     private void TestData()
     {

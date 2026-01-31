@@ -263,5 +263,15 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 );
             }
         }
+
+        public Task<Result<bool>> CanCompanyBeDeleted(int companyCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

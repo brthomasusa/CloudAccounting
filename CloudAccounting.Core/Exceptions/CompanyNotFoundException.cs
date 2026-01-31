@@ -1,12 +1,7 @@
 namespace CloudAccounting.Core.Exceptions;
 
-public class CompanyNotFoundException : Exception
+public class CompanyNotFoundException(int companyCode) : Exception($"The company with CompanyCode '{companyCode}' was not found.")
 {
-    public CompanyNotFoundException(int companyCode)
-        : base($"The company with CompanyCode '{companyCode}' was not found.")
-    {
-        CompanyCode = companyCode;
-    }
 
-    public int CompanyCode { get; }
+    public int CompanyCode { get; } = companyCode;
 }

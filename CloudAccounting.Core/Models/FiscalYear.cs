@@ -31,7 +31,7 @@ public record FiscalYear
         }
     }
 
-    private FiscalPeriod? GetFiscalPeriod(int year, int monthNumber)
+    private static FiscalPeriod? GetFiscalPeriod(int year, int monthNumber)
     {
         int lastDayOfFebruary = DateTime.IsLeapYear(year) ? 29 : 28;
 
@@ -53,7 +53,7 @@ public record FiscalYear
         };
     }
 
-    private int ChangeYearAndMonth(int startMonth)
+    private static int ChangeYearAndMonth(int startMonth)
         => startMonth switch
         {
             1 => 0,

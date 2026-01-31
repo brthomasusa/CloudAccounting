@@ -11,4 +11,6 @@ global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
-using FluentValidation;
+global using FluentValidation;
+global using NSubstitute;
+
