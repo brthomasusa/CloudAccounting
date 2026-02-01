@@ -14,6 +14,7 @@ namespace CloudAccounting.UnitTests.Services
             // Arrange
             FiscalYear fiscalYear = new
             (
+                2,
                 2024,
                 new DateTime(2024, 1, 1),
                 new DateTime(2024, 12, 31),
@@ -25,7 +26,7 @@ namespace CloudAccounting.UnitTests.Services
             );
 
             // Act
-            _companyService.CreateFiscalPeriods(fiscalYear);
+            CompanyService.CreateFiscalPeriods(fiscalYear);
 
             // Assert
             FiscalPeriod? firstPeriod = fiscalYear.FiscalPeriods.FirstOrDefault<FiscalPeriod>();
@@ -46,6 +47,7 @@ namespace CloudAccounting.UnitTests.Services
 
             FiscalYear fiscalYear = new
             (
+                2,
                 2024,
                 new DateTime(2024, 2, 1),
                 new DateTime(2025, 1, 31),
@@ -57,7 +59,7 @@ namespace CloudAccounting.UnitTests.Services
             );
 
             // Act
-            _companyService.CreateFiscalPeriods(fiscalYear);
+            CompanyService.CreateFiscalPeriods(fiscalYear);
 
             // Assert
             FiscalPeriod? firstPeriod = fiscalYear.FiscalPeriods.FirstOrDefault<FiscalPeriod>();
@@ -78,6 +80,7 @@ namespace CloudAccounting.UnitTests.Services
 
             FiscalYear fiscalYear = new
             (
+                2,
                 2024,
                 new DateTime(2024, 3, 1),
                 new DateTime(2025, 2, lastDayOfFebruary),
@@ -89,7 +92,7 @@ namespace CloudAccounting.UnitTests.Services
             );
 
             // Act
-            _companyService.CreateFiscalPeriods(fiscalYear);
+            CompanyService.CreateFiscalPeriods(fiscalYear);
 
             // Assert
             FiscalPeriod? firstPeriod = fiscalYear.FiscalPeriods.FirstOrDefault<FiscalPeriod>();
@@ -110,6 +113,7 @@ namespace CloudAccounting.UnitTests.Services
 
             FiscalYear fiscalYear = new
             (
+                2,
                 2024,
                 new DateTime(2024, 12, 1),
                 new DateTime(2025, 12, 31),
@@ -121,7 +125,7 @@ namespace CloudAccounting.UnitTests.Services
             );
 
             // Act
-            _companyService.CreateFiscalPeriods(fiscalYear);
+            CompanyService.CreateFiscalPeriods(fiscalYear);
 
             // Assert
             FiscalPeriod? firstPeriod = fiscalYear.FiscalPeriods.FirstOrDefault<FiscalPeriod>();
@@ -142,11 +146,12 @@ namespace CloudAccounting.UnitTests.Services
             company.CompanyCode = 100;
             CompanyService companyService = new(_repository);
 
+            int companyCode = 2;
             int fiscalYearNumber = 2025;
             int startMonthNumber = 2;
 
             // Act
-            Result<FiscalYear> result = await companyService.AddFiscalYear(company, fiscalYearNumber, startMonthNumber);
+            Result<FiscalYear> result = await companyService.CreateFiscalYearWithPeriods(companyCode, fiscalYearNumber, startMonthNumber);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -155,18 +160,5 @@ namespace CloudAccounting.UnitTests.Services
             Assert.Equal(new DateTime(2026, 1, 31), result.Value.FiscalPeriods[11].EndDate);
         }
 
-        private void TestData()
-        {
-            /*
-                int FiscalYear,
-                DateTime FiscalYearStartDate,
-                DateTime FiscalYearEndDate,
-                bool IsInitialFiscalYear,
-                bool IsFiscalYearClosed,
-                bool HasTransactions,
-                DateTime TemporaryYearEndProcessLastExecuted,
-                List<FiscalPeriodDto> FiscalPeriods
-            */
-        }
     }
 }

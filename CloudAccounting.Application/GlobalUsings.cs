@@ -4,5 +4,6 @@ global using CloudAccounting.SharedKernel.Utilities;
 global using CloudAccounting.Application.Abstractions.Messaging;
 global using CloudAccounting.Core.Models;
 global using CloudAccounting.Core.Repositories;
+global using CloudAccounting.Core.Services;
 global using Mapster;
 global using MapsterMapper;

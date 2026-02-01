@@ -1,13 +1,10 @@
-using CloudAccounting.Core.Repositories;
-using CloudAccounting.Core.Services;
-
 namespace CloudAccounting.Application.Services
 {
     public class CompanyService(ICompanyRepository repository) : ICompanyService
     {
         private readonly ICompanyRepository _repository = repository;
 
-        public async Task<Result<FiscalYear>> AddFiscalYear(Company company, int fiscalYearNumber, int startMonthNumber)
+        public async Task<Result<FiscalYear>> CreateFiscalYearWithPeriods(int companyCode, int fiscalYearNumber, int startMonthNumber)
         {
             DateTime startDate = new(fiscalYearNumber, startMonthNumber, 1);
             DateTime oneYearLater = startDate.AddMonths(11);
@@ -16,13 +13,14 @@ namespace CloudAccounting.Application.Services
 
             FiscalYear fiscalYear = new
             (
+                companyCode,
                 fiscalYearNumber,
                 startDate,
                 lastDateInFiscalYear,
                 true,
                 false,
                 false,
-                DateTime.MaxValue,
+                DateTime.MinValue,
                 []
             );
 
@@ -31,7 +29,7 @@ namespace CloudAccounting.Application.Services
             return fiscalYear;
         }
 
-        public void CreateFiscalPeriods(FiscalYear fiscalYear)
+        internal static void CreateFiscalPeriods(FiscalYear fiscalYear)
         {
             int monthNumber = fiscalYear.FiscalYearStartDate.Month;
             int yearNumber = fiscalYear.Year;

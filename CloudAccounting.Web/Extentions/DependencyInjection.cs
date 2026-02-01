@@ -108,6 +108,7 @@ public static class DependencyInjection
     {
         builder.Services
             .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
             .AddScoped<ICompanyService, CompanyService>();
     }
 

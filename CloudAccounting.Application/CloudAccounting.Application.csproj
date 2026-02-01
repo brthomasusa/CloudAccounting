@@ -2,8 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CloudAccounting</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Dapper" />
     <PackageReference Include="FluentValidation" />
@@ -13,6 +15,19 @@
     <PackageReference Include="Mapster.DependencyInjection" />
     <PackageReference Include="Serilog" />
   </ItemGroup>
+
+    <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>IntegrationTestsWebApi</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CloudAccounting.Infrastructure.Data\CloudAccounting.Infrastructure.Data.csproj" />
   </ItemGroup>
