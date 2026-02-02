@@ -5,9 +5,9 @@ namespace CloudAccounting.Application.Validators.Company;
 
 public class DeleteCompanyValidator : AbstractValidator<DeleteCompanyCommand>
 {
-    private readonly ICompanyRepository _repository;
+    private readonly ICompanyReadRepository _repository;
 
-    public DeleteCompanyValidator(ICompanyRepository repository)
+    public DeleteCompanyValidator(ICompanyReadRepository repository)
     {
         _repository = repository;
 
@@ -18,14 +18,8 @@ public class DeleteCompanyValidator : AbstractValidator<DeleteCompanyCommand>
 
     private async Task<bool> ValidateCompanyCode(int companyCode, CancellationToken cancellationToken)
     {
-        Result<CloudAccounting.Core.Models.Company> result =
-            await _repository.RetrieveAsync(companyCode, new CancellationToken(), true);
+        Result<bool> result = await _repository.IsExistingCompany(companyCode);
 
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        return true;
+        return result.Value;
     }
 }

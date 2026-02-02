@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>CloudAccounting</RootNamespace>
+    <RootNamespace>CloudAccounting.IntegrationTestsWebApi</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

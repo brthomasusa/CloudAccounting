@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;     // To use EntityEntry<T>.
 using Microsoft.EntityFrameworkCore;                    // To use ToArrayAsync.
 using Microsoft.Extensions.Caching.Memory;
-using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using Dapper;
 using CloudAccounting.Core.Exceptions;
 using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
 using CompanyDomainModel = CloudAccounting.Core.Models.Company;
@@ -186,92 +184,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 return Result.Failure(new Error("CompanyRepository.DeleteAsync", errMsg));
             }
-        }
-
-        public async Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName)
-        {
-            try
-            {
-                string sql = "SELECT is_unique_companyname_for_create(:CONAME) AS FROM DUAL";
-
-                var param = new { CONAME = companyName };
-
-                using var connection = _oracleContext.CreateConnection();
-
-                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
-
-                // 0 means the name is not unique; 1 means it is unique
-                return retval == 1;
-            }
-            catch (Exception ex)
-            {
-                string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
-
-                return Result<bool>.Failure<bool>(
-                    new Error("CompanyRepository.IsUniqueCompanyName", errMsg)
-                );
-            }
-        }
-
-        public async Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName)
-        {
-            try
-            {
-                string sql = "SELECT is_unique_companyname_for_update(:COCODE,:CONAME) FROM DUAL";
-
-                var param = new { COCODE = companyCode, CONAME = companyName };
-
-                using var connection = _oracleContext.CreateConnection();
-
-                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
-
-                return retval == 1;
-            }
-            catch (OracleException ex)
-            {
-                string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
-
-                return Result<bool>.Failure<bool>(
-                    new Error("CompanyRepository.IsExistingCompany", errMsg)
-                );
-            }
-        }
-
-        public async Task<Result<bool>> IsExistingCompany(int companyCode)
-        {
-            try
-            {
-                string sql = "SELECT is_existing_company(:COCODE) AS CompanyExists FROM DUAL";
-
-                var param = new { COCODE = companyCode };
-
-                using var connection = _oracleContext.CreateConnection();
-
-                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
-
-                return retval == 1;
-            }
-            catch (OracleException ex)
-            {
-                string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
-
-                return Result<bool>.Failure<bool>(
-                    new Error("CompanyRepository.IsExistingCompany", errMsg)
-                );
-            }
-        }
-
-        public Task<Result<bool>> CanCompanyBeDeleted(int companyCode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber)
-        {
-            throw new NotImplementedException();
         }
     }
 }

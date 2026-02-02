@@ -5,9 +5,9 @@ namespace CloudAccounting.Application.Validators.Company;
 
 public class CreateCompanyValidator : AbstractValidator<CreateCompanyCommand>
 {
-    private readonly ICompanyRepository _repository;
+    private readonly ICompanyReadRepository _repository;
 
-    public CreateCompanyValidator(ICompanyRepository repository)
+    public CreateCompanyValidator(ICompanyReadRepository repository)
     {
         _repository = repository;
 

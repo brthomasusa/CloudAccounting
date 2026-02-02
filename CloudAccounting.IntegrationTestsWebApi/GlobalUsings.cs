@@ -3,6 +3,7 @@ global using CloudAccounting.Core.Models;
 global using CloudAccounting.Core.Repositories;
 global using CloudAccounting.Infrastructure.Data;
 // global using CloudAccounting.Infrastructure.Data.Models;
+global using CloudAccounting.Infrastructure.Data.Interfaces;
 global using CloudAccounting.Infrastructure.Data.Repositories;
 global using CloudAccounting.IntegrationTestsWebApi.TestData;
 global using CloudAccounting.SharedKernel.Utilities;

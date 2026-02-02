@@ -5,9 +5,9 @@ namespace CloudAccounting.Application.Validators.Company
 {
     public class UpdateCompanyValidator : AbstractValidator<UpdateCompanyCommand>
     {
-        private readonly ICompanyRepository _repository;
+        private readonly ICompanyReadRepository _repository;
 
-        public UpdateCompanyValidator(ICompanyRepository repository)
+        public UpdateCompanyValidator(ICompanyReadRepository repository)
         {
             _repository = repository;
 
@@ -41,15 +41,9 @@ namespace CloudAccounting.Application.Validators.Company
 
         private async Task<bool> ValidateCompanyCode(int companyCode, CancellationToken cancellationToken)
         {
-            Result<CloudAccounting.Core.Models.Company> result =
-                await _repository.RetrieveAsync(companyCode, new CancellationToken(), true);
+            Result<bool> result = await _repository.IsExistingCompany(companyCode);
 
-            if (result.IsFailure)
-            {
-                return false;
-            }
-
-            return true;
+            return result.Value;
         }
 
         private async Task<bool> CheckCompanyName(UpdateCompanyCommand command, string companyName, CancellationToken cancellationToken)

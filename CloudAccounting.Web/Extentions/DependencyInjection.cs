@@ -13,6 +13,7 @@ using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Core.Repositories;
 using CloudAccounting.Core.Services;
 using CloudAccounting.Infrastructure.Data;
+using CloudAccounting.Infrastructure.Data.Interfaces;
 using CloudAccounting.Infrastructure.Data.Repositories;
 using CloudAccounting.Web.Endpoints;
 using Mapster;
@@ -108,6 +109,7 @@ public static class DependencyInjection
     {
         builder.Services
             .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<ICompanyReadRepository, CompanyReadRepository>()
             .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
             .AddScoped<ICompanyService, CompanyService>();
     }

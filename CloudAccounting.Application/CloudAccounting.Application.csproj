@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>CloudAccounting</RootNamespace>
+    <RootNamespace>CloudAccounting.Application</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
