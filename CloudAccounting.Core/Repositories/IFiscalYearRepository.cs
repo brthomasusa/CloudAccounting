@@ -1,3 +1,4 @@
+
 namespace CloudAccounting.Core.Repositories
 {
     public interface IFiscalYearRepository

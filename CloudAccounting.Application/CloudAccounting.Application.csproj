@@ -30,5 +30,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CloudAccounting.Infrastructure.Data\CloudAccounting.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\CloudAccounting.Shared\CloudAccounting.Shared.csproj" />
   </ItemGroup>
 </Project>
