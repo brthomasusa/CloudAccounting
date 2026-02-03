@@ -73,7 +73,8 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                     false,
                     false,
                     DateTime.MinValue,
-                    fiscalPeriods
+                    fiscalPeriods,
+                    "Computer Depot"
                 );
 
             return fiscalYear;

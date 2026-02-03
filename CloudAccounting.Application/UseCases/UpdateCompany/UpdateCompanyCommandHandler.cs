@@ -1,4 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
+using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 
 namespace CloudAccounting.Application.UseCases.UpdateCompany
 {
@@ -15,8 +16,8 @@ namespace CloudAccounting.Application.UseCases.UpdateCompany
 
         public async Task<Result<CompanyDetailVm>> Handle(UpdateCompanyCommand command, CancellationToken token)
         {
-            Company company = _mapper.Map<Company>(command);
-            Result<Company> updateCompanyResult = await _repository.UpdateAsync(company);
+            CompanyDomainModel company = _mapper.Map<CompanyDomainModel>(command);
+            Result<CompanyDomainModel> updateCompanyResult = await _repository.UpdateAsync(company);
 
             if (updateCompanyResult.IsFailure)
             {

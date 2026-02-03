@@ -1,4 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
+using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 
 namespace CloudAccounting.Application.UseCases.CreateCompany;
 
@@ -15,8 +16,8 @@ public class CreateCompanyCommandHandler
 
     public async Task<Result<CompanyDetailVm>> Handle(CreateCompanyCommand command, CancellationToken token)
     {
-        Company company = _mapper.Map<Company>(command);
-        Result<Company> createCompanyResult = await _repository.CreateAsync(company);
+        CompanyDomainModel company = _mapper.Map<CompanyDomainModel>(command);
+        Result<CompanyDomainModel> createCompanyResult = await _repository.CreateAsync(company);
 
         CompanyDetailVm companyDetail = _mapper.Map<CompanyDetailVm>(createCompanyResult.Value);
 

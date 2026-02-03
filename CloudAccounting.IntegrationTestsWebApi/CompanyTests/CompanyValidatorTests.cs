@@ -2,6 +2,7 @@ using CloudAccounting.Application.Validators.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
+using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
 using FluentValidation.TestHelper;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
@@ -131,5 +132,18 @@ public class CompanyValidatorTests : TestBase
         result.ShouldHaveValidationErrorFor(x => x.CompanyCode);
     }
 
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveNoValidationErrors()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(1, 2025, 1);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
 
 }

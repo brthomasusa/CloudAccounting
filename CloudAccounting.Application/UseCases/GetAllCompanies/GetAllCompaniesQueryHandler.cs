@@ -1,5 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
-using CloudAccounting.Core.Models;
+using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 
 namespace CloudAccounting.Application.UseCases.GetAllCompanies;
 
@@ -23,14 +23,14 @@ public class GetAllCompaniesQueryHandler
     {
         try
         {
-            Result<List<Company>> getAllCompaniesResult =
+            Result<List<CompanyDomainModel>> getAllCompaniesResult =
                 await _repository.RetrieveAllAsync(query.PageNumber, query.PageSize);
 
             if (getAllCompaniesResult.IsSuccess)
             {
                 List<CompanyDetailVm> companyDetailVms = [];
 
-                foreach (Company company in getAllCompaniesResult.Value)
+                foreach (CompanyDomainModel company in getAllCompaniesResult.Value)
                 {
                     companyDetailVms.Add(_mapper.Map<CompanyDetailVm>(company));
                 }

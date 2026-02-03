@@ -176,5 +176,55 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<Result<bool>> InitialFiscalYearExist(int companyCode)
+        {
+            try
+            {
+                string sql = "SELECT is_initial_fiscalyear(:COCODE) AS FiscalYearExists FROM DUAL";
+
+                var param = new { COCODE = companyCode };
+
+                using var connection = _dapperContext.CreateConnection();
+
+                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
+
+                return retval == 1;
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyReadRepository.InitialFiscalYearExist", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<string>> GetCompanyName(int companyCode)
+        {
+            try
+            {
+                string sql = "SELECT get_company_name(:COCODE) AS FiscalYearExists FROM DUAL";
+
+                var param = new { COCODE = companyCode };
+
+                using var connection = _dapperContext.CreateConnection();
+
+                string? companyName = await connection.ExecuteScalarAsync<string>(sql, param);
+
+                return companyName!;
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<string>.Failure<string>(
+                    new Error("CompanyReadRepository.GetCompanyName", errMsg)
+                );
+            }
+        }
     }
 }

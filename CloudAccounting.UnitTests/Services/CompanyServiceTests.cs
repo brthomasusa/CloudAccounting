@@ -22,7 +22,8 @@ namespace CloudAccounting.UnitTests.Services
                 false,
                 false,
                 DateTime.MaxValue,
-                []
+                [],
+                "Computer Depot"
             );
 
             // Act
@@ -55,7 +56,8 @@ namespace CloudAccounting.UnitTests.Services
                 false,
                 false,
                 DateTime.MaxValue,
-                []
+                [],
+                "Computer Depot"
             );
 
             // Act
@@ -88,7 +90,8 @@ namespace CloudAccounting.UnitTests.Services
                 false,
                 false,
                 DateTime.MaxValue,
-                []
+                [],
+                "Computer Depot"
             );
 
             // Act
@@ -121,7 +124,8 @@ namespace CloudAccounting.UnitTests.Services
                 false,
                 false,
                 DateTime.MaxValue,
-                []
+                [],
+                "Computer Depot"
             );
 
             // Act

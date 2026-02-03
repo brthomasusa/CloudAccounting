@@ -1,6 +1,7 @@
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Core.Models;
+using CloudAccounting.Shared.Company;
 
 namespace CloudAccounting.Application.Mappings;
 
@@ -40,6 +41,14 @@ public class CompanyMappingConfig : IRegister
             .Map(dest => dest.Phone, src => src.Phone)
             .Map(dest => dest.Fax, src => src.Fax)
             .Map(dest => dest.Currency, src => src.Currency);
+
+        // Map FiscalYear domain obj to CompanyWithFiscalPeriodsDto
+        config.NewConfig<FiscalYear, CompanyWithFiscalPeriodsDto>()
+            .Map(dest => dest.CompanyCode, src => src.CompanyCode)
+            .Map(dest => dest.CompanyName, src => src.CompanyName)
+            .Map(dest => dest.FiscalYear, src => src.Year)
+            .Map(dest => dest.IsInitialYear, src => src.IsInitialFiscalYear)
+            .Map(dest => dest.FiscalPeriods, src => src.FiscalPeriods);
 
     }
 }

@@ -1,5 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
-using CloudAccounting.Core.Models;
+using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 
 namespace CloudAccounting.Application.UseCases.GetCompanyById;
 
@@ -22,7 +22,7 @@ public class GetCompanyByIdQueryHandler
     {
         try
         {
-            Result<Company> result = await _repository.RetrieveAsync(query.CompanyCode, new CancellationToken());
+            Result<CompanyDomainModel> result = await _repository.RetrieveAsync(query.CompanyCode, new CancellationToken());
 
             if (result.IsFailure)
             {

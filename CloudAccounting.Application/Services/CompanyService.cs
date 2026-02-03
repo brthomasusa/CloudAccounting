@@ -1,8 +1,11 @@
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+
 namespace CloudAccounting.Application.Services
 {
-    public class CompanyService(ICompanyRepository repository) : ICompanyService
+    public class CompanyService(ICompanyRepository repository, ICompanyReadRepository readRepository) : ICompanyService
     {
         private readonly ICompanyRepository _repository = repository;
+        private readonly ICompanyReadRepository _readRepository = readRepository;
 
         public async Task<Result<FiscalYear>> CreateFiscalYearWithPeriods(int companyCode, int fiscalYearNumber, int startMonthNumber)
         {
@@ -17,11 +20,12 @@ namespace CloudAccounting.Application.Services
                 fiscalYearNumber,
                 startDate,
                 lastDateInFiscalYear,
-                true,
+                await IsInitialFiscalYear(companyCode),
                 false,
                 false,
                 DateTime.MinValue,
-                []
+                [],
+                await GetCompanyName(companyCode)
             );
 
             CreateFiscalPeriods(fiscalYear);
@@ -87,5 +91,23 @@ namespace CloudAccounting.Application.Services
                 12 => 2,
                 _ => -1
             };
+
+        private async Task<string> GetCompanyName(int companyCode)
+        {
+            Result<string> result = await _readRepository.GetCompanyName(companyCode);
+
+            if (result.IsSuccess)
+            {
+                return result.Value!;
+            }
+            return string.Empty;
+        }
+
+        private async Task<bool> IsInitialFiscalYear(int companyCode)
+        {
+            Result<bool> result = await _readRepository.InitialFiscalYearExist(companyCode);
+
+            return !result.Value!;
+        }
     }
 }

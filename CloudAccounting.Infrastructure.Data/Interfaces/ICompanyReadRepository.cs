@@ -15,5 +15,9 @@ namespace CloudAccounting.Infrastructure.Data.Interfaces
         Task<Result<bool>> CanCompanyBeDeleted(int companyCode);
 
         Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber);
+
+        Task<Result<bool>> InitialFiscalYearExist(int companyCode);
+
+        Task<Result<string>> GetCompanyName(int companyCode);
     }
 }

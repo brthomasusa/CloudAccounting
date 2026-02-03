@@ -1,25 +1,34 @@
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
+using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Application.Services;
 using CloudAccounting.Application.ViewModels.Company;
+using CloudAccounting.Shared.Company;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
 
 public class CompanyCommandHandlerTests : TestBase
 {
-    private readonly CompanyRepository _repository;
+    private readonly CompanyRepository _companyRepo;
+    private readonly FiscalYearRepository _fiscalYearRepo;
+    private readonly CompanyReadRepository _readRepository;
+    private readonly CompanyService _companyService;
     private readonly IMapper _mapper = AddMapsterForTests.GetMapper();
 
     public CompanyCommandHandlerTests()
     {
-        _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
+        _readRepository = new(_dapperContext!, new NullLogger<CompanyReadRepository>());
+        _companyRepo = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
+        _fiscalYearRepo = new(_efCoreContext!, _memoryCache!, new NullLogger<FiscalYearRepository>(), _dapperContext!, _mapper);
+        _companyService = new(_companyRepo, _readRepository);
     }
 
     [Fact]
     public async Task Handle_CreateCompanyCommandHandler_GivenValidCmd_ShouldSucceed()
     {
         // Arrange
-        CreateCompanyCommandHandler handler = new(_repository, new NullLogger<CreateCompanyCommandHandler>(), _mapper);
+        CreateCompanyCommandHandler handler = new(_companyRepo, new NullLogger<CreateCompanyCommandHandler>(), _mapper);
         CreateCompanyCommand command = TestData.CompanyTestData.GetCreateCompanyCommand();
 
         // Act
@@ -35,7 +44,7 @@ public class CompanyCommandHandlerTests : TestBase
     public async Task Handle_UpdateCompanyCommandHandler_GivenValidCmd_ShouldSucceed()
     {
         // Arrange
-        UpdateCompanyCommandHandler handler = new(_repository, new NullLogger<UpdateCompanyCommandHandler>(), _mapper);
+        UpdateCompanyCommandHandler handler = new(_companyRepo, new NullLogger<UpdateCompanyCommandHandler>(), _mapper);
         UpdateCompanyCommand command = TestData.CompanyTestData.GetUpdateCompanyCommand();
 
         // Act
@@ -50,7 +59,7 @@ public class CompanyCommandHandlerTests : TestBase
     public async Task Handle_DeleteCompanyCommandHandler_GivenValidCmd_ShouldSucceed()
     {
         // Arrange
-        DeleteCompanyCommandHandler handler = new(_repository, new NullLogger<DeleteCompanyCommandHandler>());
+        DeleteCompanyCommandHandler handler = new(_companyRepo, new NullLogger<DeleteCompanyCommandHandler>());
         DeleteCompanyCommand command = new() { CompanyCode = 2 };
 
         // Act
@@ -58,6 +67,21 @@ public class CompanyCommandHandlerTests : TestBase
 
         // Assert
         Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public async Task Handle_CreateFiscalYearCommandHandler_GivenValidCmd_ShouldSucceed()
+    {
+        // Arrange
+        CreateFiscalYearCommandHandler handler = new(_fiscalYearRepo, _companyService, new NullLogger<CreateFiscalYearCommandHandler>(), _mapper);
+        CreateFiscalYearCommand command = new(2, 2025, 3);
+
+        // Act
+        Result<CompanyWithFiscalPeriodsDto> result = await handler.Handle(command, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+
     }
 
 }

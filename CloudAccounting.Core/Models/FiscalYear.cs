@@ -10,5 +10,6 @@ public record FiscalYear
     bool IsFiscalYearClosed,
     bool HasTransactions,
     DateTime? TemporaryYearEndProcessLastExecuted,
-    List<FiscalPeriod> FiscalPeriods
+    List<FiscalPeriod> FiscalPeriods,
+    string? CompanyName
 );

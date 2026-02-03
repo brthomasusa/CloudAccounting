@@ -77,10 +77,13 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        private static FiscalYearDomainModel MapFiscalYearDataModelListToFiscalYearDomainModel(List<FiscalYearDataModel> fiscalYears)
+        private FiscalYearDomainModel MapFiscalYearDataModelListToFiscalYearDomainModel(List<FiscalYearDataModel> fiscalYears)
         {
             var firstRow = fiscalYears.FirstOrDefault(fy => fy.CompanyMonthId == 1);
             var lastRow = fiscalYears.FirstOrDefault(fy => fy.CompanyMonthId == 12);
+
+            //TODO This is a hack, fix it.
+            var company = _db.Companies.Find(firstRow!.CompanyCode);
 
             FiscalYearDomainModel domainModel =
                 new(
@@ -92,7 +95,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     firstRow!.YearClosed!.Value,
                     false,
                     firstRow!.TyeExecuted!.HasValue ? firstRow!.TyeExecuted!.Value : null,
-                    []
+                    [],
+                    company!.CompanyName
                 );
 
             fiscalYears.ForEach(fy =>

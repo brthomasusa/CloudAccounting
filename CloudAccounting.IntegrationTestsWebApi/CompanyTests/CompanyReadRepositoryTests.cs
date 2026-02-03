@@ -21,7 +21,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyNameForCreate_CompanyRepository_ShouldReturnsTrue()
+        public async Task IsUniqueCompanyNameForCreate_CompanyReadRepository_ShouldReturnsTrue()
         {
             // Arrange
             string companyName = "Hello World";
@@ -35,7 +35,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyNameForCreate_CompanyRepository_ShouldReturnsFalse()
+        public async Task IsUniqueCompanyNameForCreate_CompanyReadRepository_ShouldReturnsFalse()
         {
             // Arrange
             string companyName = "BTechnical Consulting";
@@ -49,7 +49,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsTrue_NameChange()
+        public async Task IsUniqueCompanyNameForUpdate_CompanyReadRepository_ShouldReturnsTrue_NameChange()
         {
             // Arrange
             int companyCode = 1;
@@ -64,7 +64,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsTrue_NoNameChange()
+        public async Task IsUniqueCompanyNameForUpdate_CompanyReadRepository_ShouldReturnsTrue_NoNameChange()
         {
             // Arrange
             int companyCode = 1;
@@ -79,7 +79,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsUniqueCompanyNameForUpdate_CompanyRepository_ShouldReturnsFalse_DupeName()
+        public async Task IsUniqueCompanyNameForUpdate_CompanyReadRepository_ShouldReturnsFalse_DupeName()
         {
             // Arrange
             int companyCode = 1;
@@ -94,7 +94,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsExistingCompany_CompanyRepository_ShouldReturnsTrue()
+        public async Task IsExistingCompany_CompanyReadRepository_ShouldReturnsTrue()
         {
             // Arrange
             int companyCode = 1;
@@ -108,7 +108,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
-        public async Task IsExistingCompany_CompanyRepository_ShouldReturnsFalse()
+        public async Task IsExistingCompany_CompanyReadRepository_ShouldReturnsFalse()
         {
             // Arrange
             int companyCode = 13;
@@ -119,6 +119,48 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             // Assert
             Assert.True(result.IsSuccess);
             Assert.False(result.Value);
+        }
+
+        [Fact]
+        public async Task InitialFiscalYearExist_CompanyReadRepository_ShouldReturnsFalse()
+        {
+            // Arrange
+            int companyCode = 2;
+
+            // Act
+            Result<bool> result = await _repository.InitialFiscalYearExist(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.False(result.Value);
+        }
+
+        [Fact]
+        public async Task InitialFiscalYearExist_CompanyReadRepository_ShouldReturnsTrue()
+        {
+            // Arrange
+            int companyCode = 4;
+
+            // Act
+            Result<bool> result = await _repository.InitialFiscalYearExist(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task GetCompanyName_CompanyReadRepository()
+        {
+            // Arrange
+            int companyCode = 4;
+
+            // Act
+            Result<string> result = await _repository.GetCompanyName(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Maulibu Bar & Grill", result.Value);
         }
     }
 }
