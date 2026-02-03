@@ -1,17 +1,21 @@
 using CloudAccounting.Application.UseCases.GetCompanyById;
 using CloudAccounting.Application.UseCases.GetAllCompanies;
+using CloudAccounting.Application.UseCases.Company.GetFiscalYearByCompanyAndYear;
 using CloudAccounting.Application.ViewModels.Company;
+using CloudAccounting.Shared.Company;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
 
 public class CompanyQueryHandlerTests : TestBase
 {
     private readonly CompanyRepository _repository;
+    private readonly CompanyReadRepository _readRepository;
     private readonly IMapper _mapper = AddMapsterForTests.GetMapper();
 
     public CompanyQueryHandlerTests()
     {
         _repository = new(_efCoreContext!, _memoryCache!, new NullLogger<CompanyRepository>(), _dapperContext!, _mapper);
+        _readRepository = new(_dapperContext!, new NullLogger<CompanyReadRepository>());
     }
 
     [Fact]
@@ -57,5 +61,22 @@ public class CompanyQueryHandlerTests : TestBase
         // Assert
         Assert.True(result.IsSuccess);
         Assert.True(result.Value.Count > 1);
+    }
+
+    [Fact]
+    public async Task Handle_GetFiscalYearByCompanyAndYearQueryHandler_ShouldReturn_1_CompanyWithFiscalPeriodsDto()
+    {
+        // Arrange
+        GetFiscalYearByCompanyAndYearQuery query = new(4, 2024);
+        GetFiscalYearByCompanyAndYearQueryHandler handler = new(_readRepository, new NullLogger<GetFiscalYearByCompanyAndYearQueryHandler>());
+
+        // Act
+        Result<CompanyWithFiscalPeriodsDto> result = await handler.Handle(query, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Maulibu Bar & Grill", result.Value.CompanyName);
+        Assert.True(result.Value.IsInitialYear);
+        Assert.Equal(12, result.Value.FiscalPeriods.Count);
     }
 }

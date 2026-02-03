@@ -1,4 +1,5 @@
 using CloudAccounting.Application.Services;
+using CloudAccounting.Infrastructure.Data.Interfaces;
 using CloudAccounting.UnitTests.TestData;
 
 namespace CloudAccounting.UnitTests.Services
@@ -6,7 +7,8 @@ namespace CloudAccounting.UnitTests.Services
     public class CompanyServiceTests
     {
         private readonly ICompanyRepository _repository = Substitute.For<ICompanyRepository>();
-        private CompanyService _companyService => new CompanyService(_repository);
+        private readonly ICompanyReadRepository _readRepository = Substitute.For<ICompanyReadRepository>();
+        private CompanyService _companyService => new(_repository, _readRepository);
 
         [Fact]
         public void Create_FiscalYear_Start_Jan()
@@ -148,7 +150,7 @@ namespace CloudAccounting.UnitTests.Services
             // Arrange
             Company company = CompanyTestData.GetCompanyForCreate();
             company.CompanyCode = 100;
-            CompanyService companyService = new(_repository);
+            CompanyService companyService = new(_repository, _readRepository);
 
             int companyCode = 2;
             int fiscalYearNumber = 2025;

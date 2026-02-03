@@ -146,4 +146,75 @@ public class CompanyValidatorTests : TestBase
         result.ShouldNotHaveAnyValidationErrors();
     }
 
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveValidationErrors_ZeroCompanyCode()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(0, 2025, 1);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.CompanyCode);
+    }
+
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveValidationErrors_InvalidCompanyCode()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(200, 2025, 1);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.CompanyCode);
+    }
+
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveValidationErrors_FiscalYearBefore2000()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(2, 1999, 1);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.FiscalYear);
+    }
+
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveValidationErrors_FiscalYear2028()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(2, 2028, 1);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.FiscalYear);
+    }
+
+    [Fact]
+    public async Task CreateFiscalYearCommandValidator_ShouldHaveValidationErrors_InvalidStartMonthNumber()
+    {
+        // Arrange
+        CreateFiscalYearCommandValidator validator = new(_repository);
+        CreateFiscalYearCommand command = new(2, 2025, 13);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.StartMonthNumber);
+    }
+
+
 }
