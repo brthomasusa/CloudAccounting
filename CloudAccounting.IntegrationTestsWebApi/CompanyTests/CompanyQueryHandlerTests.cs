@@ -1,6 +1,7 @@
 using CloudAccounting.Application.UseCases.GetCompanyById;
 using CloudAccounting.Application.UseCases.GetAllCompanies;
 using CloudAccounting.Application.UseCases.Company.GetFiscalYearByCompanyAndYear;
+using CloudAccounting.Application.UseCases.Company.GetCompanyWithNoFiscalYearData;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Shared.Company;
 
@@ -78,5 +79,21 @@ public class CompanyQueryHandlerTests : TestBase
         Assert.Equal("Maulibu Bar & Grill", result.Value.CompanyName);
         Assert.True(result.Value.IsInitialYear);
         Assert.Equal(12, result.Value.FiscalPeriods.Count);
+    }
+
+    [Fact]
+    public async Task Handle_GetCompanyWithNoFiscalYearDataQueryHandler_ShouldReturn_1_CompanyWithoutFiscalPeriodsDto()
+    {
+        // Arrange
+        GetCompanyWithNoFiscalYearDataQuery query = new(3);
+        GetCompanyWithNoFiscalYearDataQueryHandler handler = new(_readRepository, new NullLogger<GetCompanyWithNoFiscalYearDataQueryHandler>());
+
+        // Act
+        Result<CompanyWithFiscalPeriodsDto> result = await handler.Handle(query, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Rooms-2-Go", result.Value.CompanyName);
+        ; Assert.Empty(result.Value.FiscalPeriods);
     }
 }

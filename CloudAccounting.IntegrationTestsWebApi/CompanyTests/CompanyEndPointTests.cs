@@ -152,6 +152,23 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             }
 
             [Fact]
+            public async Task Get_GetCompanyWithoutFiscalYear_ReturnsOneCompanyDtoWithoutFiscalPeriods()
+            {
+                // Arrange
+                const int companyCode = 3;
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/fiscalyear/{companyCode}");
+                response.EnsureSuccessStatusCode();
+                CompanyWithFiscalPeriodsDto? dto = await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+
+                // Assert
+                Assert.NotNull(dto);
+                Assert.Equal("Rooms-2-Go", dto.CompanyName);
+                Assert.Empty(dto.FiscalPeriods);
+            }
+
+            [Fact]
             public async Task Create_CompanyWithFiscalPeriodsDto_ReturnsOneFiscalYearDtoWith12FiscalPeriods()
             {
                 // Arrange
