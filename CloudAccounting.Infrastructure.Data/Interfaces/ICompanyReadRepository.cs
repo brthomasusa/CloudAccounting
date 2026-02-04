@@ -22,5 +22,7 @@ namespace CloudAccounting.Infrastructure.Data.Interfaces
         Task<Result<bool>> InitialFiscalYearExist(int companyCode);
 
         Task<Result<string>> GetCompanyName(int companyCode);
+
+        Task<Result<List<CompanyLookup>>> GetCompanyLookups();
     }
 }

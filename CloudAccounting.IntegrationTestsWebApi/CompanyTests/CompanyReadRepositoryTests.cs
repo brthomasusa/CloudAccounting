@@ -190,5 +190,18 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             Assert.True(result.IsSuccess);
             Assert.Equal("Maulibu Bar & Grill", result.Value);
         }
+
+        [Fact]
+        public async Task GetCompanyLookups_CompanyReadRepository()
+        {
+            // Arrange
+
+            // Act
+            Result<List<CompanyLookup>> result = await _repository.GetCompanyLookups();
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.NotEmpty(result.Value);
+        }
     }
 }

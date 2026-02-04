@@ -17,6 +17,7 @@ global using CloudAccounting.Core.Services;
 global using CloudAccounting.Infrastructure.Data;
 global using CloudAccounting.Infrastructure.Data.Interfaces;
 global using CloudAccounting.Infrastructure.Data.Repositories;
+global using CloudAccounting.Shared.Lookups;
 global using CloudAccounting.Web.Endpoints;
 global using CloudAccounting.Web.Extentions;
 global using CloudAccounting.SharedKernel.Utilities;

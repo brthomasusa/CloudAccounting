@@ -188,6 +188,22 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 Assert.Equal("Computer Depot", dto!.CompanyName);
                 Assert.Equal(12, dto.FiscalPeriods.Count);
             }
+
+
+            [Fact]
+            public async Task Get_GetCompanyLookus()
+            {
+                // Arrange
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/lookups");
+                response.EnsureSuccessStatusCode();
+                List<CompanyLookup>? lookups = await response.Content.ReadFromJsonAsync<List<CompanyLookup>>();
+
+                // Assert
+                Assert.NotNull(lookups);
+                Assert.NotEmpty(lookups);
+            }
         }
     }
 }

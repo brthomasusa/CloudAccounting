@@ -1,9 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.GetCompanyById;
-using CloudAccounting.SharedKernel.Utilities;
-using CloudAccounting.Web.Endpoints;
-using CloudAccounting.Web.Extentions;
-using MediatR;
 
 namespace CloudAccounting.Web.EndPoints.Company;
 

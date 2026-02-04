@@ -312,5 +312,33 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 );
             }
         }
+
+        public async Task<Result<List<CompanyLookup>>> GetCompanyLookups()
+        {
+            try
+            {
+                string sql =
+                @"SELECT 
+                    COCODE AS CompanyCode, 
+                    CONAME AS CompanyName 
+                FROM gl_company 
+                ORDER BY CONAME";
+
+                using var connection = _dapperContext.CreateConnection();
+
+                var lookups = await connection.QueryAsync<CompanyLookup>(sql);
+
+                return lookups.ToList();
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<List<CompanyLookup>>.Failure<List<CompanyLookup>>(
+                    new Error("CompanyReadRepository.GetCompanyLookups(", errMsg)
+                );
+            }
+        }
     }
 }

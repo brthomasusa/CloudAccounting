@@ -6,6 +6,7 @@ global using CloudAccounting.Infrastructure.Data;
 global using CloudAccounting.Infrastructure.Data.Interfaces;
 global using CloudAccounting.Infrastructure.Data.Repositories;
 global using CloudAccounting.IntegrationTestsWebApi.TestData;
+global using CloudAccounting.Shared.Lookups;
 global using CloudAccounting.SharedKernel.Utilities;
 global using Mapster;
 global using MapsterMapper;

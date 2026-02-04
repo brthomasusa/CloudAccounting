@@ -2,8 +2,10 @@ using CloudAccounting.Application.UseCases.GetCompanyById;
 using CloudAccounting.Application.UseCases.GetAllCompanies;
 using CloudAccounting.Application.UseCases.Company.GetFiscalYearByCompanyAndYear;
 using CloudAccounting.Application.UseCases.Company.GetCompanyWithNoFiscalYearData;
+using CloudAccounting.Application.UseCases.Lookups.CompanyCodeLookup;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Shared.Company;
+using CloudAccounting.Shared.Lookups;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
 
@@ -95,5 +97,20 @@ public class CompanyQueryHandlerTests : TestBase
         Assert.True(result.IsSuccess);
         Assert.Equal("Rooms-2-Go", result.Value.CompanyName);
         ; Assert.Empty(result.Value.FiscalPeriods);
+    }
+
+    [Fact]
+    public async Task Handle_CompanyCodeLookupQueryHandler_ShouldReturn_List_CompanyLookups()
+    {
+        // Arrange
+        CompanyCodeLookupQuery query = new();
+        CompanyCodeLookupQueryHandler handler = new(_readRepository, new NullLogger<CompanyCodeLookupQueryHandler>());
+
+        // Act
+        Result<List<CompanyLookup>> result = await handler.Handle(query, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotEmpty(result.Value);
     }
 }
