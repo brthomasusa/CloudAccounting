@@ -6,6 +6,9 @@ namespace CloudAccounting.Infrastructure.Data.Interfaces
     {
         Task<Result<CompanyDto>> GetCompanyDtoByIdAsync(int companyCode);
         Task<Result<CompanyWithFiscalPeriodsDto>> GetFiscalYearDtoByIdAndYearAsync(int companyCode, int fiscalYearNumber);
+
+        Task<Result<CompanyWithFiscalPeriodsDto>> GetLatestFiscalYearForCompanyAsync(int companyCode);
+
         Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName);
 
         Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName);

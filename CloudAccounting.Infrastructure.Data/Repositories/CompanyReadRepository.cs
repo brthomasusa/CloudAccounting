@@ -91,6 +91,92 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
+        public async Task<Result<CompanyWithFiscalPeriodsDto>> GetLatestFiscalYearForCompanyAsync(int companyCode)
+        {
+            try
+            {
+                string sql =
+                @"SELECT
+                    c.cocode as CompanyCode, 
+                    c.coname as CompanyName,
+                    fy.coyear as FiscalYear,
+                    fy.initial_year as IsInitialYear,
+                    fy.comonthid as MonthNumber,
+                    fy.comonthname as MonthName,
+                    fy.pfrom as PeriodStart,
+                    fy.pto as PeriodEnd,                    
+                    fy.year_closed as IsYearClosed,
+                    fy.month_closed as IsPeriodClose,
+                    fy.tye_executed as TempYrEndExecuted
+                FROM
+                    gl_company c JOIN gl_fiscal_year fy on c.cocode = fy.cocode 
+                WHERE
+                    fy.coyear IN (SELECT DISTINCT COYEAR FROM gl_fiscal_year WHERE COCODE = :COCODE ORDER BY coyear desc FETCH FIRST 1 ROWS ONLY)
+                    AND c.cocode = :COCODE
+                ORDER BY fy.comonthid";
+
+                using var connection = _dapperContext.CreateConnection();
+                {
+                    var companyDictionary = new Dictionary<int, CompanyWithFiscalPeriodsDto>();
+
+                    var list = connection.Query<CompanyWithFiscalPeriodsDto, FiscalPeriodDto, CompanyWithFiscalPeriodsDto>(
+                        sql,
+                        (company, fiscalPeriods) =>
+                        {
+                            CompanyWithFiscalPeriodsDto companyDto;
+
+                            if (!companyDictionary.TryGetValue(company.CompanyCode, out companyDto!))
+                            {
+                                companyDto = company;
+                                companyDto.FiscalPeriods = [];
+                                companyDictionary.Add(companyDto.CompanyCode, companyDto);
+                            }
+
+                            companyDto.FiscalPeriods.Add(fiscalPeriods);
+                            return companyDto;
+                        },
+                        param: new { COCODE = companyCode },
+                        splitOn: "MonthNumber")
+                    .Distinct()
+                    .ToList();
+
+                    CompanyWithFiscalPeriodsDto? companyDto = list.FirstOrDefault();
+
+                    if (companyDto is null)
+                    {
+                        string companyName = string.Empty;
+
+                        Result<string> result = await GetCompanyName(companyCode);
+                        if (result.IsSuccess)
+                        {
+                            companyName = result.Value;
+                        }
+
+                        companyDto = new()
+                        {
+                            CompanyCode = companyCode,
+                            CompanyName = companyName,
+                            FiscalYear = 0,
+                            IsInitialYear = false
+                        };
+
+                        return companyDto;
+                    }
+
+                    return companyDto;
+                }
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CompanyReadRepository.GetLatestFiscalYearForCompanyAsync", errMsg)
+                );
+            }
+        }
+
         public async Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName)
         {
             try

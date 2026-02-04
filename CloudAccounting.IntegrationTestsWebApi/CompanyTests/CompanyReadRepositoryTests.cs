@@ -21,6 +21,34 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
         }
 
         [Fact]
+        public async Task GetLatestFiscalYearForCompanyAsync_CompanyReadRepository()
+        {
+            // Arrange
+            int companyCode = 4;
+
+            // Act
+            Result<CompanyWithFiscalPeriodsDto> result = await _repository.GetLatestFiscalYearForCompanyAsync(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+        }
+
+        [Fact]
+        public async Task GetLatestFiscalYearForCompanyAsync_CompanyReadRepository_Company_HasNoFiscalYearInfo()
+        {
+            // Arrange
+            int companyCode = 2;
+
+            // Act
+            Result<CompanyWithFiscalPeriodsDto> result = await _repository.GetLatestFiscalYearForCompanyAsync(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Empty(result.Value.FiscalPeriods);
+        }
+
+        [Fact]
         public async Task IsUniqueCompanyNameForCreate_CompanyReadRepository_ShouldReturnsTrue()
         {
             // Arrange
