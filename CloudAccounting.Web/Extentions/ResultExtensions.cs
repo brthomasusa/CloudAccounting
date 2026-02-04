@@ -8,7 +8,7 @@ namespace CloudAccounting.Web.Extentions
         {
             return result.IsSuccess
                 ? throw new InvalidOperationException()
-                : Results.Problem(
+                : TypedResults.Problem(
                 detail: result.Error.Message,
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Bad Request",
@@ -23,7 +23,7 @@ namespace CloudAccounting.Web.Extentions
         {
             return result.IsSuccess
                 ? throw new InvalidOperationException()
-                : Results.Problem(
+                : TypedResults.Problem(
                 detail: result.Error.Message,
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Not Found",
@@ -38,14 +38,14 @@ namespace CloudAccounting.Web.Extentions
         {
             return result.IsSuccess
                 ? throw new InvalidOperationException()
-                : Results.Problem(
+                : TypedResults.Problem(
                 detail: errorMessage,
                 statusCode: StatusCodes.Status500InternalServerError,
                 title: "Internal Server Error",
                 type: "https://tools.ietf.org/html/rfc7231#section-6.5.4",
                 extensions: new Dictionary<string, object?>
                 {
-                { "errors", new[] { result.Error } }
+                { "errors", new[] { errorMessage } }
                 });
         }
     }

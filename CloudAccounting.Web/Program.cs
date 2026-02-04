@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.HttpLogging;
 using CloudAccounting.Web.Extentions;
 using CloudAccounting.Web.Middleware;
 using Asp.Versioning;
@@ -36,6 +35,7 @@ try
     builder.Services.AddResponseCaching();
     builder.Services.AddCustomSwagger();
     builder.AddInfrastructureDataLayer();
+    builder.AddRepositoriesAndDomainServices();
     builder.Services.AddEndpoints(typeof(Program).Assembly);
     builder.Services.AddMappings();
     builder.Services.AddMediatr();

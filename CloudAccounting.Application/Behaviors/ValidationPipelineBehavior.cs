@@ -1,7 +1,6 @@
 #pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
 
 using MediatR;
-using CloudAccounting.SharedKernel.Utilities;
 using FluentValidation;
 
 namespace CloudAccounting.Application.Behaviors

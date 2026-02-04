@@ -6,6 +6,8 @@ using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
+using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Shared.Company;
 using System.Net.Http.Headers;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
@@ -129,6 +131,45 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 
                 // Assert
                 Assert.True(response.IsSuccessStatusCode);
+            }
+
+            [Fact]
+            public async Task Get_GetFiscalYearForCompanyAndYear_ReturnsOneFiscalYearDtoWith12FiscalPeriods()
+            {
+                // Arrange
+                const int companyCode = 4;
+                const int fiscalYear = 2024;
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/{companyCode}/{fiscalYear}");
+                response.EnsureSuccessStatusCode();
+                CompanyWithFiscalPeriodsDto? dto = await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+
+                // Assert
+                Assert.NotNull(dto);
+                Assert.Equal("Maulibu Bar & Grill", dto.CompanyName);
+                Assert.Equal(12, dto.FiscalPeriods.Count);
+            }
+
+            [Fact]
+            public async Task Create_CompanyWithFiscalPeriodsDto_ReturnsOneFiscalYearDtoWith12FiscalPeriods()
+            {
+                // Arrange
+                string uri = $"{relativePath}/fiscalyear";
+                CreateFiscalYearCommand command = new(2, 2025, 1);
+                var jsonCompany = JsonSerializer.Serialize(command);
+                var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.PostAsync(uri, requestContent);
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+                CompanyWithFiscalPeriodsDto? dto = await response.Content.ReadFromJsonAsync<CompanyWithFiscalPeriodsDto>();
+
+                // Assert
+                Assert.Equal("Computer Depot", dto!.CompanyName);
+                Assert.Equal(12, dto.FiscalPeriods.Count);
             }
         }
     }

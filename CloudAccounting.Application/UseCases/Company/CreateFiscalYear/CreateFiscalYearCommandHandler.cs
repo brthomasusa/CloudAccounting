@@ -27,6 +27,15 @@ namespace CloudAccounting.Application.UseCases.Company.CreateFiscalYear
                 );
             }
 
+            Result<FiscalYear> result = await _fiscalRepo.InsertFiscalYearAsync(fiscalYearResult.Value);
+
+            if (result.IsFailure)
+            {
+                return Result<CompanyWithFiscalPeriodsDto>.Failure<CompanyWithFiscalPeriodsDto>(
+                    new Error("CreateFiscalYearCommandHandler", result.Error.Message)
+                );
+            }
+
             CompanyWithFiscalPeriodsDto companyDto = _mapper.Map<CompanyWithFiscalPeriodsDto>(fiscalYearResult.Value);
 
             return companyDto;

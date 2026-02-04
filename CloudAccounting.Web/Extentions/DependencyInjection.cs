@@ -1,25 +1,8 @@
-using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.OpenApi;
-using CloudAccounting.Application;
-using CloudAccounting.Application.Behaviors;
-using CloudAccounting.Application.Services;
 using CloudAccounting.Application.Validators.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
-using CloudAccounting.Core.Repositories;
-using CloudAccounting.Core.Services;
-using CloudAccounting.Infrastructure.Data;
-using CloudAccounting.Infrastructure.Data.Interfaces;
-using CloudAccounting.Infrastructure.Data.Repositories;
-using CloudAccounting.Web.Endpoints;
-using Mapster;
-using MapsterMapper;
-using FluentValidation;
-
+using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
 
 namespace CloudAccounting.Web.Extentions;
 
@@ -99,19 +82,17 @@ public static class DependencyInjection
                 ?? throw new ArgumentNullException("Db connection string is null.");
 
         builder.Services
-            // Infrastructure.Data Layer            
             .AddDbContext<CloudAccountingContext>(options => options.UseOracle(connectionString))
-            .AddSingleton<DapperContext>(_ => new DapperContext(connectionString!))
-            .AddScoped<ICompanyRepository, CompanyRepository>();
+            .AddSingleton<DapperContext>(_ => new DapperContext(connectionString!));
     }
 
     public static void AddRepositoriesAndDomainServices(this WebApplicationBuilder builder)
     {
         builder.Services
             .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<ICompanyService, CompanyService>()
             .AddScoped<ICompanyReadRepository, CompanyReadRepository>()
-            .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
-            .AddScoped<ICompanyService, CompanyService>();
+            .AddScoped<IFiscalYearRepository, FiscalYearRepository>();
     }
 
     public static void AddMediatr(this IServiceCollection services)
@@ -139,5 +120,7 @@ public static class DependencyInjection
         services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyValidator>();
         services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyValidator>();
         services.AddScoped<IValidator<DeleteCompanyCommand>, DeleteCompanyValidator>();
+        services.AddScoped<IValidator<CreateFiscalYearCommand>, CreateFiscalYearCommandValidator>();
+
     }
 }

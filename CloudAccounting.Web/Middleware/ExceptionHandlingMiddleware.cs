@@ -1,5 +1,5 @@
-using CloudAccounting.SharedKernel.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using ValidationException = CloudAccounting.SharedKernel.Exceptions.ValidationException;
 
 namespace CloudAccounting.Web.Middleware;
 

@@ -1,7 +1,5 @@
 using MediatR;
-using Microsoft.Extensions.Logging;
 using Serilog.Context;
-using CloudAccounting.SharedKernel.Utilities;
 
 namespace CloudAccounting.Application.Behaviors
 {
