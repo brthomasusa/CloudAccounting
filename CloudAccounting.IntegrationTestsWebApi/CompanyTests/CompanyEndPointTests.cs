@@ -189,7 +189,6 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 Assert.Equal(12, dto.FiscalPeriods.Count);
             }
 
-
             [Fact]
             public async Task Get_GetCompanyLookus()
             {
@@ -203,6 +202,36 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 // Assert
                 Assert.NotNull(lookups);
                 Assert.NotEmpty(lookups);
+            }
+            // const int companyCode = 3;
+            [Fact]
+            public async Task Get_GetNextValidFiscalYearStartDate_July_1_2026()
+            {
+                // Arrange
+                const int companyCode = 4;
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/validstartdate/{companyCode}");
+                response.EnsureSuccessStatusCode();
+                DateTime startDate = await response.Content.ReadFromJsonAsync<DateTime>();
+
+                // Assert
+                Assert.Equal(new DateTime(2026, 7, 1), startDate);
+            }
+
+            [Fact]
+            public async Task Get_GetNextValidFiscalYearStartDate_ReturnsDateTime_MinValue()
+            {
+                // Arrange
+                const int companyCode = 2;
+
+                // Act
+                using HttpResponseMessage response = await _httpClient.GetAsync($"{relativePath}/validstartdate/{companyCode}");
+                response.EnsureSuccessStatusCode();
+                DateTime startDate = await response.Content.ReadFromJsonAsync<DateTime>();
+
+                // Assert
+                Assert.Equal(DateTime.MinValue, startDate);
             }
         }
     }
