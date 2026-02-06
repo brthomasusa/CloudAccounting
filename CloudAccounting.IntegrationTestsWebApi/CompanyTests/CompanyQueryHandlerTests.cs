@@ -2,6 +2,7 @@ using CloudAccounting.Application.UseCases.GetCompanyById;
 using CloudAccounting.Application.UseCases.GetAllCompanies;
 using CloudAccounting.Application.UseCases.Company.GetFiscalYearByCompanyAndYear;
 using CloudAccounting.Application.UseCases.Company.GetCompanyWithNoFiscalYearData;
+using CloudAccounting.Application.UseCases.Company.GetNextValidFiscalYearStart;
 using CloudAccounting.Application.UseCases.Lookups.CompanyCodeLookup;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Shared.Company;
@@ -112,5 +113,37 @@ public class CompanyQueryHandlerTests : TestBase
         // Assert
         Assert.True(result.IsSuccess);
         Assert.NotEmpty(result.Value);
+    }
+
+    [Fact]
+    public async Task Handle_GetNextValidFiscalYearStartDateQueryHandler_ShouldReturn_NoneNullDateTime()
+    {
+        // Arrange
+        GetNextValidFiscalYearStartDateQuery query = new(4);
+        GetNextValidFiscalYearStartDateQueryHandler handler = new(_readRepository, new NullLogger<GetNextValidFiscalYearStartDateQueryHandler>());
+
+        // Act
+        Result<DateTime> result = await handler.Handle(query, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(new DateTime(2026, 7, 1), result.Value);
+    }
+
+    [Fact]
+    public async Task Handle_GetNextValidFiscalYearStartDateQueryHandler_ShouldReturn_NullDateTime()
+    {
+        // This test is for companies that have no fiscal year info.
+
+        // Arrange
+        GetNextValidFiscalYearStartDateQuery query = new(2);
+        GetNextValidFiscalYearStartDateQueryHandler handler = new(_readRepository, new NullLogger<GetNextValidFiscalYearStartDateQueryHandler>());
+
+        // Act
+        Result<DateTime> result = await handler.Handle(query, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(DateTime.MinValue, result.Value);
     }
 }

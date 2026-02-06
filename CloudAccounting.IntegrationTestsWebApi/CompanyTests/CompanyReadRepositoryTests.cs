@@ -203,5 +203,33 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             Assert.True(result.IsSuccess);
             Assert.NotEmpty(result.Value);
         }
+
+        [Fact]
+        public async Task GetNextValidFiscalYearStartDate_CompanyReadRepository_FiscalYearInfoAvailable()
+        {
+            // Arrange
+            int companyCode = 4;
+
+            // Act
+            Result<DateTime> result = await _repository.GetNextValidFiscalYearStartDate(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal(new DateTime(2026, 7, 1), result.Value);
+        }
+
+        [Fact]
+        public async Task GetNextValidFiscalYearStartDate_CompanyReadRepository_FiscalYearInfoNotAvailable()
+        {
+            // Arrange
+            int companyCode = 2;
+
+            // Act
+            Result<DateTime> result = await _repository.GetNextValidFiscalYearStartDate(companyCode);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal(DateTime.MinValue, result.Value);
+        }
     }
 }

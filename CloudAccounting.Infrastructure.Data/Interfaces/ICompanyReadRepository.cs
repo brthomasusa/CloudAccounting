@@ -24,5 +24,7 @@ namespace CloudAccounting.Infrastructure.Data.Interfaces
         Task<Result<string>> GetCompanyName(int companyCode);
 
         Task<Result<List<CompanyLookup>>> GetCompanyLookups();
+
+        Task<Result<DateTime>> GetNextValidFiscalYearStartDate(int companyCode);
     }
 }

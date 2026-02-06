@@ -27,10 +27,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     c.coname as CompanyName,
                     fy.coyear as FiscalYear,
                     fy.initial_year as IsInitialYear,
-                    fy.comonthid as MonthNumber,
+                    fy.comonthid as MonthId,
                     fy.comonthname as MonthName,
-                    fy.pfrom as PeriodStart,
-                    fy.pto as PeriodEnd,                    
+                    fy.pfrom as StartDate,
+                    fy.pto as EndDate,                    
                     fy.year_closed as IsYearClosed,
                     fy.month_closed as IsPeriodClose,
                     fy.tye_executed as TempYrEndExecuted
@@ -60,7 +60,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                             return companyDto;
                         },
                         param: new { COCODE = companyCode, COYEAR = fiscalYearNumber },
-                        splitOn: "MonthNumber")
+                        splitOn: "MonthId")
                     .Distinct()
                     .ToList();
 
@@ -101,10 +101,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     c.coname as CompanyName,
                     fy.coyear as FiscalYear,
                     fy.initial_year as IsInitialYear,
-                    fy.comonthid as MonthNumber,
+                    fy.comonthid as MonthId,
                     fy.comonthname as MonthName,
-                    fy.pfrom as PeriodStart,
-                    fy.pto as PeriodEnd,                    
+                    fy.pfrom as StartDate,
+                    fy.pto as EndDate,                    
                     fy.year_closed as IsYearClosed,
                     fy.month_closed as IsPeriodClose,
                     fy.tye_executed as TempYrEndExecuted
@@ -136,7 +136,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                             return companyDto;
                         },
                         param: new { COCODE = companyCode },
-                        splitOn: "MonthNumber")
+                        splitOn: "MonthId")
                     .Distinct()
                     .ToList();
 
@@ -337,6 +337,32 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 return Result<List<CompanyLookup>>.Failure<List<CompanyLookup>>(
                     new Error("CompanyReadRepository.GetCompanyLookups(", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<DateTime>> GetNextValidFiscalYearStartDate(int companyCode)
+        {
+            try
+            {
+                string sql = "SELECT get_next_valid_fiscalyear_startdate(:COCODE) FROM DUAL";
+
+                var param = new { COCODE = companyCode };
+
+                using var connection = _dapperContext.CreateConnection();
+
+                DateTime nextValidDate = await connection.ExecuteScalarAsync<DateTime>(sql, param);
+
+                // 0 means the name is not unique; 1 means it is unique
+                return nextValidDate;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<DateTime>.Failure<DateTime>(
+                    new Error("CompanyRepository.GetNextValidFiscalYearStartDate", errMsg)
                 );
             }
         }

@@ -2,7 +2,7 @@ using CloudAccounting.Shared.Company;
 
 namespace CloudAccounting.Application.UseCases.Company.GetCompanyWithNoFiscalYearData
 {
-    // This can handle return a company (like a new company) that has no fiscal year info
+    // This can return a company (like a new company) that has no fiscal year info
 
     public class GetCompanyWithNoFiscalYearDataQueryHandler
     (
