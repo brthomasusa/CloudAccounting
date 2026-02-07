@@ -76,6 +76,7 @@ public class CompanyCommandHandlerTests : TestBase
         CreateFiscalYearCommandHandler handler = new(_fiscalYearRepo, _companyService, new NullLogger<CreateFiscalYearCommandHandler>(), _mapper);
         CreateFiscalYearCommand command = new(2, 2025, 3);
 
+
         // Act
         Result<CompanyWithFiscalPeriodsDto> result = await handler.Handle(command, new CancellationToken());
 

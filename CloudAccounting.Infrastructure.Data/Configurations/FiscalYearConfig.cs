@@ -19,7 +19,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .HasPrecision(4)
                 .HasColumnName("COYEAR");
             entity.Property(e => e.CompanyMonthId)
-                .HasPrecision(2)
+                .HasColumnType("NUMBER")
                 .HasColumnName("COMONTHID");
             entity.Property(e => e.CompanyMonthName)
                 .HasMaxLength(9)

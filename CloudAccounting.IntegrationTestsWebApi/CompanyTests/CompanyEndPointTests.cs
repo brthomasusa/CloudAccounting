@@ -173,7 +173,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             {
                 // Arrange
                 string uri = $"{relativePath}/fiscalyear";
-                CreateFiscalYearCommand command = new(2, 2025, 1);
+                CreateFiscalYearCommand command = new(2, 2025, 11);
                 var jsonCompany = JsonSerializer.Serialize(command);
                 var requestContent = new StringContent(jsonCompany, Encoding.UTF8, "application/json");
 

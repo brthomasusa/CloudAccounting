@@ -7,6 +7,7 @@ namespace CloudAccounting.Application.Services
         private readonly ICompanyRepository _repository = repository;
         private readonly ICompanyReadRepository _readRepository = readRepository;
 
+
         public async Task<Result<FiscalYear>> CreateFiscalYearWithPeriods(int companyCode, int fiscalYearNumber, int startMonthNumber)
         {
             DateTime startDate = new(fiscalYearNumber, startMonthNumber, 1);
@@ -47,29 +48,29 @@ namespace CloudAccounting.Application.Services
                     monthNumber = 1;
                 }
 
-                fiscalYear.FiscalPeriods.Add(GetFiscalPeriod(yearNumber, monthNumber)!);
+                fiscalYear.FiscalPeriods.Add(GetFiscalPeriod(count, yearNumber, monthNumber)!);
                 monthNumber++;
             }
         }
 
-        private static FiscalPeriod? GetFiscalPeriod(int year, int monthNumber)
+        private static FiscalPeriod? GetFiscalPeriod(int monthId, int year, int monthNumber)
         {
             int lastDayOfFebruary = DateTime.IsLeapYear(year) ? 29 : 28;
 
             return monthNumber switch
             {
-                1 => new FiscalPeriod(monthNumber, "January", new DateTime(year, 1, 1), new DateTime(year, 1, 31), false),
-                2 => new FiscalPeriod(monthNumber, "February", new DateTime(year, 2, 1), new DateTime(year, 2, lastDayOfFebruary), false),
-                3 => new FiscalPeriod(monthNumber, "March", new DateTime(year, 3, 1), new DateTime(year, 3, 31), false),
-                4 => new FiscalPeriod(monthNumber, "April", new DateTime(year, 4, 1), new DateTime(year, 4, 30), false),
-                5 => new FiscalPeriod(monthNumber, "May", new DateTime(year, 5, 1), new DateTime(year, 5, 31), false),
-                6 => new FiscalPeriod(monthNumber, "June", new DateTime(year, 6, 1), new DateTime(year, 6, 30), false),
-                7 => new FiscalPeriod(monthNumber, "July", new DateTime(year, 7, 1), new DateTime(year, 7, 31), false),
-                8 => new FiscalPeriod(monthNumber, "August", new DateTime(year, 8, 1), new DateTime(year, 8, 31), false),
-                9 => new FiscalPeriod(monthNumber, "September", new DateTime(year, 9, 1), new DateTime(year, 9, 30), false),
-                10 => new FiscalPeriod(monthNumber, "October", new DateTime(year, 10, 1), new DateTime(year, 10, 31), false),
-                11 => new FiscalPeriod(monthNumber, "November", new DateTime(year, 11, 1), new DateTime(year, 11, 30), false),
-                12 => new FiscalPeriod(monthNumber, "December", new DateTime(year, 12, 1), new DateTime(year, 12, 31), false),
+                1 => new FiscalPeriod(monthId, "January", new DateTime(year, 1, 1), new DateTime(year, 1, 31), false),
+                2 => new FiscalPeriod(monthId, "February", new DateTime(year, 2, 1), new DateTime(year, 2, lastDayOfFebruary), false),
+                3 => new FiscalPeriod(monthId, "March", new DateTime(year, 3, 1), new DateTime(year, 3, 31), false),
+                4 => new FiscalPeriod(monthId, "April", new DateTime(year, 4, 1), new DateTime(year, 4, 30), false),
+                5 => new FiscalPeriod(monthId, "May", new DateTime(year, 5, 1), new DateTime(year, 5, 31), false),
+                6 => new FiscalPeriod(monthId, "June", new DateTime(year, 6, 1), new DateTime(year, 6, 30), false),
+                7 => new FiscalPeriod(monthId, "July", new DateTime(year, 7, 1), new DateTime(year, 7, 31), false),
+                8 => new FiscalPeriod(monthId, "August", new DateTime(year, 8, 1), new DateTime(year, 8, 31), false),
+                9 => new FiscalPeriod(monthId, "September", new DateTime(year, 9, 1), new DateTime(year, 9, 30), false),
+                10 => new FiscalPeriod(monthId, "October", new DateTime(year, 10, 1), new DateTime(year, 10, 31), false),
+                11 => new FiscalPeriod(monthId, "November", new DateTime(year, 11, 1), new DateTime(year, 11, 30), false),
+                12 => new FiscalPeriod(monthId, "December", new DateTime(year, 12, 1), new DateTime(year, 12, 31), false),
                 _ => null
             };
         }
