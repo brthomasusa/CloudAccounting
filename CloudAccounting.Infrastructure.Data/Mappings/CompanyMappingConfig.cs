@@ -2,7 +2,6 @@ using CloudAccounting.Core.Models;
 using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
 using CompanyDomainModel = CloudAccounting.Core.Models.Company;
 using FiscalYearDataModel = CloudAccounting.Infrastructure.Data.Models.FiscalYear;
-using FiscalYearDomainModel = CloudAccounting.Core.Models.FiscalYear;
 
 namespace CloudAccounting.Infrastructure.Data.Mappings;
 

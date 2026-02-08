@@ -1,11 +1,6 @@
-using Dapper;
-using Microsoft.EntityFrameworkCore;                    // To use ToArrayAsync.
-using Microsoft.Extensions.Caching.Memory;
 using CloudAccounting.Core.Models;
 using FiscalYearDataModel = CloudAccounting.Infrastructure.Data.Models.FiscalYear;
 using FiscalYearDomainModel = CloudAccounting.Core.Models.FiscalYear;
-using CloudAccounting.Shared.Company;
-
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {

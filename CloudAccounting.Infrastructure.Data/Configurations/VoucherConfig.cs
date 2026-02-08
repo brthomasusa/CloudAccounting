@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CloudAccounting.Infrastructure.Data.Models;
 
@@ -17,8 +16,9 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .HasColumnType("NUMBER")
                 .HasColumnName("VCHCODE");
             entity.Property(e => e.VoucherNature)
-                .HasColumnType("NUMBER(1)")
-                .HasColumnName("VCHNATURE");
+                .HasColumnType("NUMBER(1,0)")
+                .HasColumnName("VCHNATURE")
+                .HasConversion<int>();
             entity.Property(e => e.VoucherTitle)
                 .HasMaxLength(30)
                 .IsUnicode(false)

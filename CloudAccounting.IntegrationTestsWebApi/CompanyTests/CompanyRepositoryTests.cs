@@ -1,5 +1,3 @@
-using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
-
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {
     public class CompanyRepositoryTests : TestBase

@@ -5,6 +5,8 @@ global using CloudAccounting.Infrastructure.Data;
 // global using CloudAccounting.Infrastructure.Data.Models;
 global using CloudAccounting.Infrastructure.Data.Interfaces;
 global using CloudAccounting.Infrastructure.Data.Repositories;
+global using CloudAccounting.Infrastructure.Data.Repositories.Read;
+global using CloudAccounting.Infrastructure.Data.Repositories.Write;
 global using CloudAccounting.IntegrationTestsWebApi.TestData;
 global using CloudAccounting.Shared.Lookups;
 global using CloudAccounting.SharedKernel.Utilities;

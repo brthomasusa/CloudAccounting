@@ -1,3 +1,6 @@
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.Logging;
 global using CloudAccounting.SharedKernel.Utilities;
 global using CloudAccounting.Core.Repositories;

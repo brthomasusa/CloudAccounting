@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore.ChangeTracking;     // To use EntityEntry<T>.
-using Microsoft.EntityFrameworkCore;                    // To use ToArrayAsync.
-using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using CloudAccounting.Core.Exceptions;
 using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
@@ -149,9 +146,9 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                                         .SetProperty(comp => comp.Fax, c.Fax)
                                         .SetProperty(comp => comp.Currency, c.Currency));
 
-                _memoryCache.Set($"company-{c.CompanyCode}", c, _cacheEntryOptions);
-
                 CompanyDataModel? dataModel = await _db.Companies.FindAsync(c.CompanyCode);
+
+                _memoryCache.Set($"company-{c.CompanyCode}", dataModel, _cacheEntryOptions);
 
                 return _mapper.Map<CompanyDomainModel>(dataModel!);
             }
