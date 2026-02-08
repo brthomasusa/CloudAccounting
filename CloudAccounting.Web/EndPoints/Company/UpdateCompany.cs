@@ -1,10 +1,5 @@
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.UpdateCompany;
-using CloudAccounting.SharedKernel.Utilities;
-using CloudAccounting.Web.Endpoints;
-using CloudAccounting.Web.Extentions;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CloudAccounting.Web.EndPoints.Company
 {

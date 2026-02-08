@@ -10,3 +10,4 @@ global using CloudAccounting.Infrastructure.Data.Repositories;
 global using CloudAccounting.Shared.Lookups;
 global using Mapster;
 global using MapsterMapper;
+global using FluentValidation;

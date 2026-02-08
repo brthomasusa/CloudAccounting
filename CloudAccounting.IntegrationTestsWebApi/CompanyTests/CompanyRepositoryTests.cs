@@ -115,5 +115,33 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             Assert.True(result.IsSuccess);
             Assert.True(deletedCompanyResult.IsFailure);
         }
+
+        [Fact]
+        public async Task DeleteFiscalYearAsync_CompanyRepository_ShouldDelete12Rows()
+        {
+            // Arrange
+            int companyCode = 4;
+            int fiscalYear = 2025;
+
+            // Act
+            Result result = await _companyRepo.DeleteFiscalYearAsync(companyCode, fiscalYear);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact]
+        public async Task DeleteFiscalYearAsync_CompanyRepository_ThisCompanyHasNoFiscalYears()
+        {
+            // Arrange
+            int companyCode = 2;
+            int fiscalYear = 2025;
+
+            // Act
+            Result result = await _companyRepo.DeleteFiscalYearAsync(companyCode, fiscalYear);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+        }
     }
 }

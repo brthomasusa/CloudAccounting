@@ -2,6 +2,7 @@ using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Application.UseCases.Company.DeleteFiscalYear;
 using CloudAccounting.Application.Services;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Shared.Company;
@@ -84,5 +85,21 @@ public class CompanyCommandHandlerTests : TestBase
         Assert.True(result.IsSuccess);
 
     }
+
+    [Fact]
+    public async Task Handle_DeleteFiscalYearCommandHandler_GivenValidCmd_ShouldSucceed()
+    {
+        // Arrange
+        DeleteFiscalYearCommandHandler handler = new(_companyRepo, new NullLogger<DeleteFiscalYearCommandHandler>());
+        DeleteFiscalYearCommand command = new(4, 2025);
+
+        // Act
+        Result<MediatR.Unit> result = await handler.Handle(command, new CancellationToken());
+
+        // Assert
+        Assert.True(result.IsSuccess);
+
+    }
+
 
 }

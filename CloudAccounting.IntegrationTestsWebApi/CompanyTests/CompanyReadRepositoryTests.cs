@@ -156,7 +156,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             int companyCode = 2;
 
             // Act
-            Result<bool> result = await _repository.InitialFiscalYearExist(companyCode);
+            Result<bool> result = await _repository.DoesInitialFiscalYearExist(companyCode);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -170,7 +170,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             int companyCode = 4;
 
             // Act
-            Result<bool> result = await _repository.InitialFiscalYearExist(companyCode);
+            Result<bool> result = await _repository.DoesInitialFiscalYearExist(companyCode);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -230,6 +230,36 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal(DateTime.MinValue, result.Value);
+        }
+
+        [Fact]
+        public async Task CanCompanyFiscalYearBeDeleted_CompanyReadRepository_FiscalYearInfoAvailable()
+        {
+            // Arrange
+            int companyCode = 4;
+            int fiscalYear = 2025;
+
+            // Act
+            Result<bool> result = await _repository.CanCompanyFiscalYearBeDeleted(companyCode, fiscalYear);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task CanCompanyFiscalYearBeDeleted_CompanyReadRepository_FiscalYearInfoNotAvailable()
+        {
+            // Arrange
+            int companyCode = 2;
+            int fiscalYear = 2025;
+
+            // Act
+            Result<bool> result = await _repository.CanCompanyFiscalYearBeDeleted(companyCode, fiscalYear);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
         }
     }
 }

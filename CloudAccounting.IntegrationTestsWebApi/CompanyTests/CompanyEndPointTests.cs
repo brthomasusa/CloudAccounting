@@ -7,6 +7,7 @@ using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Application.UseCases.Company.DeleteFiscalYear;
 using CloudAccounting.Shared.Company;
 using System.Net.Http.Headers;
 
@@ -233,6 +234,33 @@ namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
                 // Assert
                 Assert.Equal(DateTime.MinValue, startDate);
             }
+
+            [Fact]
+            public async Task DeleteFiscalYear_Company()
+            {
+                // Arrange  
+                DeleteFiscalYearCommand command = new(4, 2025);
+                string uri = $"{relativePath}/fiscalyear";
+
+                var memStream = new MemoryStream();
+                await JsonSerializer.SerializeAsync(memStream, command);
+                memStream.Seek(0, SeekOrigin.Begin);
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, uri);
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                using var requestContent = new StreamContent(memStream);
+                request.Content = requestContent;
+                requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                // Act
+                using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                // Assert
+                Assert.True(response.IsSuccessStatusCode);
+            }
+
+
         }
     }
 }

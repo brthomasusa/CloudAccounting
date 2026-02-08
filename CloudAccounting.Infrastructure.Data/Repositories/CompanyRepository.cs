@@ -185,5 +185,23 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 return Result.Failure(new Error("CompanyRepository.DeleteAsync", errMsg));
             }
         }
+
+        public async Task<Result> DeleteFiscalYearAsync(int companyCode, int fiscalYear)
+        {
+            try
+            {
+                await _db.FiscalYears.Where(c => c.CompanyCode == companyCode && c.CompanyYear == fiscalYear)
+                                     .ExecuteDeleteAsync();
+
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure(new Error("CompanyRepository.DeleteFiscalYearAsync", errMsg));
+            }
+        }
     }
 }

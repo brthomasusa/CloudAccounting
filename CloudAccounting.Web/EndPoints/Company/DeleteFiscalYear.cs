@@ -1,15 +1,15 @@
-using CloudAccounting.Application.UseCases.DeleteCompany;
+using CloudAccounting.Application.UseCases.Company.DeleteFiscalYear;
 
 namespace CloudAccounting.Web.EndPoints.Company
 {
-    public class DeleteCompany : IEndpoint
+    public class DeleteFiscalYear : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapDelete("companies/", DeleteCompanyFromCommand);
+            app.MapDelete("companies/fiscalyear", DeleteCompanyFiscalYear);
         }
 
-        public static async Task<IResult> DeleteCompanyFromCommand([FromBody] DeleteCompanyCommand command, ISender sender, ILogger<DeleteCompany> logger)
+        public static async Task<IResult> DeleteCompanyFiscalYear([FromBody] DeleteFiscalYearCommand command, ISender sender, ILogger<DeleteCompany> logger)
         {
             Result<MediatR.Unit>? result = null;
 
@@ -23,7 +23,7 @@ namespace CloudAccounting.Web.EndPoints.Company
                 }
 
                 string msg = result.Error.Message;
-                logger.LogWarning("There was a problem deleting the company '{COMPANYCODE}': {ERROR}", command.CompanyCode, result.Error.Message);
+                logger.LogWarning("There was a problem deleting fiscal year data for '{COMPANYCODE} (fiscal year: {FISCALYEAR})': {ERROR}", command.CompanyCode, command.FiscalYear, result.Error.Message);
                 return Results.NotFound(msg);
 
             }

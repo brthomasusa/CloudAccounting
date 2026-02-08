@@ -1,6 +1,3 @@
-using CloudAccounting.Core.Models;
-using CloudAccounting.SharedKernel.Utilities;
-
 namespace CloudAccounting.Core.Repositories;
 
 public interface ICompanyRepository
@@ -14,4 +11,6 @@ public interface ICompanyRepository
     Task<Result<Company>> UpdateAsync(Company c);
 
     Task<Result> DeleteAsync(int id);
+
+    Task<Result> DeleteFiscalYearAsync(int companyCode, int fiscalYear);
 }

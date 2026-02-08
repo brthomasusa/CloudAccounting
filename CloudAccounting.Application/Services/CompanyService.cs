@@ -106,7 +106,7 @@ namespace CloudAccounting.Application.Services
 
         private async Task<bool> IsInitialFiscalYear(int companyCode)
         {
-            Result<bool> result = await _readRepository.InitialFiscalYearExist(companyCode);
+            Result<bool> result = await _readRepository.DoesInitialFiscalYearExist(companyCode);
 
             return !result.Value!;
         }

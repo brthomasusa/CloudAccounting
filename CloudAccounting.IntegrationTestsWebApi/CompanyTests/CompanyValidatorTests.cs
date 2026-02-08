@@ -3,6 +3,7 @@ using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Application.UseCases.Company.DeleteFiscalYear;
 using FluentValidation.TestHelper;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
@@ -216,5 +217,48 @@ public class CompanyValidatorTests : TestBase
         result.ShouldHaveValidationErrorFor(x => x.StartMonthNumber);
     }
 
+    [Fact]
+    public async Task DeleteFiscalYearCommandValidator_ShouldHaveNoValidationErrors()
+    {
+        // Arrange
+        DeleteFiscalYearCommandValidator validator = new(_repository);
+        DeleteFiscalYearCommand command = new(4, 2025);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public async Task DeleteFiscalYearCommandValidator_ShouldHaveNoValidationErrors_CompanyWithoutFiscalYears()
+    {
+        // Arrange
+        DeleteFiscalYearCommandValidator validator = new(_repository);
+
+        
+        DeleteFiscalYearCommand command = new(2, 2025);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public async Task DeleteFiscalYearCommandValidator_ShouldHaveValidationErrors_InvalidFiscalYear()
+    {
+        // Arrange
+        DeleteFiscalYearCommandValidator validator = new(_repository);
+        DeleteFiscalYearCommand command = new(4, 0);
+
+        // Act
+        var result = await validator.TestValidateAsync(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.FiscalYear);
+    }
 
 }

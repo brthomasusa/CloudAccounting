@@ -33,7 +33,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     fy.pto as EndDate,                    
                     fy.year_closed as IsYearClosed,
                     fy.month_closed as IsPeriodClose,
-                    fy.tye_executed as TempYrEndExecuted
+                    fy.tye_executed as TempYrEndExecuted,
+                    get_transactions_company_fiscalyear(c.cocode,fy.coyear) as Transactions
                 FROM gl_company c JOIN gl_fiscal_year fy on c.cocode = fy.cocode
                 WHERE c.cocode = :COCODE and fy.coyear = :COYEAR                  
                 ORDER BY fy.comonthid";
@@ -107,7 +108,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     fy.pto as EndDate,                    
                     fy.year_closed as IsYearClosed,
                     fy.month_closed as IsPeriodClose,
-                    fy.tye_executed as TempYrEndExecuted
+                    fy.tye_executed as TempYrEndExecuted,
+                    get_transactions_company_fiscalyear(c.cocode,fy.coyear) as Transactions
                 FROM
                     gl_company c JOIN gl_fiscal_year fy on c.cocode = fy.cocode 
                 WHERE
@@ -258,12 +260,32 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber)
+        public async Task<Result<bool>> CanCompanyFiscalYearBeDeleted(int companyCode, int yearNumber)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string sql = "SELECT get_transactions_company_fiscalyear(:COCODE,:COYEAR) AS Transactions FROM DUAL";
+
+                var param = new { COCODE = companyCode, COYEAR = yearNumber };
+
+                using var connection = _dapperContext.CreateConnection();
+
+                int retval = await connection.ExecuteScalarAsync<int>(sql, param);
+
+                return retval == 0;
+            }
+            catch (OracleException ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.CanCompanyFiscalYearBeDeleted", errMsg)
+                );
+            }
         }
 
-        public async Task<Result<bool>> InitialFiscalYearExist(int companyCode)
+        public async Task<Result<bool>> DoesInitialFiscalYearExist(int companyCode)
         {
             try
             {
