@@ -6,7 +6,6 @@ using CloudAccounting.Application.UseCases.Company.GetNextValidFiscalYearStart;
 using CloudAccounting.Application.UseCases.Lookups.CompanyCodeLookup;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Shared.Company;
-using CloudAccounting.Shared.Lookups;
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests;
 

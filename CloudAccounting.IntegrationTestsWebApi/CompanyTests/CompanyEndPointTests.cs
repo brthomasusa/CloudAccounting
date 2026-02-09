@@ -1,6 +1,3 @@
-using System.Net.Http.Json;
-using System.Text;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using CloudAccounting.Application.ViewModels.Company;
 using CloudAccounting.Application.UseCases.CreateCompany;
@@ -9,7 +6,7 @@ using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
 using CloudAccounting.Application.UseCases.Company.DeleteFiscalYear;
 using CloudAccounting.Shared.Company;
-using System.Net.Http.Headers;
+
 
 namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests
 {

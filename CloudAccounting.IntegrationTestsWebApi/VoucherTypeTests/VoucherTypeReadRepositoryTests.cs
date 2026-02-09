@@ -1,5 +1,5 @@
 
-namespace CloudAccounting.IntegrationTestsWebApi.CompanyTests.VoucherTypeTests
+namespace CloudAccounting.IntegrationTestsWebApi.VoucherTypeTests
 {
     public class VoucherTypeReadRepositoryTests : TestBase
     {

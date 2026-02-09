@@ -3,6 +3,8 @@ using CloudAccounting.Application.UseCases.CreateCompany;
 using CloudAccounting.Application.UseCases.UpdateCompany;
 using CloudAccounting.Application.UseCases.DeleteCompany;
 using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
+using CloudAccounting.Infrastructure.Data.Repositories.Write;
+using CloudAccounting.Infrastructure.Data.Repositories.Read;
 
 namespace CloudAccounting.Web.Extentions;
 
@@ -92,7 +94,9 @@ public static class DependencyInjection
             .AddScoped<ICompanyRepository, CompanyRepository>()
             .AddScoped<ICompanyService, CompanyService>()
             .AddScoped<ICompanyReadRepository, CompanyReadRepository>()
-            .AddScoped<IFiscalYearRepository, FiscalYearRepository>();
+            .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
+            .AddScoped<IVoucherTypeRepository, VoucherTypeRepository>()
+            .AddScoped<IVoucherTypeReadRepository, VoucherTypeReadRepository>();
     }
 
     public static void AddMediatr(this IServiceCollection services)
