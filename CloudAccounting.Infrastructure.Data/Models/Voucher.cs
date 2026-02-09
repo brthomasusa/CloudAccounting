@@ -8,7 +8,7 @@ public partial class Voucher
 
     public string? VoucherTitle { get; set; }
 
-    public Int16 VoucherNature { get; set; }
+    public Int16 VoucherClassification { get; set; }
 
     public virtual ICollection<TransactionMaster> TransactionMasters { get; set; } = [];
 }

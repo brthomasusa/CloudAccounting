@@ -15,7 +15,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .ValueGeneratedOnAdd()
                 .HasColumnType("NUMBER")
                 .HasColumnName("VCHCODE");
-            entity.Property(e => e.VoucherNature)
+            entity.Property(e => e.VoucherClassification)
                 .HasColumnType("NUMBER(1,0)")
                 .HasColumnName("VCHNATURE")
                 .HasConversion<int>();

@@ -58,7 +58,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.VoucherTypeTests
                 VoucherCode = 0,
                 VoucherType = "Test",
                 VoucherTitle = "Testing",
-                VoucherNature = 1
+                VoucherClassification = 1
             };
 
         private static Voucher GetVoucherForUpdate()
@@ -67,7 +67,7 @@ namespace CloudAccounting.IntegrationTestsWebApi.VoucherTypeTests
                 VoucherCode = 1,
                 VoucherType = "Test",
                 VoucherTitle = "Testing Update",
-                VoucherNature = 1
+                VoucherClassification = 1
             };
     }
 }

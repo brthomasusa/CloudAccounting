@@ -59,7 +59,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories.Write
                                    .ExecuteUpdateAsync(setters => setters
                                         .SetProperty(voucher => voucher.VoucherType, v.VoucherType)
                                         .SetProperty(voucher => voucher.VoucherTitle, v.VoucherTitle)
-                                        .SetProperty(voucher => voucher.VoucherNature, v.VoucherNature));
+                                        .SetProperty(voucher => voucher.VoucherClassification, v.VoucherClassification));
 
                 VoucherDataModel? dataModel = await _db.Vouchers.FindAsync(v.VoucherCode);
 

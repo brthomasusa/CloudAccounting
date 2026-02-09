@@ -25,7 +25,11 @@ namespace CloudAccounting.Application.UseCases.VoucherType.GetVoucherTypes
 
                 if (getAllVoucherResult.IsSuccess)
                 {
-                    List<VoucherTypeDto> voucherDtos = _mapper.Map<List<VoucherTypeDto>>(getAllVoucherResult.Value);
+                    List<VoucherTypeDto> voucherDtos = [];
+                    getAllVoucherResult.Value.ForEach(voucher =>
+                    {
+                        voucherDtos.Add(_mapper.Map<VoucherTypeDto>(voucher));
+                    });
 
                     return voucherDtos;
                 }

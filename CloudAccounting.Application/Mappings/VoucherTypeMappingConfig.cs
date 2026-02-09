@@ -13,7 +13,7 @@ namespace CloudAccounting.Application.Mappings
                 .Map(dest => dest.VoucherCode, src => src.VoucherCode)
                 .Map(dest => dest.VoucherType, src => src.VoucherType)
                 .Map(dest => dest.VoucherTitle, src => src.VoucherTitle)
-                .Map(dest => dest.VoucherNature, src => src.VoucherNature);
+                .Map(dest => dest.VoucherNature, src => src.VoucherClassification);
 
             // Map Voucher domain model to Voucher data model
 

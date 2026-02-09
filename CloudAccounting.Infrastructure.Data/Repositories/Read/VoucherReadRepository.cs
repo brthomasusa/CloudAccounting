@@ -18,10 +18,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories.Read
             {
                 string sql =
                     @"SELECT 
-                        vchcode,
-                        vchtype,
-                        vchtitle,
-                        vchnature
+                        vchcode AS VoucherCode,
+                        vchtype AS VoucherType,
+                        vchtitle AS VoucherTitle,
+                        vchnature AS VoucherNature
                     FROM gl_voucher 
                     ORDER BY vchtype";
 

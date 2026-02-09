@@ -10,7 +10,6 @@ namespace CloudAccounting.IntegrationTestsWebApi.VoucherTypeTests
         {
             // Arrange
 
-
             // Act
             Result<List<Voucher>> result = await _repository.RetrieveAllAsync();
 
