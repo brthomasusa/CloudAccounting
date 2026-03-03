@@ -1,5 +1,3 @@
-using CloudAccounting.Core.Repositories;
-
 namespace CloudAccounting.Core.Services
 {
     public interface ICompanyService
