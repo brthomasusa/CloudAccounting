@@ -14,7 +14,7 @@ public class CreateCompanyValidator : AbstractValidator<CreateCompanyCommand>
         RuleFor(company => company.CompanyName)
                                   .NotEmpty().WithMessage("The company name is required.")
                                   .MaximumLength(50).WithMessage("Max length of the company name is 50 characters.")
-                                  .MustAsync(IsUniqueCompanyName).WithMessage("This company name already exists."); ;
+                                  .MustAsync(IsUniqueCompanyName).WithMessage("This company name already exists.");
 
         RuleFor(company => company.Address)
                                   .MaximumLength(100).WithMessage("Max length of the address is 100 characters.");
