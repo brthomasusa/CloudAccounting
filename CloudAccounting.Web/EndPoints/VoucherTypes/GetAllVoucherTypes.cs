@@ -1,5 +1,5 @@
 using CloudAccounting.Shared.VoucherType;
-using CloudAccounting.Application.UseCases.VoucherType.GetVoucherTypes;
+using CloudAccounting.Application.UseCases.VoucherTypes.GetVoucherTypes;
 
 namespace CloudAccounting.Web.EndPoints.VoucherTypes
 {
@@ -7,37 +7,26 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapGet("vouchertypes", GetVoucherTypes)
-                .Produces<List<VoucherTypeDto>>()
+            app.MapGet("vouchertypes/", GetAllVoucherTypesFromQuery)
+                .Produces(404)
+                .Produces<List<VoucherTypeDto>>(200)
                 .Produces(500);
         }
 
-        public static async Task<IResult> GetVoucherTypes
-        (
-            ISender sender,
-            ILogger<GetAllVoucherTypes> logger
-        )
+        public static async Task<IResult> GetAllVoucherTypesFromQuery(ISender sender, ILogger<GetAllVoucherTypes> logger)
         {
-            Result<List<VoucherTypeDto>>? result = null;
-            try
-            {
-                result = await sender.Send(new GetAllVoucherTypesQuery())
-                    ;
+            GetAllVoucherTypesQuery query = new();
+            Result<List<VoucherTypeDto>>? result = await sender.Send(query);
 
-                if (result.IsSuccess)
-                {
-                    return Results.Ok(result.Value);
-                }
-
-                logger.LogWarning("There was a problem retrieving the list of voucher types: {Message}", result.Error.Message);
-                return result!.ToInternalServerErrorProblemDetails(result.Error.Message);
-            }
-            catch (Exception ex)
+            if (result.IsSuccess)
             {
-                string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                logger.LogError(ex, "There was a problem retrieving the list of voucher types: {Message}", errMsg);
-                return result!.ToInternalServerErrorProblemDetails(errMsg);
+                return Results.Ok(result.Value);
             }
+
+            string msg = result.Error.Message;
+            logger.LogWarning("There was a problem getting all voucher types: {ERROR}", msg);
+            return Results.NotFound(msg);
         }
+
     }
 }

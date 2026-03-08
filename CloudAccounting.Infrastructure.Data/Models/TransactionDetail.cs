@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class TransactionDetail
+public partial class TransactionDetailDM
 {
     public int LineNumber { get; set; }
 
@@ -22,11 +22,11 @@ public partial class TransactionDetail
 
     public bool Reconciled { get; set; }
 
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
+    public virtual CompanyDM CompanyCodeNavigation { get; set; } = null!;
 
-    public virtual ChartOfAccounts COANavigation { get; set; } = null!;
+    public virtual ChartOfAccountsDM COANavigation { get; set; } = null!;
 
-    public virtual CostCenter? CostCenterNavigation { get; set; }
+    public virtual CostCenterDM? CostCenterNavigation { get; set; }
 
-    public virtual TransactionMaster TransactionMasterNavigation { get; set; } = null!;
+    public virtual TransactionMasterDM TransactionMasterNavigation { get; set; } = null!;
 }

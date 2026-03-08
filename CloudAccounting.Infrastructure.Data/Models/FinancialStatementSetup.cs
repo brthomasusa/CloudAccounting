@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class FinancialStatementSetup
+public partial class FinancialStatementSetupDM
 {
     public int CompanyCode { get; set; }
 

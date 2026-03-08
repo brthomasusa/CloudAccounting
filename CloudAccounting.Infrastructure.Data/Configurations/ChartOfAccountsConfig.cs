@@ -4,16 +4,16 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class ChartOfAccountsConfig : IEntityTypeConfiguration<ChartOfAccounts>
+    public class ChartOfAccountsConfig : IEntityTypeConfiguration<ChartOfAccountsDM>
     {
-        public void Configure(EntityTypeBuilder<ChartOfAccounts> entity)
+        public void Configure(EntityTypeBuilder<ChartOfAccountsDM> entity)
         {
             entity.HasKey(e => new { e.CompanyCode, e.AccountCode }).HasName("GL_COA_PK");
 
             entity.ToTable("GL_COA");
 
             entity.Property(e => e.CompanyCode)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.AccountCode)
                 .HasMaxLength(11)
@@ -24,7 +24,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("CCCODE");
             entity.Property(e => e.AccountLevel)
-                .HasColumnType("NUMBER(1)")
+                .HasColumnType("TINYINT")
                 .HasColumnName("COALEVEL");
             entity.Property(e => e.AccountClassification)
                 .HasMaxLength(11)

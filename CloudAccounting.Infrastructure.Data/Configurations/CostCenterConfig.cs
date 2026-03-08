@@ -1,26 +1,25 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class CostCenterConfig : IEntityTypeConfiguration<CostCenter>
+    public class CostCenterConfig : IEntityTypeConfiguration<CostCenterDM>
     {
-        public void Configure(EntityTypeBuilder<CostCenter> entity)
+        public void Configure(EntityTypeBuilder<CostCenterDM> entity)
         {
             entity.HasKey(e => new { e.CompanyCode, e.CostCenterCode }).HasName("GL_COST_CENTER_PK");
 
             entity.ToTable("GL_COST_CENTER");
 
             entity.Property(e => e.CompanyCode)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.CostCenterCode)
                 .HasMaxLength(5)
                 .IsUnicode(false)
                 .HasColumnName("CCCODE");
             entity.Property(e => e.CostCenterLevel)
-                .HasColumnType("NUMBER(1)")
+                .HasColumnType("TINYINT")
                 .HasColumnName("CCLEVEL");
             entity.Property(e => e.CostCenterTitle)
                 .HasMaxLength(25)

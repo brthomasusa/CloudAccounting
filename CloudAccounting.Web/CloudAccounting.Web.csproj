@@ -3,7 +3,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>CloudAccounting.Web</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
@@ -20,7 +19,6 @@
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mapster.DependencyInjection" />
   </ItemGroup>
-  
   <ItemGroup Label="For Serilog">
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />

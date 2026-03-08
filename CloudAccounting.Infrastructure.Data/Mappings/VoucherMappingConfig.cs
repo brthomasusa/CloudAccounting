@@ -1,5 +1,5 @@
-using VoucherDataModel = CloudAccounting.Infrastructure.Data.Models.Voucher;
-using VoucherDomainModel = CloudAccounting.Core.Models.Voucher;
+using CloudAccounting.Infrastructure.Data.Models;
+using CloudAccounting.Core.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Mappings
 {
@@ -10,14 +10,14 @@ namespace CloudAccounting.Infrastructure.Data.Mappings
         public void Register(TypeAdapterConfig config)
         {
             // Map Voucher domain model to Voucher data model
-            config.NewConfig<VoucherDomainModel, VoucherDataModel>()
+            config.NewConfig<Voucher, VoucherDM>()
                 .Map(dest => dest.VoucherCode, src => src.VoucherCode)
                 .Map(dest => dest.VoucherType, src => src.VoucherType)
                 .Map(dest => dest.VoucherTitle, src => src.VoucherTitle)
                 .Map(dest => dest.VoucherClassification, src => src.VoucherClassification);
 
-            // Map Voucher domain model to Voucher data model
-            config.NewConfig<VoucherDataModel, VoucherDomainModel>()
+            // Map Voucher data model to Voucher domain model
+            config.NewConfig<VoucherDM, Voucher>()
                 .Map(dest => dest.VoucherCode, src => src.VoucherCode)
                 .Map(dest => dest.VoucherType, src => src.VoucherType)
                 .Map(dest => dest.VoucherTitle, src => src.VoucherTitle)

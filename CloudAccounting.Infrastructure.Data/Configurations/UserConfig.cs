@@ -4,9 +4,9 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class UserConfig : IEntityTypeConfiguration<User>
+    public class UserConfig : IEntityTypeConfiguration<UserDM>
     {
-        public void Configure(EntityTypeBuilder<User> entity)
+        public void Configure(EntityTypeBuilder<UserDM> entity)
         {
             entity.HasKey(e => e.UserId).HasName("GL_USERS_PK");
 
@@ -21,16 +21,16 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("ADMIN");
             entity.Property(e => e.CompanyCode)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.CompanyMonthId)
-                .HasPrecision(2)
+                .HasColumnType("TINYINT")
                 .HasColumnName("COMONTHID");
             entity.Property(e => e.CompanyYear)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("COYEAR");
             entity.Property(e => e.GroupId)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("GROUPID");
             entity.Property(e => e.Password)
                 .IsUnicode(false)

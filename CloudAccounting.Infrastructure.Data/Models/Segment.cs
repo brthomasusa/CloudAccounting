@@ -1,12 +1,12 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class Segment
+public partial class SegmentDM
 {
-    public int SegmentId { get; set; }
+    public Int16 SegmentId { get; set; }
 
     public string? SegmentTitle { get; set; }
 
-    public int? SegmentParent { get; set; }
+    public Int16? SegmentParent { get; set; }
 
     public string? SegmentType { get; set; }
 

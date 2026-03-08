@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class FiscalYear
+public partial class FiscalYearDM
 {
     public int CompanyCode { get; set; }
 
@@ -22,7 +22,7 @@ public partial class FiscalYear
 
     public DateTime? TyeExecuted { get; set; }
 
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
+    public virtual CompanyDM CompanyCodeNavigation { get; set; } = null!;
 
-    public virtual ICollection<TransactionMaster> TransactionMasters { get; set; } = [];
+    public virtual ICollection<TransactionMasterDM> TransactionMasters { get; set; } = [];
 }

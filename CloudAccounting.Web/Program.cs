@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using CloudAccounting.Application;
 using CloudAccounting.Web.Middleware;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
@@ -24,7 +25,7 @@ try
             loggerConfiguration
                 .ReadFrom.Configuration(context.Configuration) // Read configuration from appsettings.json
                 .WriteTo.Console() // Log to console for local visibility
-                .WriteTo.Seq("http://rhel9-ws:5341"); // Log to Seq server
+                .WriteTo.Seq("http://localhost:5341"); // Log to Seq server
         });
 
     builder.Services.ConfigureAuthentication();
@@ -77,6 +78,7 @@ try
         .WithApiVersionSet(apiVersionSet);
 
     app.MapEndpoints(versionedGroup);
+
     app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 
     // Define a protected endpoint

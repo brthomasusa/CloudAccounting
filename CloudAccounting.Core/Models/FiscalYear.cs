@@ -3,6 +3,7 @@ namespace CloudAccounting.Core.Models;
 public record FiscalYear
 (
     int CompanyCode,
+    string CompanyName,
     int Year,
     DateTime FiscalYearStartDate,
     DateTime FiscalYearEndDate,
@@ -10,6 +11,5 @@ public record FiscalYear
     bool IsFiscalYearClosed,
     bool HasTransactions,
     DateTime? TemporaryYearEndProcessLastExecuted,
-    List<FiscalPeriod> FiscalPeriods,
-    string? CompanyName
+    List<FiscalPeriod> FiscalPeriods
 );

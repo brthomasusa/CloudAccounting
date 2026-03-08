@@ -8,6 +8,6 @@ namespace CloudAccounting.Shared.VoucherType
 
         public string? VoucherTitle { get; set; }
 
-        public Int16 VoucherNature { get; set; }
+        public byte? VoucherClassification { get; set; }
     }
 }

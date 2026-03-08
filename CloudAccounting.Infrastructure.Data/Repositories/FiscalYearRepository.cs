@@ -1,125 +1,276 @@
 using CloudAccounting.Core.Models;
-using FiscalYearDataModel = CloudAccounting.Infrastructure.Data.Models.FiscalYear;
-using FiscalYearDomainModel = CloudAccounting.Core.Models.FiscalYear;
+using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
     public class FiscalYearRepository
     (
         CloudAccountingContext ctx,
-        IMemoryCache memoryCache,
-        ILogger<FiscalYearRepository> logger,
-        DapperContext oracleContext,
-        IMapper mapper
+        ILogger<FiscalYearRepository> logger
     ) : IFiscalYearRepository
     {
-        private readonly IMemoryCache _memoryCache = memoryCache;
-        private readonly MemoryCacheEntryOptions _cacheEntryOptions =
-            new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(3));
-
         private readonly CloudAccountingContext _db = ctx;
         private readonly ILogger<FiscalYearRepository> _logger = logger;
-        private readonly DapperContext _oracleContext = oracleContext;
-        private readonly IMapper _mapper = mapper;
 
-        public async Task<Result<FiscalYearDomainModel>> GetFiscalYearByCompanyAndYearAsync(int companyCode, int fiscalYearNumber)
+        public async Task<Result<FiscalYear>> GetFiscalYearAsync(int companyCode, int fiscalYearNumber)
         {
             try
             {
-                List<FiscalYearDataModel>? dataModels =
-                    await _db.FiscalYears.Where(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber)
-                                         .OrderBy(fy => fy.CompanyMonthId)
-                                         .ToListAsync();
+                Result<string> companyNameResult = await GetCompanyName(companyCode);
+                string companyName = companyNameResult.IsSuccess ? companyNameResult.Value : "Unknown Company";
 
-                return MapFiscalYearDataModelListToFiscalYearDomainModel(dataModels);
+                int transactionCount = await _db.TranMasters
+                                                .CountAsync(t => t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
+
+                List<FiscalYearDM>? fiscalPeriods =
+                    await _db.FiscalYears
+                             .Include(c => c.CompanyCodeNavigation)
+                             .Where(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber)
+                             .OrderBy(fy => fy.CompanyMonthId)
+                             .ToListAsync();
+
+                List<FiscalPeriod> periods = [];
+                fiscalPeriods.ForEach(p =>
+                    periods.Add(new FiscalPeriod(p.CompanyMonthId, p.CompanyMonthName!, p.PeriodFrom!.Value, p.PeriodTo!.Value, p.MonthClosed!.Value))
+                );
+
+                if (fiscalPeriods is null || fiscalPeriods.Count == 0)
+                {
+                    return new FiscalYear(
+                        companyCode,
+                        companyName,
+                        fiscalYearNumber,
+                        DateTime.MinValue,
+                        DateTime.MinValue,
+                        false,
+                        false,
+                        false,
+                        null,
+                        []
+                    );
+                }
+
+                var firstPeriod = fiscalPeriods.SingleOrDefault(fy => fy.CompanyMonthId == 1);
+                var lastPeriod = fiscalPeriods.SingleOrDefault(fy => fy.CompanyMonthId == 12);
+
+                FiscalYear fiscalYear = new(
+                    companyCode,
+                    firstPeriod!.CompanyCodeNavigation.CompanyName!,
+                    fiscalYearNumber,
+                    firstPeriod!.PeriodFrom!.Value,
+                    lastPeriod!.PeriodTo!.Value,
+                    firstPeriod!.InitialYear!.Value,
+                    firstPeriod!.YearClosed!.Value,
+                    transactionCount > 0,
+                    firstPeriod!.TyeExecuted,
+                    periods
+                );
+
+                return fiscalYear;
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<FiscalYearDomainModel>.Failure<FiscalYearDomainModel>(
+                return Result<FiscalYear>.Failure<FiscalYear>(
                     new Error("FiscalYearRepository.GetFiscalYearByCompanyAndYearAsync", errMsg)
                 );
             }
         }
 
-        public async Task<Result<FiscalYearDomainModel>> InsertFiscalYearAsync(FiscalYearDomainModel fiscalYear)
+        public async Task<Result<FiscalYear>> InsertFiscalYearAsync(FiscalYear fiscalYear)
         {
             try
             {
-                FiscalYearDataModel? initYearTest =
-                    await _db.FiscalYears.FirstOrDefaultAsync(f => f.CompanyCode == fiscalYear.CompanyCode && f.InitialYear == true);
+                bool doesInitYearExist =
+                    await _db.FiscalYears.AnyAsync(f => f.CompanyCode == fiscalYear.CompanyCode && f.InitialYear == true);
 
-                bool isInitialYear = initYearTest is null;
-
-                List<FiscalYearDataModel> dataModels =
-                    MapFiscalYearDomainModelToFiscalYearDataModelList(fiscalYear, isInitialYear);
+                List<FiscalYearDM> dataModels =
+                    MapFiscalYearToFiscalYearDMList(fiscalYear, !doesInitYearExist);
 
                 _db.FiscalYears.AddRange(dataModels);
                 await _db.SaveChangesAsync();
 
-
-                return await GetFiscalYearByCompanyAndYearAsync(fiscalYear.CompanyCode, fiscalYear.Year);
+                return await GetFiscalYearAsync(fiscalYear.CompanyCode, fiscalYear.Year);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<FiscalYearDomainModel>.Failure<FiscalYearDomainModel>(
+                return Result<FiscalYear>.Failure<FiscalYear>(
                     new Error("FiscalYearRepository.InsertFiscalYearAsync", errMsg)
                 );
             }
         }
 
-        private FiscalYearDomainModel MapFiscalYearDataModelListToFiscalYearDomainModel(List<FiscalYearDataModel> fiscalYears)
+        public async Task<Result> DeleteFiscalYearAsync(int companyCode, int fiscalYear)
         {
-            var firstRow = fiscalYears.FirstOrDefault(fy => fy.CompanyMonthId == 1);
-            var lastRow = fiscalYears.FirstOrDefault(fy => fy.CompanyMonthId == 12);
-
-            //TODO This is a hack, fix it.
-            var company = _db.Companies.Find(firstRow!.CompanyCode);
-
-            FiscalYearDomainModel domainModel =
-                new(
-                    firstRow!.CompanyCode,
-                    firstRow!.CompanyYear,
-                    firstRow!.PeriodFrom!.Value,
-                    lastRow!.PeriodTo!.Value,
-                    firstRow!.InitialYear!.Value,
-                    firstRow!.YearClosed!.Value,
-                    false,
-                    firstRow!.TyeExecuted!.HasValue ? firstRow!.TyeExecuted!.Value : null,
-                    [],
-                    company!.CompanyName
-                );
-
-            fiscalYears.ForEach(fy =>
+            try
             {
-                domainModel.FiscalPeriods.Add(new FiscalPeriod(
-                    fy.CompanyMonthId,
-                    fy.CompanyMonthName!,
-                    fy.PeriodFrom!.Value,
-                    fy.PeriodTo!.Value,
-                    fy.MonthClosed!.Value
-                ));
-            });
+                await _db.FiscalYears.Where(c => c.CompanyCode == companyCode && c.CompanyYear == fiscalYear)
+                                     .ExecuteDeleteAsync();
 
-            return domainModel;
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure(new Error("FiscalYearRepository.DeleteFiscalYearAsync", errMsg));
+            }
         }
 
-        private static List<FiscalYearDataModel> MapFiscalYearDomainModelToFiscalYearDataModelList
+        public async Task<Result<bool>> CanFiscalYearBeDeleted(int companyCode, int fiscalYearNumber)
+        {
+            try
+            {
+                bool doesFiscalYearHaveTransactions =
+                    await _db.TranMasters.AnyAsync(t => t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
+
+                return doesFiscalYearHaveTransactions == false;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("FiscalYearRepository.CanFiscalYearBeDeleted", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<DateTime>> EarliestNextFiscalYearStartDate(int companyCode)
+        {
+            try
+            {
+                var query = await _db.FiscalYears
+                                     .Where(fy => fy.CompanyCode == companyCode)
+                                     .OrderByDescending(fy => fy.PeriodTo)
+                                     .Take(1)
+                                     .ToListAsync();
+
+                if (query is not null && query.Count > 0)
+                {
+                    FiscalYearDM lastPeriod = query[0];
+                    return lastPeriod.PeriodTo!.Value.AddDays(1);
+                }
+
+                return DateTime.MinValue;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<DateTime>.Failure<DateTime>(
+                    new Error("FiscalYearRepository.EarliestNextFiscalYearStartDate", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<string>> GetCompanyName(int companyCode)
+        {
+            try
+            {
+                string? companyName = await _db.Companies
+                                               .Where(c => c.CompanyCode == companyCode)
+                                               .Select(c => c.CompanyName)
+                                               .SingleOrDefaultAsync();
+                if (companyName is null)
+                {
+                    return Result<string>.Failure<string>(
+                        new Error("FiscalYearRepository.GetCompanyName", "There was a problem retrieving the company name!"));
+                }
+
+                return companyName;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<string>.Failure<string>(
+                    new Error("FiscalYearRepository.GetCompanyName", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> DoesCompanyHaveInitialFiscalYear(int companyCode)
+        {
+            try
+            {
+                var query = await _db.FiscalYears
+                                     .Where(c => c.CompanyCode == companyCode && c.InitialYear == true)
+                                     .Select(c => c.CompanyYear)
+                                     .ToListAsync();
+
+                return query is not null && query.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("FiscalYearRepository.DoesCompanyHaveIsInitialFiscalYear", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsValidCompanyCode(int companyCode)
+        {
+            try
+            {
+                var company = await _db.Companies.SingleOrDefaultAsync(c => c.CompanyCode == companyCode);
+
+                return company is not null;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("FiscalYearRepository.IsValidCompanyCode", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsUniqueFiscalYearNumber(int companyCode, int fiscalYearNumber)
+        {
+            try
+            {
+                bool doesExist = await _db.FiscalYears
+                                          .AnyAsync(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber);
+
+                return !doesExist;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("FiscalYearRepository.IsUniqueFiscalYearNumber", errMsg)
+                );
+            }
+        }
+
+        private static List<FiscalYearDM> MapFiscalYearToFiscalYearDMList
         (
-            FiscalYearDomainModel fiscalYear,
+            FiscalYear fiscalYear,
             bool isInitYr
         )
         {
-            List<FiscalYearDataModel> dataModels = [];
+            List<FiscalYearDM> dataModels = [];
 
             fiscalYear.FiscalPeriods.ForEach(p =>
             {
-                dataModels.Add(new FiscalYearDataModel()
+                dataModels.Add(new FiscalYearDM()
                 {
                     CompanyCode = fiscalYear.CompanyCode,
                     CompanyYear = (short)fiscalYear.Year,

@@ -1,10 +1,18 @@
-using CloudAccounting.Application.Validators.Company;
-using CloudAccounting.Application.UseCases.CreateCompany;
-using CloudAccounting.Application.UseCases.UpdateCompany;
-using CloudAccounting.Application.UseCases.DeleteCompany;
-using CloudAccounting.Application.UseCases.Company.CreateFiscalYear;
-using CloudAccounting.Infrastructure.Data.Repositories.Write;
-using CloudAccounting.Infrastructure.Data.Repositories.Read;
+using CloudAccounting.Application;
+using CloudAccounting.Application.Behaviors;
+using CloudAccounting.Application.UseCases.Companies.CreateCompany;
+using CloudAccounting.Application.UseCases.Companies.DeleteCompany;
+using CloudAccounting.Application.UseCases.Companies.UpdateCompany;
+using CloudAccounting.Application.UseCases.FiscalYears.CreateFiscalYear;
+using CloudAccounting.Application.UseCases.FiscalYears.DeleteFiscalYear;
+using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
+using CloudAccounting.Infrastructure.Data.Repositories;
+using CloudAccounting.Infrastructure.Data.Services;
+using CloudAccounting.Web.EndPoints;
+using FluentValidation;
+using Mapster;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace CloudAccounting.Web.Extentions;
 
@@ -29,6 +37,40 @@ public static class DependencyInjection
                    .AllowAnyMethod()
             );
         });
+
+    public static void AddCustomSwagger(this IServiceCollection services) =>
+        services.AddSwaggerGen(c =>
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Description = "Cloud Accounting",
+                Title = "CloudAccounting API",
+                Version = "v1",
+                Contact = new OpenApiContact
+                {
+                    Name = "CloudAccounting"
+                }
+            }
+        ));
+
+    public static void UseCustomSwagger(this WebApplication app)
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CloudAccounting v1"));
+    }
+
+    public static void AddInfrastructureDataLayer(this WebApplicationBuilder builder)
+    {
+        string? connectionString =
+             builder.Configuration["ConnectionStrings:CloudAcctgTest"] ??
+                throw new ArgumentNullException("Db connection string is null.");
+
+        builder.Services
+            .AddDbContext<CloudAccountingContext>(options =>
+                    options.UseSqlServer(connectionString)
+                           .EnableSensitiveDataLogging()
+                           .EnableDetailedErrors()
+                );
+    }
 
     public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
     {
@@ -57,56 +99,14 @@ public static class DependencyInjection
         return app;
     }
 
-    public static void AddCustomSwagger(this IServiceCollection services) =>
-        services.AddSwaggerGen(c =>
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Description = "Cloud Accounting",
-                Title = "CloudAccounting API",
-                Version = "v1",
-                Contact = new OpenApiContact
-                {
-                    Name = "CloudAccounting"
-                }
-            }
-        ));
-
-    public static void UseCustomSwagger(this WebApplication app)
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CloudAccounting v1"));
-    }
-
-    public static void AddInfrastructureDataLayer(this WebApplicationBuilder builder)
-    {
-        string? connectionString =
-             builder.Configuration["ConnectionStrings:OracleConnectionDev"]
-                ?? throw new ArgumentNullException("Db connection string is null.");
-
-        builder.Services
-            .AddDbContext<CloudAccountingContext>(options => options.UseOracle(connectionString))
-            .AddSingleton<DapperContext>(_ => new DapperContext(connectionString!));
-    }
-
     public static void AddRepositoriesAndDomainServices(this WebApplicationBuilder builder)
     {
         builder.Services
             .AddScoped<ICompanyRepository, CompanyRepository>()
-            .AddScoped<ICompanyService, CompanyService>()
-            .AddScoped<ICompanyReadRepository, CompanyReadRepository>()
             .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
             .AddScoped<IVoucherTypeRepository, VoucherTypeRepository>()
-            .AddScoped<IVoucherTypeReadRepository, VoucherTypeReadRepository>();
-    }
-
-    public static void AddMediatr(this IServiceCollection services)
-    {
-        services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(ApplicationAssembly).Assembly);
-            config.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
-            config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
-        });
+            .AddScoped<ILookupRepository, LookupRepository>()
+            .AddScoped<IFiscalYearService, FiscalYearService>();
     }
 
     public static void AddMappings(this IServiceCollection services)
@@ -117,14 +117,5 @@ public static class DependencyInjection
 
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
-    }
-
-    public static void RegisterValidators(this IServiceCollection services)
-    {
-        services.AddScoped<IValidator<CreateCompanyCommand>, CreateCompanyValidator>();
-        services.AddScoped<IValidator<UpdateCompanyCommand>, UpdateCompanyValidator>();
-        services.AddScoped<IValidator<DeleteCompanyCommand>, DeleteCompanyValidator>();
-        services.AddScoped<IValidator<CreateFiscalYearCommand>, CreateFiscalYearCommandValidator>();
-
     }
 }

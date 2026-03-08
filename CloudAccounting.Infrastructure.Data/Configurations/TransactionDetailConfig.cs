@@ -4,9 +4,9 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class TransactionDetailConfig : IEntityTypeConfiguration<TransactionDetail>
+    public class TransactionDetailConfig : IEntityTypeConfiguration<TransactionDetailDM>
     {
-        public void Configure(EntityTypeBuilder<TransactionDetail> entity)
+        public void Configure(EntityTypeBuilder<TransactionDetailDM> entity)
         {
             entity.HasKey(e => e.LineNumber).HasName("PK_TRAN_DETAIL");
 
@@ -14,7 +14,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
 
             entity.Property(e => e.LineNumber)
                 .ValueGeneratedOnAdd()
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("LINE_NO");
             entity.Property(e => e.CostCenterCode)
                 .HasMaxLength(5)
@@ -28,23 +28,23 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .HasColumnName("COACODE");
             entity.Property(e => e.CompanyCode)
                 .ValueGeneratedOnAdd()
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.Reconciled)
-                .HasColumnType("NUMBER(1)")
+                .HasColumnType("BIT")
                 .HasColumnName("RECONCILED");
             entity.Property(e => e.TransactionNumber)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("TRAN_NO");
             entity.Property(e => e.Credit)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("VCHCR");
             entity.Property(e => e.Description)
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("VCHDESCRIPTION");
             entity.Property(e => e.Debit)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("VCHDR");
             entity.Property(e => e.Reference)
                 .HasMaxLength(25)

@@ -4,16 +4,16 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class ReconcileReportConfig : IEntityTypeConfiguration<ReconcileReport>
+    public class ReconcileReportConfig : IEntityTypeConfiguration<ReconcileReportDM>
     {
-        public void Configure(EntityTypeBuilder<ReconcileReport> entity)
+        public void Configure(EntityTypeBuilder<ReconcileReportDM> entity)
         {
             entity
                 .HasNoKey()
                 .ToTable("GL_RECONCILE_REPORT");
 
             entity.Property(e => e.Amount)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("AMOUNT");
             entity.Property(e => e.AccountCode)
                 .HasMaxLength(11)
@@ -32,24 +32,24 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("MONTHYEAR");
             entity.Property(e => e.ReportDate)
-                .HasColumnType("DATE")
+                .HasColumnType("DATETIME2")
                 .HasColumnName("REPORTDATE");
             entity.Property(e => e.Srno)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("SRNO");
             entity.Property(e => e.UserId)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("USERID");
             entity.Property(e => e.VoucherDate)
-                .HasColumnType("DATE")
+                .HasColumnType("DATETIME2")
                 .HasColumnName("VCHDATE");
             entity.Property(e => e.Description)
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("VCHDESCRIPTION");
             entity.Property(e => e.VoucherNumber)
-                .HasPrecision(10)
+                .HasColumnType("INT")
                 .HasColumnName("VCHNO");
             entity.Property(e => e.Reference)
                 .HasMaxLength(25)

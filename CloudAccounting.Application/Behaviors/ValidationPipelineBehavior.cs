@@ -1,7 +1,6 @@
 #pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
 
 using MediatR;
-using FluentValidation;
 
 namespace CloudAccounting.Application.Behaviors
 {
@@ -19,29 +18,25 @@ namespace CloudAccounting.Application.Behaviors
         {
             if (!_validators.Any())
             {
-                return await next();
+                return await next(cancellationToken);
             }
 
             var context = new ValidationContext<TRequest>(request);
             var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
             var failures = validationResults.SelectMany(r => r.Errors)
                                             .Where(f => f != null)
-                                            .Select(failure => new Error(
+                                            .Select(failure => new CloudAccounting.SharedKernel.Exceptions.ValidationError(
                                                 failure.PropertyName,
                                                 failure.ErrorMessage))
                                             .Distinct()
-                                            .ToArray();
+                                            .ToList();
 
-            return failures.Length != 0 ? CreateResult<TResponse>(failures) : await next();
-        }
-
-        private static TResult? CreateResult<TResult>(Error[] errors)
-            where TResult : Result
-        {
-            System.Text.StringBuilder sb = new();
-            errors.ToList().ForEach(err => sb.AppendLine(err.Message));
-
-            return Result<int>.Failure<int>(new Error("FluentValidationBehavior.Handle", sb.ToString())) as TResult;
+            if (failures.Count != 0)
+            {
+                throw new CloudAccounting.SharedKernel.Exceptions.ValidationException(failures);
+            }
+            
+            return await next(cancellationToken);
         }
     }
 }

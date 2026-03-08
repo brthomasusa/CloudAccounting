@@ -1,12 +1,12 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class FinancialStatementReport
+public partial class FinancialStatementReportDM
 {
     public string? ReportCode { get; set; }
 
     public string? ReportTitle { get; set; }
 
-    public decimal? Srno { get; set; }
+    public int? Srno { get; set; }
 
     public string? FinancialStatementAccount { get; set; }
 

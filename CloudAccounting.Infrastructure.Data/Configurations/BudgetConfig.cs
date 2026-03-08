@@ -4,49 +4,49 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class BudgetConfig : IEntityTypeConfiguration<Budget>
+    public class BudgetConfig : IEntityTypeConfiguration<BudgetDM>
     {
-        public void Configure(EntityTypeBuilder<Budget> entity)
+        public void Configure(EntityTypeBuilder<BudgetDM> entity)
         {
             entity
                 .HasNoKey()
                 .ToTable("GL_BUDGET");
 
             entity.Property(e => e.BudgetAmount1)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT1");
             entity.Property(e => e.BudgetAmount10)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT10");
             entity.Property(e => e.BudgetAmount11)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT11");
             entity.Property(e => e.BudgetAmount12)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT12");
             entity.Property(e => e.BudgetAmount2)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT2");
             entity.Property(e => e.BudgetAmount3)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT3");
             entity.Property(e => e.BudgetAmount4)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT4");
             entity.Property(e => e.BudgetAmount5)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT5");
             entity.Property(e => e.BudgetAmount6)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT6");
             entity.Property(e => e.BudgetAmount7)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT7");
             entity.Property(e => e.BudgetAmount8)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT8");
             entity.Property(e => e.BudgetAmount9)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET_AMOUNT9");
             entity.Property(e => e.CostCenterCode)
                 .HasMaxLength(5)
@@ -61,13 +61,13 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("COANATURE");
             entity.Property(e => e.CompanyCode)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.CompanyYear)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("COYEAR");
             entity.Property(e => e.Criterion)
-                .HasColumnType("NUMBER(1)")
+                .HasColumnType("BIT")
                 .HasColumnName("CRITERION");
 
             entity.HasOne(d => d.CompanyCodeNavigation).WithMany()

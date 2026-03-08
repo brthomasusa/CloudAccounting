@@ -1,12 +1,12 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class TrialBalance
+public partial class TrialBalanceDM
 {
     public string? AccountCode { get; set; }
 
     public string? AccountTitle { get; set; }
 
-    public bool? AccountLevel { get; set; }
+    public byte? AccountLevel { get; set; }
 
     public decimal? OpeningDebit { get; set; }
 
@@ -32,7 +32,7 @@ public partial class TrialBalance
 
     public string? CostCenterTitle { get; set; }
 
-    public bool? ReportLevel { get; set; }
+    public byte? ReportLevel { get; set; }
 
     public string? UserId { get; set; }
 

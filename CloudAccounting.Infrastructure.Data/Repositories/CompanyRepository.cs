@@ -1,7 +1,8 @@
 using System.Data;
 using CloudAccounting.Core.Exceptions;
-using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
-using CompanyDomainModel = CloudAccounting.Core.Models.Company;
+using CloudAccounting.Infrastructure.Data.Models;
+using CloudAccounting.Core.Models;
+
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
@@ -10,7 +11,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         CloudAccountingContext ctx,
         IMemoryCache memoryCache,
         ILogger<CompanyRepository> logger,
-        DapperContext oracleContext,
         IMapper mapper
     )
         : ICompanyRepository
@@ -21,28 +21,27 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
         private readonly CloudAccountingContext _db = ctx;
         private readonly ILogger<CompanyRepository> _logger = logger;
-        private readonly DapperContext _oracleContext = oracleContext;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<Result<CompanyDomainModel>> CreateAsync(CompanyDomainModel c)
+        public async Task<Result<Company>> CreateAsync(Company c)
         {
             try
             {
                 // Map company domain model to company data model
-                CompanyDataModel companyDataModel = _mapper.Map<CompanyDataModel>(c);
+                CompanyDM companyDM = _mapper.Map<CompanyDM>(c);
 
-                EntityEntry<CompanyDataModel> added = await _db.Companies.AddAsync(companyDataModel);
+                EntityEntry<CompanyDM> added = await _db.Companies.AddAsync(companyDM);
 
                 int affected = await _db.SaveChangesAsync();
 
                 if (affected == 1)
                 {
-                    _memoryCache.Set($"company-{c.CompanyCode}", companyDataModel, _cacheEntryOptions);
+                    _memoryCache.Set($"company-{c.CompanyCode}", companyDM, _cacheEntryOptions);
 
-                    return _mapper.Map<CompanyDomainModel>(companyDataModel);
+                    return _mapper.Map<Company>(companyDM);
                 }
 
-                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
+                return Result<Company>.Failure<Company>(
                     new Error("CompanyRepository.CreateAsync", "Create company operation failed!")
                 );
             }
@@ -51,17 +50,17 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
+                return Result<Company>.Failure<Company>(
                     new Error("CompanyRepository.CreateAsync", errMsg)
                 );
             }
         }
 
-        public async Task<Result<List<CompanyDomainModel>>> RetrieveAllAsync(int pageNumber, int pageSize)
+        public async Task<Result<List<Company>>> RetrieveAllAsync(int pageNumber, int pageSize)
         {
             try
             {
-                Result<List<CompanyDataModel>> paginatedResults =
+                Result<List<CompanyDM>> paginatedResults =
                     await _db.Companies
                              .OrderBy(c => c.CompanyName) // Primary sort
                              .Skip((pageNumber - 1) * pageSize)
@@ -70,13 +69,13 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 if (paginatedResults.IsSuccess)
                 {
-                    // List<CompanyDomainModel> companyDomainList = paginatedResults.Value.Adapt<List<CompanyDomainModel>>();
-                    return paginatedResults.Value.Adapt<List<CompanyDomainModel>>();
+                    // List<Company> companyDomainList = paginatedResults.Value.Adapt<List<Company>>();
+                    return paginatedResults.Value.Adapt<List<Company>>();
                 }
 
                 _logger.LogWarning("There was a problem retrieving a list of companies: {Message}", paginatedResults.Error.Message);
 
-                return Result<List<CompanyDomainModel>>.Failure<List<CompanyDomainModel>>(
+                return Result<List<Company>>.Failure<List<Company>>(
                     new Error("CompanyRepository.CreateAsync", paginatedResults.Error.Message)
                 );
             }
@@ -85,54 +84,44 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<List<CompanyDomainModel>>.Failure<List<CompanyDomainModel>>(
+                return Result<List<Company>>.Failure<List<Company>>(
                     new Error("CompanyRepository.CreateAsync", Helpers.GetInnerExceptionMessage(ex))
                 );
             }
         }
 
-        public async Task<Result<CompanyDomainModel>> RetrieveAsync(int id, CancellationToken token, bool noTracking = false)
+        public async Task<Result<Company>> RetrieveAsync(int id, CancellationToken token)
         {
             try
             {
-                CompanyDataModel? company = null;
-
                 string cacheKey = $"company-{id}";
 
-                if (noTracking)
-                {
-                    company = await _db.Companies.AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.CompanyCode == id, cancellationToken: token);
-                }
-                else
-                {
-                    company = await _db.Companies
-                        .FirstOrDefaultAsync(c => c.CompanyCode == id, cancellationToken: token);
-                }
+                CompanyDM? company = await _db.Companies.AsNoTracking()
+                        .SingleOrDefaultAsync(c => c.CompanyCode == id, cancellationToken: token);
 
                 if (company is null)
                 {
                     CompanyNotFoundException notFoundException = new(id);
-                    return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
+                    return Result<Company>.Failure<Company>(
                         new Error("CompanyRepository.RetrieveAsync", notFoundException.Message));
                 }
 
                 _memoryCache.Set(cacheKey, company, _cacheEntryOptions);
 
-                return _mapper.Map<CompanyDomainModel>(company);
+                return _mapper.Map<Company>(company);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
+                return Result<Company>.Failure<Company>(
                     new Error("CompanyRepository.RetrieveAsync", Helpers.GetInnerExceptionMessage(ex))
                 );
             }
         }
 
-        public async Task<Result<CompanyDomainModel>> UpdateAsync(CompanyDomainModel c)
+        public async Task<Result<Company>> UpdateAsync(Company c)
         {
             try
             {
@@ -146,18 +135,18 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                                         .SetProperty(comp => comp.Fax, c.Fax)
                                         .SetProperty(comp => comp.Currency, c.Currency));
 
-                CompanyDataModel? dataModel = await _db.Companies.FindAsync(c.CompanyCode);
+                CompanyDM? dataModel = await _db.Companies.FindAsync(c.CompanyCode);
 
                 _memoryCache.Set($"company-{c.CompanyCode}", dataModel, _cacheEntryOptions);
 
-                return _mapper.Map<CompanyDomainModel>(dataModel!);
+                return _mapper.Map<Company>(dataModel!);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<CompanyDomainModel>.Failure<CompanyDomainModel>(
+                return Result<Company>.Failure<Company>(
                     new Error("CompanyRepository.UpdateAsync", errMsg)
                 );
             }
@@ -183,21 +172,78 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<Result> DeleteFiscalYearAsync(int companyCode, int fiscalYear)
+        public async Task<Result<bool>> IsUniqueCompanyNameForCreate(string companyName)
         {
             try
             {
-                await _db.FiscalYears.Where(c => c.CompanyCode == companyCode && c.CompanyYear == fiscalYear)
-                                     .ExecuteDeleteAsync();
-
-                return Result.Success();
+                bool isUnique = await _db.Companies.AllAsync(c => c.CompanyName != companyName);
+                return Result<bool>.Success(isUnique);
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result.Failure(new Error("CompanyRepository.DeleteFiscalYearAsync", errMsg));
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.IsUniqueCompanyNameForCreate", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsUniqueCompanyNameForUpdate(int companyCode, string companyName)
+        {
+            try
+            {
+                bool isUnique = await _db.Companies
+                                         .AnyAsync(c => c.CompanyName != companyName);
+
+                return Result<bool>.Success(isUnique);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.IsUniqueCompanyNameForUpdate", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsExistingCompany(int companyCode)
+        {
+            try
+            {
+                bool exists = await _db.Companies.AnyAsync(c => c.CompanyCode == companyCode);
+                return Result<bool>.Success(exists);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.IsExistingCompany", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> CanCompanyBeDeleted(int companyCode)
+        {
+            try
+            {
+                bool hasFiscalYears = await _db.FiscalYears.AnyAsync(c => c.CompanyCode == companyCode);
+
+                return Result<bool>.Success(!hasFiscalYears);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<bool>.Failure<bool>(
+                    new Error("CompanyRepository.CanCompanyBeDeleted", errMsg)
+                );
             }
         }
     }

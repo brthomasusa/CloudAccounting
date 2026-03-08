@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class TransactionMaster
+public partial class TransactionMasterDM
 {
     public int TransactionNumber { get; set; }
 
@@ -28,11 +28,11 @@ public partial class TransactionMaster
 
     public bool Closing { get; set; }
 
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
+    public virtual CompanyDM CompanyCodeNavigation { get; set; } = null!;
 
-    public virtual FiscalYear FiscalYearNavigation { get; set; } = null!;
+    public virtual FiscalYearDM FiscalYearNavigation { get; set; } = null!;
 
-    public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
+    public virtual ICollection<TransactionDetailDM> TransactionDetails { get; set; } = [];
 
-    public virtual Voucher VoucherNavigation { get; set; } = null!;
+    public virtual VoucherDM VoucherNavigation { get; set; } = null!;
 }

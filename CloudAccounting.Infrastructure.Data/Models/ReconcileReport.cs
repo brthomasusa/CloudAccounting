@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class ReconcileReport
+public partial class ReconcileReportDM
 {
     public int? Srno { get; set; }
 

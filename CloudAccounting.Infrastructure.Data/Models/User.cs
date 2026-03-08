@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class User
+public partial class UserDM
 {
     public string UserId { get; set; } = null!;
 
@@ -16,7 +16,7 @@ public partial class User
 
     public string? Admin { get; set; }
 
-    public virtual Company? CompanyCodeNavigation { get; set; }
+    public virtual CompanyDM? CompanyCodeNavigation { get; set; }
 
-    public virtual GroupsMaster? GroupsMasterNavigation { get; set; }
+    public virtual GroupsMasterDM? GroupsMasterNavigation { get; set; }
 }

@@ -4,9 +4,9 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class SegmentConfig : IEntityTypeConfiguration<Segment>
+    public class SegmentConfig : IEntityTypeConfiguration<SegmentDM>
     {
-        public void Configure(EntityTypeBuilder<Segment> entity)
+        public void Configure(EntityTypeBuilder<SegmentDM> entity)
         {
             entity.HasKey(e => e.SegmentId).HasName("GL_SEGMENTS_PK");
 
@@ -14,17 +14,17 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
 
             entity.Property(e => e.SegmentId)
                 .ValueGeneratedOnAdd()
-                .HasColumnType("NUMBER")
+                .HasColumnType("SMALLINT")
                 .HasColumnName("SEGMENTID");
             entity.Property(e => e.ItemRole)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("ITEMROLE");
             entity.Property(e => e.PageId)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("PAGEID");
             entity.Property(e => e.SegmentParent)
-                .HasColumnType("NUMBER")
+                .HasColumnType("SMALLINT")
                 .HasColumnName("SEGMENTPARENT");
             entity.Property(e => e.SegmentTitle)
                 .HasMaxLength(50)

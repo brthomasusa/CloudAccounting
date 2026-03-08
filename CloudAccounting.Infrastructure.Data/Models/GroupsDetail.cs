@@ -1,12 +1,12 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class GroupsDetail
+public partial class GroupsDetailDM
 {
     public Int16? GroupId { get; set; }
 
-    public int? SegmentId { get; set; }
+    public Int16? SegmentId { get; set; }
 
-    public int? SegmentParent { get; set; }
+    public Int16? SegmentParent { get; set; }
 
     public string? SegmentType { get; set; }
 
@@ -16,7 +16,7 @@ public partial class GroupsDetail
 
     public string? AllowAccess { get; set; }
 
-    public virtual GroupsMaster? GroupsMasterNavigation { get; set; }
+    public virtual GroupsMasterDM? GroupsMasterNavigation { get; set; }
 
-    public virtual Segment? SegmentNavigation { get; set; }
+    public virtual SegmentDM? SegmentNavigation { get; set; }
 }

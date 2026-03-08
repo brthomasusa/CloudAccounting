@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class CostCenter
+public partial class CostCenterDM
 {
     public int CompanyCode { get; set; }
 
@@ -8,9 +8,9 @@ public partial class CostCenter
 
     public string? CostCenterTitle { get; set; }
 
-    public bool? CostCenterLevel { get; set; }
+    public byte? CostCenterLevel { get; set; }
 
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
+    public virtual CompanyDM CompanyCodeNavigation { get; set; } = null!;
 
-    public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
+    public virtual ICollection<TransactionDetailDM> TransactionDetails { get; set; } = [];
 }

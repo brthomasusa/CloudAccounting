@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -7,4 +6,7 @@
     <RootNamespace>CloudAccounting.Shared</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CloudAccounting.SharedKernel\CloudAccounting.SharedKernel.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,7 +1,5 @@
 using CloudAccounting.Core.Models;
-using CompanyDataModel = CloudAccounting.Infrastructure.Data.Models.Company;
-using CompanyDomainModel = CloudAccounting.Core.Models.Company;
-using FiscalYearDataModel = CloudAccounting.Infrastructure.Data.Models.FiscalYear;
+using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Mappings;
 
@@ -11,7 +9,7 @@ public class CompanyMappingConfig : IRegister
     {
         // TypeAdapterConfig<TSource, TDestination>()
         // Map Company domain model to Company data model
-        config.NewConfig<CompanyDomainModel, CompanyDataModel>()
+        config.NewConfig<Company, CompanyDM>()
             .Map(dest => dest.CompanyCode, src => src.CompanyCode)
             .Map(dest => dest.CompanyName, src => src.CompanyName)
             .Map(dest => dest.Address, src => src.Address)
@@ -22,7 +20,7 @@ public class CompanyMappingConfig : IRegister
             .Map(dest => dest.Currency, src => src.Currency);
 
         // Map Company data model to Company domain model
-        config.NewConfig<CompanyDataModel, CompanyDomainModel>()
+        config.NewConfig<CompanyDM, Company>()
             .Map(dest => dest.CompanyCode, src => src.CompanyCode)
             .Map(dest => dest.CompanyName, src => src.CompanyName)
             .Map(dest => dest.Address, src => src.Address)
@@ -33,7 +31,7 @@ public class CompanyMappingConfig : IRegister
             .Map(dest => dest.Currency, src => src.Currency);
 
         // Map FiscalPeriod domain model to FiscalYear data model
-        config.NewConfig<FiscalPeriod, FiscalYearDataModel>()
+        config.NewConfig<FiscalPeriod, FiscalYearDM>()
             .Map(dest => dest.CompanyMonthId, src => src.MonthId)
             .Map(dest => dest.CompanyMonthName, src => src.MonthName)
             .Map(dest => dest.PeriodFrom, src => src.StartDate)

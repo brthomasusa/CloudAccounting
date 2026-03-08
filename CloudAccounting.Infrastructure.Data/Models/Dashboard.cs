@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class Dashboard
+public partial class DashboardDM
 {
     public int? Srno { get; set; }
 

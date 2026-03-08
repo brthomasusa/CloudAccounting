@@ -4,9 +4,9 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class GroupsDetailConfig : IEntityTypeConfiguration<GroupsDetail>
+    public class GroupsDetailConfig : IEntityTypeConfiguration<GroupsDetailDM>
     {
-        public void Configure(EntityTypeBuilder<GroupsDetail> entity)
+        public void Configure(EntityTypeBuilder<GroupsDetailDM> entity)
         {
             entity
                 .HasNoKey()
@@ -17,20 +17,20 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("ALLOW_ACCESS");
             entity.Property(e => e.GroupId)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("GROUPID");
             entity.Property(e => e.ItemRole)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .HasColumnName("ITEMROLE");
             entity.Property(e => e.PageId)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("PAGEID");
             entity.Property(e => e.SegmentId)
-                .HasColumnType("NUMBER")
+                .HasColumnType("SMALLINT")
                 .HasColumnName("SEGMENTID");
             entity.Property(e => e.SegmentParent)
-                .HasColumnType("NUMBER")
+                .HasColumnType("SMALLINT")
                 .HasColumnName("SEGMENTPARENT");
             entity.Property(e => e.SegmentType)
                 .HasMaxLength(4)

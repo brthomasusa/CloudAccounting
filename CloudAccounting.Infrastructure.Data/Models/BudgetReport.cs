@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class BudgetReport
+public partial class BudgetReportDM
 {
     public string? AccountCode { get; set; }
 

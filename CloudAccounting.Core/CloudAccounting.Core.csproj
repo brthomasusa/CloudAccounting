@@ -5,9 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>CloudAccounting.Core</RootNamespace>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CloudAccounting.SharedKernel\CloudAccounting.SharedKernel.csproj" />
   </ItemGroup>
-
 </Project>

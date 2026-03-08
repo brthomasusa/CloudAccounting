@@ -4,9 +4,9 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class BudgetReportConfig : IEntityTypeConfiguration<BudgetReport>
+    public class BudgetReportConfig : IEntityTypeConfiguration<BudgetReportDM>
     {
-        public void Configure(EntityTypeBuilder<BudgetReport> entity)
+        public void Configure(EntityTypeBuilder<BudgetReportDM> entity)
         {
             entity
                 .HasNoKey()
@@ -21,10 +21,10 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("ACCOUNTTO");
             entity.Property(e => e.Actual)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("ACTUAL");
             entity.Property(e => e.Budget)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("BUDGET");
             entity.Property(e => e.AccountCode)
                 .HasMaxLength(11)
@@ -39,7 +39,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("CONAME");
             entity.Property(e => e.GrandTotal)
-                .HasColumnType("NUMBER(1)")
+                .HasColumnType("BIT")
                 .HasColumnName("GRAND_TOTAL");
             entity.Property(e => e.MonthFrom)
                 .HasMaxLength(9)
@@ -50,10 +50,10 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("MONTHTO");
             entity.Property(e => e.Percent)
-                .HasColumnType("NUMBER(7,2)")
+                .HasColumnType("DECIMAL(7,2)")
                 .HasColumnName("PERCENT");
             entity.Property(e => e.PrintedOn)
-                .HasPrecision(6)
+                .HasColumnType("DATETIME2")
                 .HasColumnName("PRINTEDON");
             entity.Property(e => e.Status)
                 .HasMaxLength(1)
@@ -64,7 +64,7 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("USERID");
             entity.Property(e => e.Variance)
-                .HasColumnType("NUMBER(15,2)")
+                .HasColumnType("MONEY")
                 .HasColumnName("VARIANCE");
         }
     }

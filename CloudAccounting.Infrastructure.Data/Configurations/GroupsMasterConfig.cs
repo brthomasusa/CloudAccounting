@@ -4,16 +4,16 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class GroupsMasterConfig : IEntityTypeConfiguration<GroupsMaster>
+    public class GroupsMasterConfig : IEntityTypeConfiguration<GroupsMasterDM>
     {
-        public void Configure(EntityTypeBuilder<GroupsMaster> entity)
+        public void Configure(EntityTypeBuilder<GroupsMasterDM> entity)
         {
             entity.HasKey(e => e.GroupId).HasName("GL_GROUPS_PK");
 
             entity.ToTable("GL_GROUPS_MASTER");
 
             entity.Property(e => e.GroupId)
-                .HasPrecision(4)
+                .HasColumnType("SMALLINT")
                 .HasColumnName("GROUPID");
             entity.Property(e => e.GroupTitle)
                 .HasMaxLength(25)

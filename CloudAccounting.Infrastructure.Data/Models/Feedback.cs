@@ -1,6 +1,6 @@
 namespace CloudAccounting.Infrastructure.Data.Models;
 
-public partial class Feedback
+public partial class FeedbackDM
 {
     public int FeedbackId { get; set; }
 

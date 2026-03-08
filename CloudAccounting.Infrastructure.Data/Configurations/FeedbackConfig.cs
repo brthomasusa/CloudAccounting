@@ -4,16 +4,17 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class FeedbackConfig : IEntityTypeConfiguration<Feedback>
+    public class FeedbackConfig : IEntityTypeConfiguration<FeedbackDM>
     {
-        public void Configure(EntityTypeBuilder<Feedback> entity)
+        public void Configure(EntityTypeBuilder<FeedbackDM> entity)
         {
             entity.HasKey(e => e.FeedbackId).HasName("GL_FEEDBACK_PK");
 
             entity.ToTable("GL_FEEDBACK");
 
             entity.Property(e => e.FeedbackId)
-                .HasColumnType("NUMBER")
+                .ValueGeneratedOnAdd()
+                .HasColumnType("INT")
                 .HasColumnName("FEEDBACKID");
             entity.Property(e => e.CustomerEmail)
                 .HasMaxLength(100)
@@ -27,8 +28,8 @@ namespace CloudAccounting.Infrastructure.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("CUSTNAME");
             entity.Property(e => e.Timestamp)
-                .HasPrecision(6)
-                .HasDefaultValueSql("sysdate")
+                .HasColumnType("DATETIME2")
+                .HasDefaultValueSql("GETDATE()")
                 .HasColumnName("TS");
         }
     }

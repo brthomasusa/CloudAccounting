@@ -4,16 +4,16 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {
-    public class FinancialStatementSetupConfig : IEntityTypeConfiguration<FinancialStatementSetup>
+    public class FinancialStatementSetupConfig : IEntityTypeConfiguration<FinancialStatementSetupDM>
     {
-        public void Configure(EntityTypeBuilder<FinancialStatementSetup> entity)
+        public void Configure(EntityTypeBuilder<FinancialStatementSetupDM> entity)
         {
             entity.HasKey(e => new { e.CompanyCode, e.ReportCode, e.FinancialStatementAccount }).HasName("GL_FS_SETUP_PK");
 
             entity.ToTable("GL_FS_SETUP");
 
             entity.Property(e => e.CompanyCode)
-                .HasColumnType("NUMBER")
+                .HasColumnType("INT")
                 .HasColumnName("COCODE");
             entity.Property(e => e.ReportCode)
                 .HasMaxLength(4)

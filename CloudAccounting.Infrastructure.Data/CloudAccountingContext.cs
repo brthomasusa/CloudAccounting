@@ -1,6 +1,5 @@
 #pragma warning disable CS8604
 
-using Microsoft.EntityFrameworkCore;
 using CloudAccounting.Infrastructure.Data.Models;
 using System.Reflection;
 
@@ -15,77 +14,61 @@ public partial class CloudAccountingContext : DbContext
     public CloudAccountingContext(DbContextOptions<CloudAccountingContext> options)
         : base(options)
     {
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
-    public virtual DbSet<BankOpeningStatement> BankOpeningStatements { get; set; }
+    public virtual DbSet<BankOpeningStatementDM> BankOpeningStatements { get; set; }
 
-    public virtual DbSet<Budget> Budgets { get; set; }
+    public virtual DbSet<BudgetDM> Budgets { get; set; }
 
-    public virtual DbSet<BudgetReport> BudgetReports { get; set; }
+    public virtual DbSet<BudgetReportDM> BudgetReports { get; set; }
 
-    public virtual DbSet<ChartOfAccounts> ChartOfAccounts { get; set; }
+    public virtual DbSet<ChartOfAccountsDM> ChartOfAccounts { get; set; }
 
-    public virtual DbSet<Company> Companies { get; set; }
+    public virtual DbSet<CompanyDM> Companies { get; set; }
 
-    public virtual DbSet<CostCenter> CostCenters { get; set; }
+    public virtual DbSet<CostCenterDM> CostCenters { get; set; }
 
-    public virtual DbSet<Dashboard> Dashboards { get; set; }
+    public virtual DbSet<DashboardDM> Dashboards { get; set; }
 
-    public virtual DbSet<Feedback> Feedbacks { get; set; }
+    public virtual DbSet<FeedbackDM> Feedbacks { get; set; }
 
-    public virtual DbSet<FiscalYear> FiscalYears { get; set; }
+    public virtual DbSet<FiscalYearDM> FiscalYears { get; set; }
 
-    public virtual DbSet<FinancialStatementReport> FinancialStatementReports { get; set; }
+    public virtual DbSet<FinancialStatementReportDM> FinancialStatementReports { get; set; }
 
-    public virtual DbSet<FinancialStatementSetup> FinancialStatementSetups { get; set; }
+    public virtual DbSet<FinancialStatementSetupDM> FinancialStatementSetups { get; set; }
 
-    public virtual DbSet<GroupsDetail> GroupsDetails { get; set; }
+    public virtual DbSet<GroupsDetailDM> GroupsDetails { get; set; }
 
-    public virtual DbSet<GroupsMaster> GroupsMasters { get; set; }
+    public virtual DbSet<GroupsMasterDM> GroupsMasters { get; set; }
 
-    public virtual DbSet<ReconcileReport> ReconcileReports { get; set; }
+    public virtual DbSet<ReconcileReportDM> ReconcileReports { get; set; }
 
-    public virtual DbSet<Segment> Segments { get; set; }
+    public virtual DbSet<SegmentDM> Segments { get; set; }
 
-    public virtual DbSet<TransactionDetail> TranDetails { get; set; }
+    public virtual DbSet<TransactionDetailDM> TranDetails { get; set; }
 
-    public virtual DbSet<TransactionMaster> TranMasters { get; set; }
+    public virtual DbSet<TransactionMasterDM> TranMasters { get; set; }
 
-    public virtual DbSet<TrialBalance> TrialBalances { get; set; }
+    public virtual DbSet<TrialBalanceDM> TrialBalances { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserDM> Users { get; set; }
 
-    public virtual DbSet<Voucher> Vouchers { get; set; }
+    public virtual DbSet<VoucherDM> Vouchers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseOracle("User Id=CLOUD_ACCTG_DEV;Password=Info33Gum;Data Source=rhel9-ws:1521/ORCL;");
+        => optionsBuilder.UseSqlServer("Server=tcp:rhel9-ws,1433;Database=CloudAcctgTest;User Id=sa;Password=Info99Gum;TrustServerCertificate=True");
 
+    // "Server=tcp:rhel9-ws,1433;Database=CloudAcctgTest;User Id=sa;Password=Info99Gum;TrustServerCertificate=True"
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.UseCollation("USING_NLS_COMP");
-
-        modelBuilder.HasSequence("GL_BANKS_OS_SEQ");
-        modelBuilder.HasSequence("GL_COMPANY_SEQ");
-        modelBuilder.HasSequence("GL_FEEDBACK_SEQ");
-        modelBuilder.HasSequence("GL_SEGMENTS_SEQ");
-        modelBuilder.HasSequence("GL_TRAN_DETAIL_SEQ");
-        modelBuilder.HasSequence("GL_TRAN_MASTER_SEQ");
-        modelBuilder.HasSequence("GL_VOUCHER_SEQ");
-
-        modelBuilder
-                .HasDbFunction(typeof(CloudAccountingContext).GetMethod(nameof(IsUniqueCompanyName), [typeof(string)]))
-                .HasName("is_unique_companyname") // Specify the exact Oracle function name
-                .HasSchema("CLOUD_ACCTG_DEV"); // Specify the schema if needed
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         OnModelCreatingPartial(modelBuilder);
     }
-
-    public static int IsUniqueCompanyName(string companyName)
-        => throw new NotSupportedException();
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
