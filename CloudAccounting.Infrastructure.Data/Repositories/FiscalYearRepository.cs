@@ -79,6 +79,45 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
+        public async Task<Result<FiscalYear>> GetMostRecentFiscalYearAsync(int companyCode)
+        {
+            try
+            {
+                int? mostRecentFiscalYearNumber = await _db.FiscalYears
+                                                           .Where(fy => fy.CompanyCode == companyCode)
+                                                           .MaxAsync(fy => (int?)fy.CompanyYear);
+
+                if (mostRecentFiscalYearNumber is null)
+                {
+                    Result<string> companyNameResult = await GetCompanyName(companyCode);
+
+                    return new FiscalYear(
+                        companyCode,
+                        companyNameResult.IsSuccess ? companyNameResult.Value : "Unknown Company",
+                        0,
+                        DateTime.MinValue,
+                        DateTime.MinValue,
+                        false,
+                        false,
+                        false,
+                        null,
+                        []
+                    );
+                }
+
+                return await GetFiscalYearAsync(companyCode, mostRecentFiscalYearNumber.Value);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<FiscalYear>.Failure<FiscalYear>(
+                    new Error("FiscalYearRepository.GetMostRecentFiscalYearAsync", errMsg)
+                );
+            }
+        }
+
         public async Task<Result<FiscalYear>> InsertFiscalYearAsync(FiscalYear fiscalYear)
         {
             try

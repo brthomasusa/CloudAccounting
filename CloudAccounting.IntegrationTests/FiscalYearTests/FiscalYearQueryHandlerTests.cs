@@ -1,5 +1,6 @@
 using CloudAccounting.Shared.FiscalYear;
 using CloudAccounting.Application.UseCases.FiscalYears.GetFiscalYear;
+using CloudAccounting.Application.UseCases.FiscalYears.GetMostRecentFiscalYear;
 
 namespace CloudAccounting.IntegrationTests.FiscalYearTests
 {
@@ -50,5 +51,43 @@ namespace CloudAccounting.IntegrationTests.FiscalYearTests
             Assert.Equal("Contoso Ltd.", result.Value.CompanyName);
             ; Assert.Empty(result.Value.FiscalPeriods);
         }
+
+        [Fact]
+        public async Task Handle_GetMostRecentFiscalYearQueryHandler_ShouldReturn_CompanyWithFiscalPeriodDtos()
+        {
+            // Arrange
+            await ReseedTestDb.ReseedTestDbAsync(_context);
+            GetMostRecentFiscalYearQuery query = new(1);
+            GetMostRecentFiscalYearQueryHandler handler = new(_repo, new NullLogger<GetMostRecentFiscalYearQueryHandler>());
+
+            // Act
+            Result<FiscalYearDto> result = await handler.Handle(query, new CancellationToken());
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal("BTechnical Consulting", result.Value.CompanyName);
+            Assert.False(result.Value.IsInitialFiscalYear);
+            Assert.Equal(2025, result.Value.Year);
+            Assert.Equal(12, result.Value.FiscalPeriods.Count);
+        }
+
+        [Fact]
+        public async Task Handle_GetMostRecentFiscalYearQueryHandler_ShouldReturn_CompanyWithoutFiscalPeriodDtos()
+        {
+            // Arrange
+            await ReseedTestDb.ReseedTestDbAsync(_context);
+            GetMostRecentFiscalYearQuery query = new(2);
+            GetMostRecentFiscalYearQueryHandler handler = new(_repo, new NullLogger<GetMostRecentFiscalYearQueryHandler>());
+
+            // Act
+            Result<FiscalYearDto> result = await handler.Handle(query, new CancellationToken());
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Contoso Ltd.", result.Value.CompanyName);
+            Assert.Equal(0, result.Value.Year);
+            Assert.Empty(result.Value.FiscalPeriods);
+        }
+
     }
 }

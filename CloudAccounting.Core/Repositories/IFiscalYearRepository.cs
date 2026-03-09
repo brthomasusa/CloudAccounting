@@ -5,6 +5,8 @@ namespace CloudAccounting.Core.Repositories
     {
         Task<Result<FiscalYear>> GetFiscalYearAsync(int companyCode, int fiscalYearNumber);
 
+        Task<Result<FiscalYear>> GetMostRecentFiscalYearAsync(int companyCode);
+
         Task<Result<FiscalYear>> InsertFiscalYearAsync(FiscalYear fiscalYear);
 
         Task<Result> DeleteFiscalYearAsync(int companyCode, int fiscalYear);

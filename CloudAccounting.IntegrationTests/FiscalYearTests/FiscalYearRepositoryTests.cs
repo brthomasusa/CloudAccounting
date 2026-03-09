@@ -27,6 +27,38 @@ public class FiscalYearRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task GetMostRecentFiscalYearAsync_FiscalYearRepository_CompanyWithPrevFiscalYear_ShouldRetrieve12FiscalYearRecords()
+    {
+        // Arrange
+        await ReseedTestDb.ReseedTestDbAsync(_context);
+        int companyCode = 1;
+
+        // Act
+        Result<FiscalYear> result = await _repo.GetMostRecentFiscalYearAsync(companyCode);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(2025, result.Value.Year);
+        Assert.Equal(12, result.Value.FiscalPeriods.Count);
+    }
+
+    [Fact]
+    public async Task GetMostRecentFiscalYearAsync_FiscalYearRepository_CompanyWithoutPrevFiscalYear_ShouldRetrieveNoFiscalYearRecords()
+    {
+        // Arrange
+        await ReseedTestDb.ReseedTestDbAsync(_context);
+        int companyCode = 2;
+
+        // Act
+        Result<FiscalYear> result = await _repo.GetMostRecentFiscalYearAsync(companyCode);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(0, result.Value.Year);
+        Assert.Empty(result.Value.FiscalPeriods);
+    }
+
+    [Fact]
     public async Task GetFiscalYearByCompanyAndYearAsync_FiscalYearRepository_ShouldRetrieve12FiscalYearRecords()
     {
         // Arrange

@@ -60,6 +60,40 @@ namespace CloudAccounting.IntegrationTests.FiscalYearTests
             }
 
             [Fact]
+            public async Task Get_MostRecentFiscalYear_ReturnsOneFiscalYear_WithFiscalPeriods()
+            {
+                // Arrange
+                await ReseedTestDb.ReseedTestDbAsync(_context);
+                const int companyCode = 1;
+
+                // Act
+                using HttpResponseMessage response = await _client.GetAsync($"{relativePath}/{companyCode}");
+                response.EnsureSuccessStatusCode();
+                FiscalYear? fiscalYear = await response.Content.ReadFromJsonAsync<FiscalYear>();
+
+                // Assert
+                Assert.NotNull(fiscalYear);
+                Assert.Equal(2025, fiscalYear.Year);
+            }
+
+            [Fact]
+            public async Task Get_MostRecentFiscalYear_ReturnsOneFiscalYear_WithoutFiscalPeriods()
+            {
+                // Arrange
+                await ReseedTestDb.ReseedTestDbAsync(_context);
+                const int companyCode = 2;
+
+                // Act
+                using HttpResponseMessage response = await _client.GetAsync($"{relativePath}/{companyCode}");
+                response.EnsureSuccessStatusCode();
+                FiscalYear? fiscalYear = await response.Content.ReadFromJsonAsync<FiscalYear>();
+
+                // Assert
+                Assert.NotNull(fiscalYear);
+                Assert.Equal(0, fiscalYear.Year);
+            }
+
+            [Fact]
             public async Task Create_CompanyWithFiscalPeriodsDto_ReturnsOneFiscalYearDtoWith12FiscalPeriods()
             {
                 // Arrange
