@@ -12,7 +12,7 @@ public class DeleteFiscalYearCommandValidator : AbstractValidator<DeleteFiscalYe
                                         .GreaterThan(0).WithMessage("Missing company code.")
                                         .MustAsync(ValidateCompanyCode).WithMessage("The company code is not valid.");
 
-        RuleFor(fiscalYear => fiscalYear.FiscalYearNumber)
+        RuleFor(fiscalYear => fiscalYear.FiscalYear)
                                         .GreaterThan(0).WithMessage("Missing fiscal year.")
                                         .MustAsync(ValidateFiscalYearCanBeDeleted).WithMessage("This fiscal year can't be deleted because it has transactions.");
     }
@@ -26,7 +26,7 @@ public class DeleteFiscalYearCommandValidator : AbstractValidator<DeleteFiscalYe
 
     private async Task<bool> ValidateFiscalYearCanBeDeleted(DeleteFiscalYearCommand command, int fiscalYearNumber, CancellationToken cancellationToken)
     {
-        Result<bool> result = await _repository.CanFiscalYearBeDeleted(command.CompanyCode, command.FiscalYearNumber);
+        Result<bool> result = await _repository.CanFiscalYearBeDeleted(command.CompanyCode, command.FiscalYear);
 
         return result.Value;
     }

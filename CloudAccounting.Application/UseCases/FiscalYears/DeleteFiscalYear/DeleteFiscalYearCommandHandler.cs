@@ -11,7 +11,7 @@ public class DeleteFiscalYearCommandHandler
 
     public async Task<Result<MediatR.Unit>> Handle(DeleteFiscalYearCommand command, CancellationToken token)
     {
-        Result result = await _repository.DeleteFiscalYearAsync(command.CompanyCode, command.FiscalYearNumber);
+        Result result = await _repository.DeleteFiscalYearAsync(command.CompanyCode, command.FiscalYear);
 
         if (result.IsFailure)
         {
