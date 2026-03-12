@@ -19,6 +19,7 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
             ILogger<DeleteFiscalYear> logger
         )
         {
+            logger.LogInformation("Received request to delete fiscal year {FISCALYEARID} for company with code {COMPANYCODE}", command.FiscalYearNumber, command.CompanyCode);
             Result<MediatR.Unit> result = await sender.Send(command);
 
             if (result.IsSuccess)
