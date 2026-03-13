@@ -42,7 +42,7 @@ public class FiscalYearCommandValidatorTests(DatabaseFixture fixture) : IAsyncLi
         var result = await validator.TestValidateAsync(command);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.FiscalYearNumber)
+        result.ShouldHaveValidationErrorFor(x => x.FiscalYear)
               .WithErrorMessage("The fiscal year number already exists for this company.");
     }
 

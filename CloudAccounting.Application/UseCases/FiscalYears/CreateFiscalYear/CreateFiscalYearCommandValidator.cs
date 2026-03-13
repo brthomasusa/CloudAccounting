@@ -12,7 +12,7 @@ public class CreateFiscalYearCommandValidator : AbstractValidator<CreateFiscalYe
                                         .GreaterThan(0).WithMessage("Missing company code.")
                                         .MustAsync(ValidateCompanyCode).WithMessage("The company code is not valid.");
 
-        RuleFor(fiscalYear => fiscalYear.FiscalYearNumber)
+        RuleFor(fiscalYear => fiscalYear.FiscalYear)
                                         .GreaterThan(0).WithMessage("Missing fiscal year.")
                                         .MustAsync(ValidateFiscalYearNumber).WithMessage("The fiscal year number already exists for this company.");
 
@@ -30,7 +30,7 @@ public class CreateFiscalYearCommandValidator : AbstractValidator<CreateFiscalYe
 
     private async Task<bool> ValidateFiscalYearNumber(CreateFiscalYearCommand command, int fiscalYear, CancellationToken cancellationToken)
     {
-        Result<bool> result = await _repository.IsUniqueFiscalYearNumber(command.CompanyCode, command.FiscalYearNumber);
+        Result<bool> result = await _repository.IsUniqueFiscalYearNumber(command.CompanyCode, command.FiscalYear);
 
         return result.Value;
     }

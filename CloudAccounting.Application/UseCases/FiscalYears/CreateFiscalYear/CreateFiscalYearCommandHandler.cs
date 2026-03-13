@@ -16,7 +16,7 @@ namespace CloudAccounting.Application.UseCases.FiscalYears.CreateFiscalYear
         public async Task<Result<FiscalYearDto>> Handle(CreateFiscalYearCommand command, CancellationToken token)
         {
             Result<FiscalYear> result =
-                await _fiscalYearService.CreateFiscalYear(command.CompanyCode, command.FiscalYearNumber, command.StartDate);
+                await _fiscalYearService.CreateFiscalYear(command.CompanyCode, command.FiscalYear, command.StartDate);
 
             if (result.IsFailure)
             {
