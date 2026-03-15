@@ -16,13 +16,13 @@ namespace CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType
             RuleFor(voucherType => voucherType.VoucherType)
                                             .NotEmpty().WithMessage("Missing voucher type.")
                                             .NotNull().WithMessage("Missing voucher type.")
-                                            .MaximumLength(10).WithMessage("Voucher type cannot exceed 10 characters.")
+                                            .MaximumLength(6).WithMessage("Voucher type cannot exceed 6 characters.")
                                             .MustAsync(IsUniqueVoucherTypeNameForCreate).WithMessage("This voucher type already exists.");
 
             RuleFor(voucherType => voucherType.VoucherTitle)
                                             .NotEmpty().WithMessage("Missing voucher title.")
                                             .NotNull().WithMessage("Missing voucher title.")
-                                            .MaximumLength(100).WithMessage("Voucher title cannot exceed 100 characters.");
+                                            .MaximumLength(30).WithMessage("Voucher title cannot exceed 30 characters.");
 
             RuleFor(voucherType => voucherType.VoucherClassification)
                                             .NotNull().WithMessage("Missing voucher classification.")

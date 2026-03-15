@@ -21,7 +21,7 @@ namespace CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType
             RuleFor(voucherType => voucherType.VoucherTitle)
                                             .NotEmpty().WithMessage("Missing voucher title.")
                                             .NotNull().WithMessage("Missing voucher title.")
-                                            .MaximumLength(10).WithMessage("Voucher title cannot exceed 10 characters.");
+                                            .MaximumLength(30).WithMessage("Voucher title cannot exceed 30 characters.");
 
             RuleFor(voucherType => voucherType.VoucherClassification)
                                             .NotNull().WithMessage("Missing voucher classification.")

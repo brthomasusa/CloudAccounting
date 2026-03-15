@@ -106,14 +106,14 @@ namespace CloudAccounting.IntegrationTests.VoucherTypeTests
             await ReseedTestDb.ReseedTestDbAsync(_context);
             CreateVoucherTypeCommandValidator validator = new(_repo);
             CreateVoucherTypeCommand command = GetVoucherForCreate();
-            command.VoucherTitle = new string('A', 11); // 11 characters, exceeding the 10-character limit
+            command.VoucherTitle = new string('A', 31); // 31 characters, exceeding the 30-character limit
 
             // Act
             var result = await validator.TestValidateAsync(command);
 
             // Assert
             result.ShouldHaveValidationErrorFor(x => x.VoucherTitle)
-                .WithErrorMessage("Voucher title cannot exceed 10 characters.");
+                .WithErrorMessage("Voucher title cannot exceed 30 characters.");
         }
 
         [Fact]
