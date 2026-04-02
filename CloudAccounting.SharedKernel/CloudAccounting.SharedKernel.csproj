@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <RootNamespace>CloudAccounting.SharedKernel</RootNamespace>
   </PropertyGroup>
+  
   <ItemGroup Label="For SharedKernel">
-    <PackageReference Include="MediatR.Contracts" />
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
   </ItemGroup>
 </Project>

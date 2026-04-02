@@ -1,15 +1,16 @@
 using CloudAccounting.Core.Models;
 using CloudAccounting.Infrastructure.Data.Models;
+using CloudAccounting.Infrastructure.Data.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
     public class FiscalYearRepository
     (
-        CloudAccountingContext ctx,
+        AppDbContext ctx,
         ILogger<FiscalYearRepository> logger
     ) : IFiscalYearRepository
     {
-        private readonly CloudAccountingContext _db = ctx;
+        private readonly AppDbContext _db = ctx;
         private readonly ILogger<FiscalYearRepository> _logger = logger;
 
         public async Task<Result<FiscalYear>> GetFiscalYearAsync(int companyCode, int fiscalYearNumber)

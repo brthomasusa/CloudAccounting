@@ -11,7 +11,7 @@ namespace CloudAccounting.IntegrationTests.CompanyTests;
 public class CompanyEndpointTests(DatabaseFixture fixture, WebApplicationFactory<Program> factory)
     : IAsyncLifetime, IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly CloudAccountingContext _context = fixture.Context!;
+    private readonly AppDbContext _context = fixture.Context!;
     private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;
 
     public Task InitializeAsync() => Task.CompletedTask;
@@ -120,7 +120,6 @@ public class CompanyEndpointTests(DatabaseFixture fixture, WebApplicationFactory
             await ReseedTestDb.ReseedTestDbAsync(_context);
             DeleteCompanyCommand command = new() { CompanyCode = 3 };
             string uri = $"{relativePath}";
-
 
             var memStream = new MemoryStream();
             await JsonSerializer.SerializeAsync(memStream, command);

@@ -7,7 +7,7 @@ namespace CloudAccounting.IntegrationTests.VoucherTypeTests
     [Collection("SequentialTestCollection")]
     public class VoucherTypeValidatorTests(DatabaseFixture fixture) : IAsyncLifetime
     {
-        private readonly CloudAccountingContext _context = fixture.Context!;
+        private readonly AppDbContext _context = fixture.Context!;
         private readonly IMemoryCache? _memoryCache = fixture.MemoryCache;
         private IVoucherTypeRepository _repo => new VoucherTypeRepository(_context, _memoryCache!, new NullLogger<VoucherTypeRepository>());
         private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;

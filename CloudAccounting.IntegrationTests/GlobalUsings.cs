@@ -8,6 +8,7 @@ global using Respawn;
 global using CloudAccounting.Core.Models;
 global using CloudAccounting.Core.Repositories;
 global using CloudAccounting.Infrastructure.Data;
+global using CloudAccounting.Infrastructure.Data.Data;
 global using CloudAccounting.Infrastructure.Data.Repositories;
 global using CloudAccounting.SharedKernel.Utilities;
 global using CloudAccounting.IntegrationTests.TestData;

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CloudAccounting.Infrastructure.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CloudAccounting.Infrastructure.Data.Configurations
 {

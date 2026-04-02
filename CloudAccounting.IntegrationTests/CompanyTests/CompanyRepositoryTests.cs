@@ -3,7 +3,7 @@ namespace CloudAccounting.IntegrationTests.CompanyTests;
 [Collection("SequentialTestCollection")]
 public class CompanyRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
 {
-    private readonly CloudAccountingContext _context = fixture.Context!;
+    private readonly AppDbContext _context = fixture.Context!;
     private readonly IMemoryCache? _memoryCache = fixture.MemoryCache;
     private ICompanyRepository _repo => new CompanyRepository(_context, _memoryCache!, new NullLogger<CompanyRepository>(), _mapper);
     private readonly IMapper _mapper = AddMapsterForTests.GetMapper();

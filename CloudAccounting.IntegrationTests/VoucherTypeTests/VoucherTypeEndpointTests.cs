@@ -3,8 +3,6 @@
 using CloudAccounting.Shared.VoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
-using CloudAccounting.Application.UseCases.VoucherTypes.GetVoucherTypeById;
-using CloudAccounting.Application.UseCases.VoucherTypes.GetVoucherTypes;
 using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
 
 
@@ -14,7 +12,7 @@ namespace CloudAccounting.IntegrationTests.VoucherTypeTests
     public class VoucherTypeEndpointTests(DatabaseFixture fixture, WebApplicationFactory<Program> factory)
     : IAsyncLifetime, IClassFixture<WebApplicationFactory<Program>>
     {
-        private readonly CloudAccountingContext _context = fixture.Context!;
+        private readonly AppDbContext _context = fixture.Context!;
         private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;
 
         public Task InitializeAsync() => Task.CompletedTask;

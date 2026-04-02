@@ -1,33 +1,15 @@
 using CloudAccounting.Application;
-using CloudAccounting.Application.Behaviors;
-using CloudAccounting.Application.UseCases.Companies.CreateCompany;
-using CloudAccounting.Application.UseCases.Companies.DeleteCompany;
-using CloudAccounting.Application.UseCases.Companies.UpdateCompany;
-using CloudAccounting.Application.UseCases.FiscalYears.CreateFiscalYear;
-using CloudAccounting.Application.UseCases.FiscalYears.DeleteFiscalYear;
-using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
 using CloudAccounting.Infrastructure.Data.Repositories;
 using CloudAccounting.Infrastructure.Data.Services;
 using CloudAccounting.Web.EndPoints;
-using FluentValidation;
 using Mapster;
 using MapsterMapper;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 namespace CloudAccounting.Web.Extentions;
 
 public static class DependencyInjection
 {
-    public static void ConfigureAuthentication(this IServiceCollection services) =>
-        services
-            .AddAuthorization()
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                // options.Authority = "https://your-identity-server.com";
-                // options.Audience = "your-api-resource";
-            });
-
     public static void ConfigureCors(this IServiceCollection services) =>
         services.AddCors(options =>
         {
@@ -38,38 +20,24 @@ public static class DependencyInjection
             );
         });
 
-    public static void AddCustomSwagger(this IServiceCollection services) =>
-        services.AddSwaggerGen(c =>
-            c.SwaggerDoc("v1", new OpenApiInfo
+    public static void AddSwaggerGenAuth(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
             {
-                Description = "Cloud Accounting",
-                Title = "CloudAccounting API",
-                Version = "v1",
-                Contact = new OpenApiContact
-                {
-                    Name = "CloudAccounting"
-                }
-            }
-        ));
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme.",
+                In = ParameterLocation.Header,
+            });
 
-    public static void UseCustomSwagger(this WebApplication app)
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CloudAccounting v1"));
-    }
-
-    public static void AddInfrastructureDataLayer(this WebApplicationBuilder builder)
-    {
-        string? connectionString =
-             builder.Configuration["ConnectionStrings:CloudAcctgTest"] ??
-                throw new ArgumentNullException("Db connection string is null.");
-
-        builder.Services
-            .AddDbContext<CloudAccountingContext>(options =>
-                    options.UseSqlServer(connectionString)
-                           .EnableSensitiveDataLogging()
-                           .EnableDetailedErrors()
-                );
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("bearer", document)] = []
+            });
+        });
     }
 
     public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
@@ -87,9 +55,11 @@ public static class DependencyInjection
 
     public static IApplicationBuilder MapEndpoints(this WebApplication app, RouteGroupBuilder? routeGroupBuilder = null)
     {
+        RouteGroupBuilder basicGroup = app.MapGroup("/api/v1").WithTags("Cloud Accounting API v1");
+
         IEnumerable<IEndpoint> endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
 
-        IEndpointRouteBuilder builder = routeGroupBuilder is null ? app : routeGroupBuilder;
+        IEndpointRouteBuilder builder = routeGroupBuilder is null ? basicGroup : routeGroupBuilder;
 
         foreach (IEndpoint endpoint in endpoints)
         {
@@ -97,16 +67,6 @@ public static class DependencyInjection
         }
 
         return app;
-    }
-
-    public static void AddRepositoriesAndDomainServices(this WebApplicationBuilder builder)
-    {
-        builder.Services
-            .AddScoped<ICompanyRepository, CompanyRepository>()
-            .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
-            .AddScoped<IVoucherTypeRepository, VoucherTypeRepository>()
-            .AddScoped<ILookupRepository, LookupRepository>()
-            .AddScoped<IFiscalYearService, FiscalYearService>();
     }
 
     public static void AddMappings(this IServiceCollection services)
@@ -117,5 +77,16 @@ public static class DependencyInjection
 
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
+    }
+
+    public static void AddRepositoriesAndDomainServices(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddScoped<ICompanyRepository, CompanyRepository>()
+            .AddScoped<IFiscalYearRepository, FiscalYearRepository>()
+            .AddScoped<IVoucherTypeRepository, VoucherTypeRepository>()
+            .AddScoped<ILookupRepository, LookupRepository>()
+            .AddScoped<IFiscalYearService, FiscalYearService>()
+            .AddScoped<IIdentityMgmtRepository, IdentityMgmtRepository>();
     }
 }

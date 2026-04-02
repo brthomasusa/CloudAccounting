@@ -1,14 +1,14 @@
-using CloudAccounting.Shared.Lookups;
+using CloudAccounting.Infrastructure.Data.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
     public class LookupRepository
     (
-        CloudAccountingContext context,
+        AppDbContext context,
         ILogger<LookupRepository> logger
     ) : ILookupRepository
     {
-        private readonly CloudAccountingContext _context = context;
+        private readonly AppDbContext _context = context;
         private readonly ILogger<LookupRepository> _logger = logger;
 
         public async Task<Result<List<CompanyLookupItem>>> RetrieveAllAsync()

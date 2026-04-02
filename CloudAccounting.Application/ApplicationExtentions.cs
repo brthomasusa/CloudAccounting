@@ -5,8 +5,10 @@ using CloudAccounting.Application.UseCases.Companies.UpdateCompany;
 using CloudAccounting.Application.UseCases.FiscalYears.CreateFiscalYear;
 using CloudAccounting.Application.UseCases.FiscalYears.DeleteFiscalYear;
 using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
-using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
+using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
+using CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser;
+using CloudAccounting.Application.UseCases.IdentityManagement.LoginUser;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -23,7 +25,9 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<DeleteFiscalYearCommand>, DeleteFiscalYearCommandValidator>()
                 .AddScoped<IValidator<CreateVoucherTypeCommand>, CreateVoucherTypeCommandValidator>()
                 .AddScoped<IValidator<UpdateVoucherTypeCommand>, UpdateVoucherTypeCommandValidator>()
-                .AddScoped<IValidator<DeleteVoucherTypeCommand>, DeleteVoucherTypeCommandValidator>();
+                .AddScoped<IValidator<DeleteVoucherTypeCommand>, DeleteVoucherTypeCommandValidator>()
+                .AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>()
+                .AddScoped<IValidator<LoginCommand>, LoginCommandValidator>();
 
         }
 

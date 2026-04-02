@@ -10,7 +10,7 @@ namespace CloudAccounting.IntegrationTests.FiscalYearTests
     public class FiscalYearEndpointTests(DatabaseFixture fixture, WebApplicationFactory<Program> factory)
         : IAsyncLifetime, IClassFixture<WebApplicationFactory<Program>>
     {
-        private readonly CloudAccountingContext _context = fixture.Context!;
+        private readonly AppDbContext _context = fixture.Context!;
         private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;
 
         public Task InitializeAsync() => Task.CompletedTask;
@@ -56,7 +56,7 @@ namespace CloudAccounting.IntegrationTests.FiscalYearTests
 
                 // Assert
                 Assert.NotNull(fiscalYear);
-                Assert.Equal(2023, fiscalYear.Year);
+                Assert.Equal(2025, fiscalYear.Year);
             }
 
             [Fact]

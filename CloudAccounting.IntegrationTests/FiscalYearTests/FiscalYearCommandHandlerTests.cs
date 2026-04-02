@@ -8,7 +8,7 @@ namespace CloudAccounting.IntegrationTests.FiscalYearTests;
 [Collection("SequentialTestCollection")]
 public class FiscalYearCommandHandlerTests(DatabaseFixture fixture) : IAsyncLifetime
 {
-    private readonly CloudAccountingContext _context = fixture.Context!;
+    private readonly AppDbContext _context = fixture.Context!;
     private IFiscalYearRepository _repo => new FiscalYearRepository(_context, new NullLogger<FiscalYearRepository>());
     private readonly IMapper _mapper = AddMapsterForTests.GetMapper();
 

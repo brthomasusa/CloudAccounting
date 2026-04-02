@@ -2,13 +2,14 @@ using System.Data;
 using CloudAccounting.Core.Exceptions;
 using CloudAccounting.Infrastructure.Data.Models;
 using CloudAccounting.Core.Models;
+using CloudAccounting.Infrastructure.Data.Data;
 
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
     public class CompanyRepository
     (
-        CloudAccountingContext ctx,
+        AppDbContext ctx,
         IMemoryCache memoryCache,
         ILogger<CompanyRepository> logger,
         IMapper mapper
@@ -19,7 +20,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         private readonly MemoryCacheEntryOptions _cacheEntryOptions =
             new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(3));
 
-        private readonly CloudAccountingContext _db = ctx;
+        private readonly AppDbContext _db = ctx;
         private readonly ILogger<CompanyRepository> _logger = logger;
         private readonly IMapper _mapper = mapper;
 
@@ -195,9 +196,9 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 bool isUnique = await _db.Companies
-                                         .AnyAsync(c => c.CompanyName != companyName);
+                                         .AnyAsync(c => c.CompanyName == companyName && c.CompanyCode != companyCode);
 
-                return Result<bool>.Success(isUnique);
+                return Result<bool>.Success(!isUnique);
             }
             catch (Exception ex)
             {

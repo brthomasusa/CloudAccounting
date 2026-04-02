@@ -1,12 +1,12 @@
 using CloudAccounting.Infrastructure.Data.Models;
 using CloudAccounting.Core.Models;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using CloudAccounting.Infrastructure.Data.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
     public class VoucherTypeRepository
     (
-        CloudAccountingContext ctx,
+        AppDbContext ctx,
         IMemoryCache memoryCache,
         ILogger<VoucherTypeRepository> logger
     ) : IVoucherTypeRepository
@@ -15,7 +15,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         private readonly MemoryCacheEntryOptions _cacheEntryOptions =
             new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(3));
 
-        private readonly CloudAccountingContext _db = ctx;
+        private readonly AppDbContext _db = ctx;
         private readonly ILogger<VoucherTypeRepository> _logger = logger;
 
         public async Task<Result<List<Voucher>>> RetrieveAllAsync()

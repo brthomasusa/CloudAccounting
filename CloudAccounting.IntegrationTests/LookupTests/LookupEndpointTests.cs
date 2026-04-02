@@ -8,7 +8,7 @@ namespace CloudAccounting.IntegrationTests.LookupTests
     public class LookupEndpointTests(DatabaseFixture fixture, WebApplicationFactory<Program> factory)
         : IAsyncLifetime, IClassFixture<WebApplicationFactory<Program>>
     {
-        private readonly CloudAccountingContext _context = fixture.Context!;
+        private readonly AppDbContext _context = fixture.Context!;
         private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;
 
         public Task InitializeAsync() => Task.CompletedTask;

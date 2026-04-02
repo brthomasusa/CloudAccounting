@@ -6,15 +6,19 @@ public class DeleteCompany : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("companies/{companyCode:int}", DeleteCompanyFromCommand)
-            .Produces(400)
+        app.MapDelete("companies", DeleteCompanyFromCommand)
+            .Produces(404)
             .Produces(204)
             .Produces(500);
     }
 
-    public static async Task<IResult> DeleteCompanyFromCommand([FromRoute] int companyCode, ISender sender, ILogger<DeleteCompany> logger)
+    public static async Task<IResult> DeleteCompanyFromCommand
+    (
+        [FromBody] DeleteCompanyCommand command,
+        ISender sender,
+        ILogger<DeleteCompany> logger
+    )
     {
-        DeleteCompanyCommand command = new() { CompanyCode = companyCode };
         Result<MediatR.Unit> result = await sender.Send(command);
 
         if (result.IsSuccess)
@@ -23,7 +27,8 @@ public class DeleteCompany : IEndpoint
         }
 
         string msg = result.Error.Message;
-        logger.LogWarning("There was a problem deleting the company with code {CODE}: {ERROR}", companyCode, msg);
-        return Results.BadRequest(msg);
+        logger.LogWarning("There was a problem deleting the company with code {CODE}: {ERROR}", command.CompanyCode, msg);
+        return Results.NotFound(msg);
     }
 }
+

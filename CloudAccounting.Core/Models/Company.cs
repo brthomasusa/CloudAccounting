@@ -18,6 +18,8 @@ public partial class Company
 
     public string? Currency { get; set; }
 
+    public string? DomainName { get; set; }
+
     public virtual ICollection<ChartOfAccounts> ChartOfAccounts { get; set; } = [];
 
     public virtual ICollection<FiscalYear> FiscalYears { get; set; } = [];

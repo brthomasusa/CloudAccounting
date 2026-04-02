@@ -1,4 +1,5 @@
 global using Microsoft.Extensions.Logging;
+global using Microsoft.AspNetCore.Identity;
 global using CloudAccounting.Application.Mappings;
 global using CloudAccounting.SharedKernel.Utilities;
 global using CloudAccounting.Application.Abstractions.Messaging;

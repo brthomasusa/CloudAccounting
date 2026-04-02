@@ -5,7 +5,7 @@ namespace CloudAccounting.IntegrationTests.LookupTests
     [Collection("SequentialTestCollection")]
     public class LookupRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
     {
-        private readonly CloudAccountingContext _context = fixture.Context!;
+        private readonly AppDbContext _context = fixture.Context!;
         private ILookupRepository _repo => new LookupRepository(_context, new NullLogger<LookupRepository>());
         private readonly Func<Task>? _resetDatabase = fixture.ResetDatabase;
 

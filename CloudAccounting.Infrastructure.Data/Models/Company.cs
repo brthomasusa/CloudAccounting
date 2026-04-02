@@ -18,6 +18,8 @@ public partial class CompanyDM
 
     public string? Currency { get; set; }
 
+    public string? DomainName { get; set; }
+
     public virtual ICollection<BankOpeningStatementDM> BankOpeningStatements { get; set; } = [];
 
     public virtual ICollection<ChartOfAccountsDM> ChartOfAccounts { get; set; } = [];
