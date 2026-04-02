@@ -121,6 +121,7 @@ public class CompanyEndpointTests(DatabaseFixture fixture, WebApplicationFactory
             DeleteCompanyCommand command = new() { CompanyCode = 3 };
             string uri = $"{relativePath}";
 
+
             var memStream = new MemoryStream();
             await JsonSerializer.SerializeAsync(memStream, command);
             memStream.Seek(0, SeekOrigin.Begin);
