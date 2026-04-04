@@ -63,7 +63,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 string issuer = "CloudAccountingAPI";
-                int expiryMinutes = 3600;
+                int expiryMinutes = 60;
                 string key = "2d5785e2-f7b4-4b92-a6c0-ed3988030dbc-f62ef9c6-675c-46f3-96e9-6cb983eab39f";
 
                 ApplicationUser? user = await _userManager.FindByEmailAsync(login.Email);
