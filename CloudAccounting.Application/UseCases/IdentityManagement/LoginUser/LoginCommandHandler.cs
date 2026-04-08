@@ -1,30 +1,29 @@
-using CloudAccounting.Infrastructure.Data.IdentityModels;
+using CloudAccounting.Infrastructure.Data.Services;
+using CloudAccounting.Shared.Identity;
 
 namespace CloudAccounting.Application.UseCases.IdentityManagement.LoginUser
 {
     public class LoginCommandHandler
     (
-        IIdentityMgmtRepository identityMgmtRepository,
+        AuthService authService,
         ILogger<LoginCommandHandler> logger
-    ) : ICommandHandler<LoginCommand, LoginResponse>
+    ) : ICommandHandler<LoginCommand, LoginResponseModel>
     {
-        private readonly IIdentityMgmtRepository _identityMgmtRepository = identityMgmtRepository;
+        private readonly AuthService _authService = authService;
         private readonly ILogger<LoginCommandHandler> _logger = logger;
 
-        public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<Result<LoginResponseModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            Login login = request.Adapt<Login>();
-
-            Result<string> result = await _identityMgmtRepository.LoginUserAsync(login);
+            Result<LoginResponseModel> result = await _authService.LoginAsync(request.Email, request.Password);
 
             if (result.IsFailure)
             {
                 string errMsg = result.Error.Message;
                 _logger.LogError("Error logging in user: {Message}", errMsg);
-                return Result<LoginResponse>.Failure<LoginResponse>(new Error("LoginCommandHandler.Handle", errMsg));
+                return Result<LoginResponseModel>.Failure<LoginResponseModel>(new Error("LoginCommandHandler.Handle", errMsg));
             }
 
-            return new LoginResponse(result.Value);
+            return Result<LoginResponseModel>.Success(result.Value);
         }
     }
 }

@@ -22,6 +22,8 @@ namespace CloudAccounting.Infrastructure.Data.Migrations
                     CompanyYear = table.Column<short>(type: "smallint", nullable: true),
                     CompanyMonthId = table.Column<byte>(type: "tinyint", nullable: true),
                     IsAdministrator = table.Column<bool>(type: "bit", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

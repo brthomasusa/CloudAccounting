@@ -5,7 +5,7 @@
 namespace CloudAccounting.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ReseedCloudAcctgTestDb : Migration
+    public partial class ReseedCloudAcctgAuthDb : Migration
     {
         /// <inheritdoc />
 		protected override void Up(MigrationBuilder migrationBuilder)
@@ -78,7 +78,9 @@ namespace CloudAccounting.Infrastructure.Data.Migrations
 								LastName, 
 								CompanyYear, 
 								CompanyMonthId, 
-								IsAdministrator, 
+								IsAdministrator,
+								RefreshToken,
+								RefreshTokenExpiresAtUtc, 
 								UserName, 
 								NormalizedUserName, 
 								Email, 
@@ -100,7 +102,9 @@ namespace CloudAccounting.Infrastructure.Data.Migrations
 								'Administrator',
 								0,
 								0,
-								1, 
+								1,
+								'ieCsTq21DHmEPWyyi9SDGddYohH6vSDyMfF1A5v3fw9+0zbXDjgecqAYLHp0TtecQqBBJ6PyF3VO5iVR2jKkTw==',
+								'2026-04-11T20:08:40.2207477', 
 								'admin@cloudacctg.com', 
 								'ADMIN@CLOUDACCTG.COM', 
 								'admin@cloudacctg.com', 

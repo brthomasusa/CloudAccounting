@@ -1,20 +1,15 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using CloudAccounting.Application;
+using CloudAccounting.Infrastructure.Data.Data;
+using CloudAccounting.Infrastructure.Data.Options;
+using CloudAccounting.Web.Authorization;
+using CloudAccounting.Web.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using System.Text;
-using Serilog;
-using CloudAccounting.Application;
-using CloudAccounting.Infrastructure.Data;
-using CloudAccounting.Web;
-using CloudAccounting.Web.Extentions;
-using CloudAccounting.Web.Authorization;
-using CloudAccounting.Web.Extentions;
-using CloudAccounting.Web.Middleware;
-using CloudAccounting.Infrastructure.Data.Data;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -28,6 +23,9 @@ try
         .AddJsonFile("appsettings.json", false, true)
         .AddJsonFile("appsettings.Development.json", false, true)
         .AddEnvironmentVariables();
+
+    builder.Services.Configure<JwtOptions>(
+        builder.Configuration.GetSection(JwtOptions.JwtOptionsKey));
 
     builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
@@ -80,8 +78,8 @@ try
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+            ValidIssuer = builder.Configuration["JwtOptions:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtOptions:Secret"]!))
         };
     });
 

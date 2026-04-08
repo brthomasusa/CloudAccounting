@@ -15,5 +15,7 @@ namespace CloudAccounting.Infrastructure.Data.Data
         public Int16? CompanyYear { get; set; }
         public byte? CompanyMonthId { get; set; }
         public bool IsAdministrator { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiresAtUtc { get; set; }
     }
 }

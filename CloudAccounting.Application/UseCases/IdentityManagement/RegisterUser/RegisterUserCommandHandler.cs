@@ -1,4 +1,4 @@
-using CloudAccounting.Infrastructure.Data.IdentityModels;
+using CloudAccounting.Shared.Identity;
 
 namespace CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser
 {
@@ -13,9 +13,14 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser
 
         public async Task<Result<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
-            Register register = request.Adapt<Register>();
-
-            Result<bool> result = await _identityMgmtRepository.RegisterUserAsync(register);
+            Result<bool> result =
+                await _identityMgmtRepository.RegisterUserAsync(
+                    request.Email,
+                    request.Password,
+                    request.PhoneNumber,
+                    request.CompanyCode,
+                    request.IsAdministrator
+                );
 
             if (result.IsFailure)
             {
@@ -24,7 +29,7 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser
                 return Result<RegisterUserResponse>.Failure<RegisterUserResponse>(new Error("RegisterUserCommandHandler.Handle", errMsg));
             }
 
-            return new RegisterUserResponse(register.Email, register.Email);
+            return Result<RegisterUserResponse>.Success(new RegisterUserResponse(request.Email, request.Email));
         }
     }
 }

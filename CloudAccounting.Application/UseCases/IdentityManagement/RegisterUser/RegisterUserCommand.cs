@@ -6,6 +6,8 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser
     (
         string Email,
         string Password,
-        string PhoneNumber
+        string PhoneNumber,
+        int CompanyCode,
+        bool IsAdministrator
     ) : ICommand<RegisterUserResponse>;
 }

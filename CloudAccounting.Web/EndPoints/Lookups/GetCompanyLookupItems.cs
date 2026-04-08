@@ -8,8 +8,9 @@ namespace CloudAccounting.Web.EndPoints.Lookups
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
             app.MapGet("lookups/companycodes/", GetCompanyAllLookupItems)
+                .Produces(401)
                 .Produces(404)
-                .Produces<List<CompanyLookupItem>>(200)
+                .Produces<List<CompanyLookupItem>>(200).RequireAuthorization()
                 .Produces(500);
         }
 

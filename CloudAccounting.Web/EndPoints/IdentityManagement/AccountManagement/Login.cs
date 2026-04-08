@@ -1,4 +1,5 @@
 using CloudAccounting.Application.UseCases.IdentityManagement.LoginUser;
+using CloudAccounting.Shared.Identity;
 
 namespace CloudAccounting.Web.EndPoints.IdentityManagement.AccountManagement
 {
@@ -8,7 +9,7 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.AccountManagement
         {
             app.MapPost("identity/login", LoginUserFromCommand)
                 .Produces(400)
-                .Produces<LoginResponse>(200)
+                .Produces<LoginResponseModel>(200)
                 .Produces(500);
         }
 
@@ -18,7 +19,7 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.AccountManagement
             ILogger<Login> logger
         )
         {
-            Result<LoginResponse>? result = await sender.Send(command);
+            Result<LoginResponseModel>? result = await sender.Send(command);
 
             if (result.IsSuccess)
             {

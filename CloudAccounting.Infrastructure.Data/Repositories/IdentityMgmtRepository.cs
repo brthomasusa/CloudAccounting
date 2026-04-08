@@ -1,9 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using CloudAccounting.Infrastructure.Data.Data;
-using CloudAccounting.Infrastructure.Data.IdentityModels;
+using CloudAccounting.Infrastructure.Data.Options;
+using CloudAccounting.Shared.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
@@ -12,30 +15,41 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
     (
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager,
+        IOptions<JwtOptions> jwtOptions,
         ILogger<IdentityMgmtRepository> logger
     ) : IIdentityMgmtRepository
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
         private readonly ILogger<IdentityMgmtRepository> _logger = logger;
 
-        public async Task<Result<bool>> RegisterUserAsync(Register register)
+        public async Task<Result<bool>> RegisterUserAsync
+        (
+            string email,
+            string password,
+            string phoneNumber,
+            int companyCode,
+            bool isAdministrator
+        )
         {
             try
             {
                 ApplicationUser user = new()
                 {
-                    UserName = register.Email,
-                    NormalizedUserName = register.Email.ToUpper(),
-                    Email = register.Email,
-                    NormalizedEmail = register.Email.ToUpper(),
-                    PhoneNumber = register.PhoneNumber,
+                    UserName = email,
+                    NormalizedUserName = email.ToUpper(),
+                    Email = email,
+                    NormalizedEmail = email.ToUpper(),
+                    PhoneNumber = phoneNumber,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false,
+                    CompanyCode = companyCode,
+                    IsAdministrator = isAdministrator
                 };
 
-                var result = await _userManager.CreateAsync(user, register.Password);
+                var result = await _userManager.CreateAsync(user, password);
 
                 if (result.Succeeded)
                 {
@@ -58,52 +72,5 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<Result<string>> LoginUserAsync(Login login)
-        {
-            try
-            {
-                string issuer = "CloudAccountingAPI";
-                int expiryMinutes = 60;
-                string key = "2d5785e2-f7b4-4b92-a6c0-ed3988030dbc-f62ef9c6-675c-46f3-96e9-6cb983eab39f";
-
-                ApplicationUser? user = await _userManager.FindByEmailAsync(login.Email);
-
-                if (user != null && await _userManager.CheckPasswordAsync(user!, login.Password))
-                {
-                    var userRoles = await _userManager.GetRolesAsync(user);
-
-                    var authClaims = new List<Claim>
-                    {
-                        new(JwtRegisteredClaimNames.Name, user.UserName!),
-                        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new(JwtRegisteredClaimNames.Email, user.Email!),
-                        new("userId", user.Id)
-                    };
-
-                    authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                    var token = new JwtSecurityToken(
-                        issuer: issuer,
-                        expires: DateTime.Now.AddMinutes(expiryMinutes),
-                        claims: authClaims,
-                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                        SecurityAlgorithms.HmacSha256));
-
-                    return Result<string>.Success(new JwtSecurityTokenHandler().WriteToken(token));
-                }
-                return Result<string>.Failure<string>(
-                    new Error("IdentityMgmtRepository.LoginUserAsync", "Invalid login attempt")
-                );
-            }
-            catch (Exception ex)
-            {
-                string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
-
-                return Result<string>.Failure<string>(
-                    new Error("IdentityMgmtRepository.LoginUserAsync", errMsg)
-                );
-            }
-        }
     }
 }
