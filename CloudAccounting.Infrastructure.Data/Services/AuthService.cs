@@ -32,37 +32,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
 
                 if (user != null && await _userManager.CheckPasswordAsync(user!, password))
                 {
-                    var userRoles = await _userManager.GetRolesAsync(user);
-
-                    var authClaims = new List<Claim>
-                    {
-                        new(JwtRegisteredClaimNames.Name, user.UserName!),
-                        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new(JwtRegisteredClaimNames.Email, user.Email!),
-                        new("userId", user.Id)
-                    };
-
-                    authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                    var token = new JwtSecurityToken(
-                        issuer: _jwtOptions.Issuer!,
-                        expires: DateTime.Now.AddMinutes(_jwtOptions.ExpirationTimeInMinutes),
-                        claims: authClaims,
-                        signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret!)),
-                        SecurityAlgorithms.HmacSha256));
-
-                    var refreshTokenValue = GenerateRefreshToken();
-                    user.RefreshToken = refreshTokenValue;
-                    user.RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7);
-
-                    await _userManager.UpdateAsync(user);
-
-                    return Result<LoginResponseModel>.Success(new LoginResponseModel
-                    {
-                        Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        TokenExpired = DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds(),
-                        RefreshToken = refreshTokenValue
-                    });
+                    return await GetAccessToken(user);
                 }
 
                 return Result<LoginResponseModel>.Failure<LoginResponseModel>(
@@ -80,13 +50,62 @@ namespace CloudAccounting.Infrastructure.Data.Services
             }
         }
 
-        public static string GenerateRefreshToken()
+        public async Task<Result<LoginResponseModel>> LoginWithRefreshTokenAsync(string refreshToken)
+        {
+            ApplicationUser? user = await _userManager.Users
+                .SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+
+            if (user == null || user.RefreshTokenExpiresAtUtc <= DateTime.UtcNow)
+            {
+                return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                    new Error("IdentityMgmtRepository.GetRefreshTokenAsync", "Invalid refresh token")
+                );
+            }
+
+            return await GetAccessToken(user);
+        }
+
+        private async Task<LoginResponseModel> GetAccessToken(ApplicationUser user)
+        {
+            var authClaims = new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.Name, user.UserName!),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Email, user.Email!),
+                new("userId", user.Id),
+                new("companyCode", user.CompanyCode.ToString())
+            };
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtOptions.Issuer!,
+                expires: DateTime.Now.AddMinutes(_jwtOptions.ExpirationTimeInMinutes),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret!)),
+                SecurityAlgorithms.HmacSha256));
+
+            var refreshTokenValue = GenerateRefreshToken();
+            user.RefreshToken = refreshTokenValue;
+            user.RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7);
+
+            await _userManager.UpdateAsync(user);
+
+            return new LoginResponseModel
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                TokenExpired = DateTimeOffset.UtcNow.AddMinutes(_jwtOptions.ExpirationTimeInMinutes).ToUnixTimeSeconds(),
+                RefreshToken = refreshTokenValue
+            };
+        }
+
+        private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-
     }
 }

@@ -9,6 +9,7 @@ using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
 using CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser;
 using CloudAccounting.Application.UseCases.IdentityManagement.LoginUser;
+using CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefreshToken;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -27,7 +28,8 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<UpdateVoucherTypeCommand>, UpdateVoucherTypeCommandValidator>()
                 .AddScoped<IValidator<DeleteVoucherTypeCommand>, DeleteVoucherTypeCommandValidator>()
                 .AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>()
-                .AddScoped<IValidator<LoginCommand>, LoginCommandValidator>();
+                .AddScoped<IValidator<LoginCommand>, LoginCommandValidator>()
+                .AddScoped<IValidator<LoginWithRefreshTokenCommand>, LoginWithRefreshTokenCommandValidator>();
 
         }
 
