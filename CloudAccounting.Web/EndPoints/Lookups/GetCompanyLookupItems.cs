@@ -1,6 +1,5 @@
 using CloudAccounting.Shared.Lookups;
 using CloudAccounting.Application.UseCases.Lookups.GetCompanyLookupItems;
-using Microsoft.AspNetCore.Authorization;
 
 namespace CloudAccounting.Web.EndPoints.Lookups
 {
@@ -12,7 +11,7 @@ namespace CloudAccounting.Web.EndPoints.Lookups
                 .Produces(401)
                 .Produces(403)
                 .Produces(404)
-                .Produces<List<CompanyLookupItem>>(200)
+                .Produces<List<CompanyLookupItem>>(200).RequireAuthorization()
                 .Produces(500); // .Produces<List<CompanyLookupItem>>(200).RequireAuthorization()
         }
 

@@ -1,6 +1,7 @@
 global using System.Reflection;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Microsoft.AspNetCore.Authorization;
 global using MediatR;
 global using Microsoft.AspNetCore.Mvc;
 global using CloudAccounting.Core.Repositories;

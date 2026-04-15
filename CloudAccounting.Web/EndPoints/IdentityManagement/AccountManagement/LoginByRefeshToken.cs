@@ -9,7 +9,8 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.AccountManagement
         {
             app.MapPost("identity/loginbyrefreshtoken", LoginWithRefreshToken)
                 .Produces(400)
-                .Produces<LoginResponseModel>(200).RequireAuthorization()
+                .Produces(401)
+                .Produces<LoginResponseModel>(200)
                 .Produces(500);
         }
 
