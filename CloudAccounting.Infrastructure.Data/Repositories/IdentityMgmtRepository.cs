@@ -1,13 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using CloudAccounting.Infrastructure.Data.Data;
 using CloudAccounting.Infrastructure.Data.Options;
-using CloudAccounting.Shared.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {

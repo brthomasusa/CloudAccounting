@@ -88,6 +88,8 @@ public static class DependencyInjection
             .AddScoped<ILookupRepository, LookupRepository>()
             .AddScoped<IFiscalYearService, FiscalYearService>()
             .AddScoped<IIdentityMgmtRepository, IdentityMgmtRepository>()
-            .AddScoped<AuthService>();
+            .AddScoped<AuthenticationService>()
+            .AddScoped<AuthorizationService>()
+            .AddScoped<IGroupRepository, GroupRepository>();
     }
 }

@@ -27,6 +27,12 @@ try
     builder.Services.Configure<JwtOptions>(
         builder.Configuration.GetSection(JwtOptions.JwtOptionsKey));
 
+    builder.Services.Configure<JwtOptions>(
+        builder.Configuration.GetSection(JwtOptions.JwtOptionsKey));
+
+    builder.Services.Configure<DbConnectionOptions>(
+        builder.Configuration.GetSection("ConnectionStrings"));
+
     builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
             loggerConfiguration

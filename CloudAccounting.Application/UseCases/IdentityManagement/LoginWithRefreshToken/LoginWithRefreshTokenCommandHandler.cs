@@ -5,11 +5,11 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefre
 {
     public class LoginWithRefreshTokenCommandHandler
     (
-        AuthService authService,
+        AuthenticationService authService,
         ILogger<LoginWithRefreshTokenCommandHandler> logger
     ) : ICommandHandler<LoginWithRefreshTokenCommand, LoginResponseModel>
     {
-        private readonly AuthService _authService = authService;
+        private readonly AuthenticationService _authService = authService;
         private readonly ILogger<LoginWithRefreshTokenCommandHandler> _logger = logger;
 
         public async Task<Result<LoginResponseModel>> Handle(LoginWithRefreshTokenCommand request, CancellationToken cancellationToken)

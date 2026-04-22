@@ -47,6 +47,11 @@ namespace CloudAccounting.Infrastructure.Data.Data
 
         public virtual DbSet<VoucherDM> Vouchers { get; set; }
 
+        public AppDbContext(string connectionString)
+        : base(new DbContextOptionsBuilder<AppDbContext>().UseSqlServer(connectionString).Options)
+        {
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

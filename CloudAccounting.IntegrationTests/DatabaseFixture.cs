@@ -1,9 +1,12 @@
+using Microsoft.Extensions.Configuration;
+
 namespace CloudAccounting.IntegrationTests;
 
 public class DatabaseFixture : IAsyncLifetime
 {
     public AppDbContext? Context { get; private set; }
     public IMemoryCache? MemoryCache { get; private set; }
+    public ConfigurationManager? Config { get; private set; }
     private Respawner? _respawner;
     private DbConnection? _connection;
 
@@ -22,6 +25,11 @@ public class DatabaseFixture : IAsyncLifetime
             .Options;
 
         Context = new AppDbContext(options);
+
+        Config = new ConfigurationManager();
+        Config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+              .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+              .AddEnvironmentVariables();
 
         var respawnerOptions = new RespawnerOptions
         {

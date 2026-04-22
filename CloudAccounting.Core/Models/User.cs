@@ -1,22 +1,18 @@
 namespace CloudAccounting.Core.Models;
 
-public partial class User
+public class User
 {
-    public string UserId { get; set; } = null!;
+    public string UserId { get; set; } = string.Empty;
 
-    public int? CompanyCode { get; set; }
+    public int CompanyCode { get; set; }
 
-    public Int16? CompanyYear { get; set; }
+    public Int16 CompanyYear { get; set; }
 
-    public byte? CompanyMonthId { get; set; }
+    public byte CompanyMonthId { get; set; }
 
-    public Int16? GroupId { get; set; }
+    public Int16 GroupId { get; set; }
 
-    public string? Password { get; set; }
+    public string? Admin { get; set; } = string.Empty;
 
-    public string? Admin { get; set; }
-
-    public virtual Company? CompanyCodeNavigation { get; set; }
-
-    public virtual GroupsMaster? GroupsMasterNavigation { get; set; }
+    public string RoleName { get; set; } = string.Empty;
 }

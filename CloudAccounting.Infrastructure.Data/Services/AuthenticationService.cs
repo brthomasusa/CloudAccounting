@@ -2,8 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using CloudAccounting.Core.Models;
 using CloudAccounting.Infrastructure.Data.Data;
 using CloudAccounting.Infrastructure.Data.Options;
+using CloudAccounting.Infrastructure.Data.Repositories;
 using CloudAccounting.Shared.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -11,18 +13,20 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CloudAccounting.Infrastructure.Data.Services
 {
-    public class AuthService
+    public class AuthenticationService
     (
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
+        IIdentityMgmtRepository identityMgmtRepository,
+        IGroupRepository groupRepository,
         IOptions<JwtOptions> jwtOptions,
-        ILogger<AuthService> logger
+        ILogger<AuthenticationService> logger
     )
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly IIdentityMgmtRepository _identityMgmtRepository = identityMgmtRepository;
+        private readonly IGroupRepository _groupRepository = groupRepository;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-        private readonly ILogger<AuthService> _logger = logger;
+        private readonly ILogger<AuthenticationService> _logger = logger;
 
         public async Task<Result<LoginResponseModel>> LoginAsync(string userName, string password)
         {
@@ -65,18 +69,93 @@ namespace CloudAccounting.Infrastructure.Data.Services
             return await GetAccessToken(user);
         }
 
+        public async Task<Result<User>> CreateUserWithRoleAsync
+        (
+            string Email,
+            string Password,
+            int CompanyCode,
+            string RoleName,
+            bool IsSystemAdmin,
+            bool IsCompanyAdmin
+        )
+        {
+            try
+            {
+                ApplicationUser user = new()
+                {
+                    UserName = Email,
+                    NormalizedUserName = Email.ToUpper(),
+                    Email = Email,
+                    NormalizedEmail = Email.ToUpper(),
+                    PhoneNumber = string.Empty,
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = false,
+                    LockoutEnabled = false,
+                    CompanyCode = CompanyCode,
+                    IsAdministrator = IsSystemAdmin || IsCompanyAdmin
+                };
+
+                var result = await _userManager.CreateAsync(user, Password);
+                await _userManager.AddToRoleAsync(user, RoleName);
+
+                if (!result.Succeeded)
+                {
+                    string errMsg = string.Join(", ", result.Errors.Select(e => e.Description));
+                    _logger.LogError("Error creating user with role: {Message}", errMsg);
+
+                    return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+                }
+
+                // Map ApplicationUser to User
+                User userProfile = new()
+                {
+                    UserId = user.Email,
+                    CompanyCode = user.CompanyCode,
+                    Admin = user.IsAdministrator ? "Y" : "N",
+                    RoleName = RoleName
+                };
+
+                Result<User> groupResult = await _groupRepository.CreateUserAsync(userProfile);
+
+                if (groupResult.IsSuccess)
+                {
+                    return Result<User>.Success(userProfile);
+                }
+                else
+                {
+                    string errMsg = string.Format("Unable to create user with email {0}: {1}", user.Email, groupResult.Error.Message);
+                    _logger.LogWarning(errMsg);
+
+                    var deleteResult = await _userManager.DeleteAsync(user);
+
+                    return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+                }
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<User>.Failure<User>(
+                    new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg)
+                );
+            }
+        }
+
         private async Task<LoginResponseModel> GetAccessToken(ApplicationUser user)
         {
+            var userRoles = await _userManager.GetRolesAsync(user);
+
             var authClaims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Name, user.UserName!),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Email, user.Email!),
                 new("userId", user.Id),
-                new("companyCode", user.CompanyCode.ToString())
+                new("companyCode", user.CompanyCode.ToString()),
+                new("userRole", string.Join(",", userRoles)),
             };
 
-            var userRoles = await _userManager.GetRolesAsync(user);
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var token = new JwtSecurityToken(
