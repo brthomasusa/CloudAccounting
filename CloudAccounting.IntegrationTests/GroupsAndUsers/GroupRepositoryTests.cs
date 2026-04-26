@@ -53,7 +53,7 @@ namespace CloudAccounting.IntegrationTests.GroupsAndUsers
             await ReseedTestDb.ReseedTestDbAsync(_context);
             GroupsMaster group = new()
             {
-                GroupId = 4,
+                GroupId = 0,
                 GroupTitle = "Test Group"
             };
 
@@ -117,7 +117,6 @@ namespace CloudAccounting.IntegrationTests.GroupsAndUsers
             await ReseedTestDb.ReseedTestDbAsync(_context);
             int groupId = 999;
 
-
             // Act
             Result<bool> result = await _repo.IsValidGroupId(groupId);
 
@@ -125,5 +124,62 @@ namespace CloudAccounting.IntegrationTests.GroupsAndUsers
             Assert.True(result.IsSuccess);
             Assert.False(result.Value);
         }
+
+        [Fact]
+        public async Task RetrieveAllUserAsync_GroupRepository_ReturnsMultipleUsers()
+        {
+            // Arrange
+            await ReseedTestDb.ReseedTestDbAsync(_context);
+
+            // Act
+            Result<List<User>> result = await _repo.RetrieveAllUserAsync();
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.NotEmpty(result.Value);
+        }
+
+        [Fact]
+        public async Task RetrieveUserAsync_GroupRepository_ReturnsOneUser()
+        {
+            // Arrange
+            await ReseedTestDb.ReseedTestDbAsync(_context);
+            string userId = "hgonzales@btechnical-consulting.com";
+
+            // Act
+            Result<User> result = await _repo.RetrieveUserAsync(userId);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Value);
+        }
+
+        private static User UserForCreate()
+            => new()
+            {
+                UserId = "ivanka@btechnical-consulting.com",
+                CompanyCode = 1,
+                CompanyName = "BTechnical Consulting",
+                CompanyYear = 2024,
+                CompanyMonthId = 1,
+                CompanyMonthName = "January",
+                GroupId = 3,
+                Admin = "N",
+                GroupTitle = "User"
+            };
+
+        private static User UserForUpdate()
+            => new()
+            {
+                UserId = "dquale@btechnical-consulting.com",
+                CompanyCode = 1,
+                CompanyName = "BTechnical Consulting",
+                CompanyYear = 2025,
+                CompanyMonthId = 7,
+                CompanyMonthName = "July",
+                GroupId = 2,
+                Admin = "Y",
+                GroupTitle = "CompanyAdmin"
+            };
     }
 }

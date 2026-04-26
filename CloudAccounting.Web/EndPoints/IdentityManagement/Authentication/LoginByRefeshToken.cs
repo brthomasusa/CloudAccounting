@@ -1,7 +1,7 @@
 using CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefreshToken;
 using CloudAccounting.Shared.Identity;
 
-namespace CloudAccounting.Web.EndPoints.IdentityManagement.AccountManagement
+namespace CloudAccounting.Web.EndPoints.IdentityManagement.Authentication
 {
     public class LoginByRefeshToken : IEndpoint
     {

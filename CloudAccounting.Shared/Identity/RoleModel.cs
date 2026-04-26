@@ -2,7 +2,7 @@
 {
     public class RoleModel
     {
-        public Guid Id { get; set; }
-        public string? Name { get; set; }
+        public int GroupId { get; set; }
+        public string? GroupTitle { get; set; }
     }
 }

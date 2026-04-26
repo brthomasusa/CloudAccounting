@@ -1,13 +1,12 @@
+using CloudAccounting.Application.UseCases.IdentityManagement.CreateRole;
 
-using CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWithRole;
-
-namespace CloudAccounting.Web.EndPoints.IdentityManagement.Administration
+namespace CloudAccounting.Web.EndPoints.IdentityManagement.Authorization
 {
-    public class CreateUser : IEndpoint
+    public class CreateRole : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPost("identity/users/", CreateUserHandler)
+            app.MapPost("identity/roles/", CreateRoleHandler)
                 .Produces(401)
                 .Produces(403)
                 .Produces(204)
@@ -15,12 +14,8 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.Administration
                 .Produces(500);
         }
 
-        public static async Task<IResult> CreateUserHandler
-        (
-            CreateUserWithRoleCommand command,
-            ISender sender,
-            ILogger<CreateUser> logger
-        )
+        // [Authorize(Roles = "AppAdmin")]
+        public static async Task<IResult> CreateRoleHandler(CreateRoleCommand command, ISender sender, ILogger<CreateRole> logger)
         {
             Result<MediatR.Unit>? result = await sender.Send(command);
 
@@ -30,7 +25,7 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.Administration
             }
 
             string msg = result.Error.Message;
-            logger.LogWarning("There was a problem creating the user: {ERROR}", msg);
+            logger.LogWarning("There was a problem creating the role: {ERROR}", msg);
             return Results.BadRequest(msg);
         }
     }

@@ -4,14 +4,13 @@ using CloudAccounting.Application.UseCases.Companies.DeleteCompany;
 using CloudAccounting.Application.UseCases.Companies.UpdateCompany;
 using CloudAccounting.Application.UseCases.FiscalYears.CreateFiscalYear;
 using CloudAccounting.Application.UseCases.FiscalYears.DeleteFiscalYear;
+using CloudAccounting.Application.UseCases.IdentityManagement.CreateRole;
+using CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWithRole;
+using CloudAccounting.Application.UseCases.IdentityManagement.LoginUser;
+using CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefreshToken;
 using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
-using CloudAccounting.Application.UseCases.IdentityManagement.RegisterUser;
-using CloudAccounting.Application.UseCases.IdentityManagement.LoginUser;
-using CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefreshToken;
-using CloudAccounting.Application.UseCases.IdentityManagement.CreateRole;
-using CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWithRole;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -29,7 +28,6 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<CreateVoucherTypeCommand>, CreateVoucherTypeCommandValidator>()
                 .AddScoped<IValidator<UpdateVoucherTypeCommand>, UpdateVoucherTypeCommandValidator>()
                 .AddScoped<IValidator<DeleteVoucherTypeCommand>, DeleteVoucherTypeCommandValidator>()
-                .AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>()
                 .AddScoped<IValidator<LoginCommand>, LoginCommandValidator>()
                 .AddScoped<IValidator<LoginWithRefreshTokenCommand>, LoginWithRefreshTokenCommandValidator>()
                 .AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>()

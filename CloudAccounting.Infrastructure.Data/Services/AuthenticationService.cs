@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -5,25 +8,19 @@ using System.Text;
 using CloudAccounting.Core.Models;
 using CloudAccounting.Infrastructure.Data.Data;
 using CloudAccounting.Infrastructure.Data.Options;
-using CloudAccounting.Infrastructure.Data.Repositories;
 using CloudAccounting.Shared.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CloudAccounting.Infrastructure.Data.Services
 {
     public class AuthenticationService
     (
         UserManager<ApplicationUser> userManager,
-        IIdentityMgmtRepository identityMgmtRepository,
         IGroupRepository groupRepository,
         IOptions<JwtOptions> jwtOptions,
         ILogger<AuthenticationService> logger
     )
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IIdentityMgmtRepository _identityMgmtRepository = identityMgmtRepository;
         private readonly IGroupRepository _groupRepository = groupRepository;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
         private readonly ILogger<AuthenticationService> _logger = logger;
@@ -106,29 +103,15 @@ namespace CloudAccounting.Infrastructure.Data.Services
                     return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
                 }
 
-                // Map ApplicationUser to User
-                User userProfile = new()
-                {
-                    UserId = user.Email,
-                    CompanyCode = user.CompanyCode,
-                    Admin = user.IsAdministrator ? "Y" : "N",
-                    RoleName = RoleName
-                };
+                Result<User> mapResult = await MapApplicationUserToUser(user, RoleName);
 
-                Result<User> groupResult = await _groupRepository.CreateUserAsync(userProfile);
-
-                if (groupResult.IsSuccess)
+                if (mapResult.IsSuccess)
                 {
-                    return Result<User>.Success(userProfile);
+                    return Result<User>.Success(mapResult.Value);
                 }
                 else
                 {
-                    string errMsg = string.Format("Unable to create user with email {0}: {1}", user.Email, groupResult.Error.Message);
-                    _logger.LogWarning(errMsg);
-
-                    var deleteResult = await _userManager.DeleteAsync(user);
-
-                    return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+                    return Result<User>.Failure<User>(mapResult.Error);
                 }
             }
             catch (Exception ex)
@@ -185,6 +168,33 @@ namespace CloudAccounting.Infrastructure.Data.Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        }
+
+        private async Task<Result<User>> MapApplicationUserToUser(ApplicationUser user, string RoleName)
+        {
+            User userProfile = new()
+            {
+                UserId = user.Email!,
+                CompanyCode = user.CompanyCode,
+                Admin = user.IsAdministrator ? "Y" : "N",
+                GroupTitle = RoleName
+            };
+
+            Result<User> groupResult = await _groupRepository.CreateUserAsync(userProfile);
+
+            if (groupResult.IsSuccess)
+            {
+                return Result<User>.Success(userProfile);
+            }
+            else
+            {
+                string errMsg = string.Format("Unable to create user with email {0}: {1}", user.Email, groupResult.Error.Message);
+                _logger.LogWarning(errMsg);
+
+                var deleteResult = await _userManager.DeleteAsync(user);
+
+                return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+            }
         }
     }
 }

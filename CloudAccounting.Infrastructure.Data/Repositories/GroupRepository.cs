@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using CloudAccounting.Core.Models;
 using CloudAccounting.Infrastructure.Data.Data;
 using CloudAccounting.Infrastructure.Data.Models;
@@ -127,14 +126,14 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                Result<GroupsMaster> role = await RetrieveByGroupNameAsync(user.RoleName);
+                Result<GroupsMaster> role = await RetrieveByGroupNameAsync(user.GroupTitle);
 
                 if (!role.IsSuccess)
                 {
-                    logger.LogWarning("No group found with name '{RoleName}' for user creation.", user.RoleName);
+                    logger.LogWarning("No group found with name '{RoleName}' for user creation.", user.GroupTitle);
 
                     return Result<User>.Failure<User>(
-                        new Error("GroupRepository.CreateUserAsync", $"No group found with name '{user.RoleName}'.")
+                        new Error("GroupRepository.CreateUserAsync", $"No group found with name '{user.GroupTitle}'.")
                     );
                 }
 
@@ -164,6 +163,87 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
+        public async Task<Result<User>> RetrieveUserAsync(string email)
+        {
+            try
+            {
+                var query = await (from grpMaster in ctx.GroupsMasters
+                                   join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                                   join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                                   where userModel.UserId!.ToUpper() == email.ToUpper()
+                                   select new CloudAccounting.Core.Models.User
+                                   {
+                                       UserId = userModel.UserId,
+                                       CompanyCode = (int)userModel.CompanyCode!,
+                                       CompanyName = company.CompanyName,
+                                       CompanyYear = (short)userModel.CompanyYear!,
+                                       CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                                       CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
+                                       GroupId = (short)userModel.GroupId!,
+                                       Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                                       GroupTitle = grpMaster.GroupTitle!
+                                   }).SingleOrDefaultAsync();
+
+                if (query != null)
+                {
+                    return Result<User>.Success((User)query);
+                }
+
+                return Result<User>.Failure<User>(
+                    new Error("GroupRepository.RetrieveUserAsync", $"No user found with email '{email}'.")
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<User>.Failure<User>(
+                    new Error("GroupRepository.RetrieveUserAsync", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<List<User>>> RetrieveAllUserAsync()
+        {
+            try
+            {
+                var list = await (from grpMaster in ctx.GroupsMasters
+                                  join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                                  join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                                  select new CloudAccounting.Core.Models.User
+                                  {
+                                      UserId = userModel.UserId,
+                                      CompanyCode = (int)userModel.CompanyCode!,
+                                      CompanyName = company.CompanyName,
+                                      CompanyYear = (short)userModel.CompanyYear!,
+                                      CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                                      CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
+                                      GroupId = (short)userModel.GroupId!,
+                                      Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                                      GroupTitle = grpMaster.GroupTitle!
+                                  }).ToListAsync();
+
+                if (list != null && list.Count != 0)
+                {
+                    return Result<List<User>>.Success(list);
+                }
+
+                return Result<List<User>>.Failure<List<User>>(
+                    new Error("GroupRepository.RetrieveAllUserAsync", "No users found.")
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<List<User>>.Failure<List<User>>(
+                    new Error("GroupRepository.RetrieveAllUserAsync", errMsg)
+                );
+            }
+        }
+
         public async Task<Result<User>> UpdateUserAsync(User user)
         {
             try
@@ -179,7 +259,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     );
                 }
 
-                // existingUser.CompanyCode = user.CompanyCode;
                 existingUser.CompanyYear = user.CompanyYear;
                 existingUser.CompanyMonthId = user.CompanyMonthId;
                 existingUser.GroupId = user.GroupId;
@@ -196,6 +275,51 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 return Result<User>.Failure<User>(
                     new Error("GroupRepository.UpdateUserAsync", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(User user, string newRole, string currentRole)
+        {
+            try
+            {
+                // get the user by email (user.UserId is email)
+                UserDM? userDM = await ctx.UserModels.SingleOrDefaultAsync(u => u.UserId == user.UserId);
+
+                if (userDM == null)
+                {
+                    logger.LogWarning("User with email {Email} not found for role change.", user.UserId);
+
+                    return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                        new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "User not found")
+                    );
+                }
+
+                // get the new role
+                GroupsMasterDM? newRoleDM = await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle == newRole);
+
+                if (newRoleDM == null)
+                {
+                    logger.LogWarning("New role {NewRole} not found for user {Email}.", newRole, user.UserId);
+
+                    return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                        new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "New role not found")
+                    );
+                }
+
+                // update the user's GroupId to the GroupId of the new role
+                userDM.GroupId = newRoleDM.GroupId;
+                await ctx.SaveChangesAsync();
+
+                return Result.Success(MediatR.Unit.Value);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                logger.LogError(ex, "{Message}", errMsg);
+
+                return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                    new Error("GroupRepository.ChangeUserRoleAssignmentAsync", errMsg)
                 );
             }
         }
@@ -237,5 +361,23 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 );
             }
         }
+
+        private static string GetMonthName(int monthNumber)
+            => monthNumber switch
+            {
+                1 => "January",
+                2 => "February",
+                3 => "March",
+                4 => "April",
+                5 => "May",
+                6 => "June",
+                7 => "July",
+                8 => "August",
+                9 => "September",
+                10 => "October",
+                11 => "November",
+                12 => "December",
+                _ => "Invalid month"
+            };
     }
 }
