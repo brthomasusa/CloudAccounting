@@ -1,6 +1,6 @@
 namespace CloudAccounting.Core.Models;
 
-public partial class GroupsMaster
+public class GroupsMaster
 {
     public Int16 GroupId { get; set; }
 

@@ -130,9 +130,10 @@ namespace CloudAccounting.IntegrationTests.GroupsAndUsers
         {
             // Arrange
             await ReseedTestDb.ReseedTestDbAsync(_context);
+            int companyCode = 1;
 
             // Act
-            Result<List<User>> result = await _repo.RetrieveAllUserAsync();
+            Result<List<User>> result = await _repo.RetrieveAllUserAsync(companyCode);
 
             // Assert
             Assert.True(result.IsSuccess);

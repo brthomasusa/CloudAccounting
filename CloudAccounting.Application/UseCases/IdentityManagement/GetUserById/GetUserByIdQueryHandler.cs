@@ -25,7 +25,7 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.GetUserById
                     return getUserResult.Value.Adapt<UserModel>();
                 }
 
-                return Result<UserModel>.Failure<UserModel>(
+                return Result.Failure<UserModel>(
                     new Error("GetUserByIdQueryHandler.Handle", getUserResult.Error.Message)
                 );
             }
@@ -34,7 +34,7 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.GetUserById
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<UserModel>.Failure<UserModel>(
+                return Result.Failure<UserModel>(
                     new Error("GetUserByIdQueryHandler.Handle", errMsg)
                 );
             }

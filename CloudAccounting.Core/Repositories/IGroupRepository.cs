@@ -1,4 +1,3 @@
-using CloudAccounting.Core.Models;
 
 namespace CloudAccounting.Core.Repositories
 {
@@ -16,7 +15,7 @@ namespace CloudAccounting.Core.Repositories
 
         Task<Result<User>> RetrieveUserAsync(string email);
 
-        Task<Result<List<User>>> RetrieveAllUserAsync();
+        Task<Result<List<User>>> RetrieveAllUserAsync(int companyCode);
 
         Task<Result<User>> UpdateUserAsync(User user);
 

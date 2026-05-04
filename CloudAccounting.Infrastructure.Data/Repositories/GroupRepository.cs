@@ -35,7 +35,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<List<GroupsMaster>>.Failure<List<GroupsMaster>>(
+                return Result.Failure<List<GroupsMaster>>(
                     new Error("GroupRepository.RetrieveAllAsync", errMsg)
                 );
             }
@@ -58,7 +58,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     return dataModel.Adapt<GroupsMaster>();
                 }
 
-                return Result<GroupsMaster>.Failure<GroupsMaster>(
+                return Result.Failure<GroupsMaster>(
                     new Error("GroupRepository.RetrieveAsync", $"No group found with ID {groupId}.")
                 );
             }
@@ -67,7 +67,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<GroupsMaster>.Failure<GroupsMaster>(
+                return Result.Failure<GroupsMaster>(
                     new Error("GroupRepository.RetrieveAsync", errMsg)
                 );
             }
@@ -84,7 +84,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     return dataModel.Adapt<GroupsMaster>();
                 }
 
-                return Result<GroupsMaster>.Failure<GroupsMaster>(
+                return Result.Failure<GroupsMaster>(
                     new Error("GroupRepository.RetrieveByGroupNameAsync", $"No group found with name '{groupName}'.")
                 );
             }
@@ -93,7 +93,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<GroupsMaster>.Failure<GroupsMaster>(
+                return Result.Failure<GroupsMaster>(
                     new Error("GroupRepository.RetrieveByGroupNameAsync", errMsg)
                 );
             }
@@ -116,7 +116,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<GroupsMaster>.Failure<GroupsMaster>(
+                return Result.Failure<GroupsMaster>(
                     new Error("GroupRepository.CreateAsync", errMsg)
                 );
             }
@@ -132,12 +132,12 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 {
                     logger.LogWarning("No group found with name '{RoleName}' for user creation.", user.GroupTitle);
 
-                    return Result<User>.Failure<User>(
+                    return Result.Failure<User>(
                         new Error("GroupRepository.CreateUserAsync", $"No group found with name '{user.GroupTitle}'.")
                     );
                 }
 
-                UserDM userDM = new()
+                UserDM userDm = new()
                 {
                     UserId = user.UserId,
                     CompanyCode = user.CompanyCode,
@@ -147,17 +147,17 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                     Admin = user.Admin
                 };
 
-                ctx.UserModels.Add(userDM);
+                ctx.UserModels.Add(userDm);
                 await ctx.SaveChangesAsync();
 
-                return userDM.Adapt<User>();
+                return userDm.Adapt<User>();
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<User>.Failure<User>(
+                return Result.Failure<User>(
                     new Error("GroupRepository.CreateUserAsync", errMsg)
                 );
             }
@@ -170,8 +170,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 var query = await (from grpMaster in ctx.GroupsMasters
                                    join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
                                    join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
-                                   where userModel.UserId!.ToUpper() == email.ToUpper()
-                                   select new CloudAccounting.Core.Models.User
+                                   where userModel.UserId.ToUpper() == email.ToUpper()
+                                   select new User
                                    {
                                        UserId = userModel.UserId,
                                        CompanyCode = (int)userModel.CompanyCode!,
@@ -186,10 +186,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 if (query != null)
                 {
-                    return Result<User>.Success((User)query);
+                    return query;
                 }
 
-                return Result<User>.Failure<User>(
+                return Result.Failure<User>(
                     new Error("GroupRepository.RetrieveUserAsync", $"No user found with email '{email}'.")
                 );
             }
@@ -198,20 +198,21 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<User>.Failure<User>(
+                return Result.Failure<User>(
                     new Error("GroupRepository.RetrieveUserAsync", errMsg)
                 );
             }
         }
 
-        public async Task<Result<List<User>>> RetrieveAllUserAsync()
+        public async Task<Result<List<User>>> RetrieveAllUserAsync(int companyCode)
         {
             try
             {
                 var list = await (from grpMaster in ctx.GroupsMasters
                                   join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
                                   join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
-                                  select new CloudAccounting.Core.Models.User
+                                  where userModel.CompanyCode == companyCode
+                                  select new User
                                   {
                                       UserId = userModel.UserId,
                                       CompanyCode = (int)userModel.CompanyCode!,
@@ -224,12 +225,12 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                                       GroupTitle = grpMaster.GroupTitle!
                                   }).ToListAsync();
 
-                if (list != null && list.Count != 0)
+                if (list.Count != 0)
                 {
-                    return Result<List<User>>.Success(list);
+                    return list;
                 }
 
-                return Result<List<User>>.Failure<List<User>>(
+                return Result.Failure<List<User>>(
                     new Error("GroupRepository.RetrieveAllUserAsync", "No users found.")
                 );
             }
@@ -238,7 +239,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<List<User>>.Failure<List<User>>(
+                return Result.Failure<List<User>>(
                     new Error("GroupRepository.RetrieveAllUserAsync", errMsg)
                 );
             }
@@ -254,7 +255,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 {
                     logger.LogWarning("No user found with ID '{UserId}' for update.", user.UserId);
 
-                    return Result<User>.Failure<User>(
+                    return Result.Failure<User>(
                         new Error("GroupRepository.UpdateUserAsync", $"No user found with ID '{user.UserId}'.")
                     );
                 }
@@ -273,7 +274,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<User>.Failure<User>(
+                return Result.Failure<User>(
                     new Error("GroupRepository.UpdateUserAsync", errMsg)
                 );
             }
@@ -284,31 +285,31 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 // get the user by email (user.UserId is email)
-                UserDM? userDM = await ctx.UserModels.SingleOrDefaultAsync(u => u.UserId == user.UserId);
+                var userDm = await ctx.UserModels.SingleOrDefaultAsync(u => u.UserId == user.UserId);
 
-                if (userDM == null)
+                if (userDm == null)
                 {
                     logger.LogWarning("User with email {Email} not found for role change.", user.UserId);
 
-                    return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                    return Result.Failure<MediatR.Unit>(
                         new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "User not found")
                     );
                 }
 
                 // get the new role
-                GroupsMasterDM? newRoleDM = await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle == newRole);
+                var newRoleDm = await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle == newRole);
 
-                if (newRoleDM == null)
+                if (newRoleDm == null)
                 {
                     logger.LogWarning("New role {NewRole} not found for user {Email}.", newRole, user.UserId);
 
-                    return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                    return Result.Failure<MediatR.Unit>(
                         new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "New role not found")
                     );
                 }
 
                 // update the user's GroupId to the GroupId of the new role
-                userDM.GroupId = newRoleDM.GroupId;
+                userDm.GroupId = newRoleDm.GroupId;
                 await ctx.SaveChangesAsync();
 
                 return Result.Success(MediatR.Unit.Value);
@@ -318,7 +319,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+                return Result.Failure<MediatR.Unit>(
                     new Error("GroupRepository.ChangeUserRoleAssignmentAsync", errMsg)
                 );
             }
@@ -337,7 +338,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<bool>.Failure<bool>(
+                return Result.Failure<bool>(
                     new Error("GroupRepository.IsUniqueGroupNameForCreate", errMsg)
                 );
             }
@@ -356,7 +357,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<bool>.Failure<bool>(
+                return Result.Failure<bool>(
                     new Error("GroupRepository.IsValidGroupId", errMsg)
                 );
             }
