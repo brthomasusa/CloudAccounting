@@ -16,7 +16,7 @@ public class GetAllUsersQueryHandler
     {
         try
         {
-            Result<List<User>> getUsersResult = await groupRepository.RetrieveAllUserAsync(query.CompanyCode);
+            var getUsersResult = await groupRepository.RetrieveAllUserAsync(query.CompanyCode);
 
             if (getUsersResult.IsSuccess)
             {
