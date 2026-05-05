@@ -17,6 +17,8 @@ namespace CloudAccounting.Core.Repositories
 
         Task<Result<List<User>>> RetrieveAllUserAsync(int companyCode);
 
+        Task<Result<List<User>>> RetrieveUserByCompanyAndGroupAsync(int companyCode, int groupId);
+
         Task<Result<User>> UpdateUserAsync(User user);
 
         Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(User user, string newRole, string currentRole);

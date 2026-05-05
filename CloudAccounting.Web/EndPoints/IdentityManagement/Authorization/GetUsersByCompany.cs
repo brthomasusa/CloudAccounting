@@ -25,7 +25,7 @@ public class GetUsersByCompany : IEndpoint
             return Results.Ok(result.Value);
         }
 
-        string msg = result.Error.Message;
+        var msg = result.Error.Message;
         logger.LogWarning("There was a problem retrieving the users: {ERROR}", msg);
         return Results.BadRequest(msg);
     }

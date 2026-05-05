@@ -245,6 +245,47 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
+        public async Task<Result<List<User>>> RetrieveUserByCompanyAndGroupAsync(int companyCode, int groupId)
+        {
+            try
+            {
+                var list = await (from grpMaster in ctx.GroupsMasters
+                                  join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                                  join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                                  where userModel.CompanyCode == companyCode && userModel.GroupId == groupId
+                                  select new User
+                                  {
+                                      UserId = userModel.UserId,
+                                      CompanyCode = (int)userModel.CompanyCode!,
+                                      CompanyName = company.CompanyName,
+                                      CompanyYear = (short)userModel.CompanyYear!,
+                                      CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                                      CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
+                                      GroupId = (short)userModel.GroupId!,
+                                      Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                                      GroupTitle = grpMaster.GroupTitle!
+                                  }).ToListAsync();
+
+                if (list.Count != 0)
+                {
+                    return list;
+                }
+
+                return Result.Failure<List<User>>(
+                    new Error("GroupRepository.RetrieveUserByCompanyAndGroupAsync", "No users found for the specified company and group.")
+                );
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                logger.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure<List<User>>(
+                    new Error("GroupRepository.RetrieveUserByCompanyAndGroupAsync", errMsg)
+                );
+            }
+        }
+
         public async Task<Result<User>> UpdateUserAsync(User user)
         {
             try
