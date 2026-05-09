@@ -17,7 +17,7 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.Authorization
         // [Authorize(Roles = "AppAdmin")]
         public static async Task<IResult> CreateRoleHandler(CreateRoleCommand command, ISender sender, ILogger<CreateRole> logger)
         {
-            Result<MediatR.Unit>? result = await sender.Send(command);
+            Result<Unit> result = await sender.Send(command);
 
             if (result.IsSuccess)
             {

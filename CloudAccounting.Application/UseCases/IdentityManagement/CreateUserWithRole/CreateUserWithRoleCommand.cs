@@ -1,8 +1,7 @@
-using CloudAccounting.Shared.Identity;
 
 namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWithRole
 {
-    public record class CreateUserWithRoleCommand
+    public record CreateUserWithRoleCommand
     (
         string Email,
         string Password,

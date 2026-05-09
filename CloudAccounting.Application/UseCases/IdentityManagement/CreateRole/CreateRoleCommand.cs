@@ -1,5 +1,7 @@
 
+using MediatR;
+
 namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateRole
 {
-    public record class CreateRoleCommand(string RoleName) : ICommand<MediatR.Unit>;
+    public record CreateRoleCommand(string RoleName) : ICommand<Unit>;
 }

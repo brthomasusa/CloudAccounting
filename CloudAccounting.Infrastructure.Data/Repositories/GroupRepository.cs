@@ -11,7 +11,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         ILogger<GroupRepository> logger
     ) : IGroupRepository
     {
-        private readonly IMemoryCache _memoryCache = memoryCache;
+        // private readonly IMemoryCache memoryCache = memoryCache;
         private readonly MemoryCacheEntryOptions _cacheEntryOptions =
             new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(3));
 
@@ -45,7 +45,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                if (_memoryCache.TryGetValue($"group-{groupId}", out GroupsMasterDM? cachedGroup))
+                if (memoryCache.TryGetValue($"group-{groupId}", out GroupsMasterDM? cachedGroup))
                 {
                     return cachedGroup!.Adapt<GroupsMaster>();
                 }
@@ -54,7 +54,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 if (dataModel != null)
                 {
-                    _memoryCache.Set($"group-{groupId}", dataModel, _cacheEntryOptions);
+                    memoryCache.Set($"group-{groupId}", dataModel, _cacheEntryOptions);
                     return dataModel.Adapt<GroupsMaster>();
                 }
 
@@ -107,7 +107,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 ctx.GroupsMasters.Add(newGroup);
                 await ctx.SaveChangesAsync();
 
-                _memoryCache.Set($"group-{newGroup.GroupId}", newGroup, _cacheEntryOptions);
+                memoryCache.Set($"group-{newGroup.GroupId}", newGroup, _cacheEntryOptions);
 
                 return newGroup.Adapt<GroupsMaster>();
             }
@@ -321,16 +321,16 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(User user, string newRole, string currentRole)
+        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole, string currentRole)
         {
             try
             {
                 // get the user by email (user.UserId is email)
-                var userDm = await ctx.UserModels.SingleOrDefaultAsync(u => u.UserId == user.UserId);
+                var userDm = await ctx.UserModels.SingleOrDefaultAsync(u => u.UserId == email);
 
                 if (userDm == null)
                 {
-                    logger.LogWarning("User with email {Email} not found for role change.", user.UserId);
+                    logger.LogWarning("User with email {Email} not found for role change.", email);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "User not found")
@@ -342,7 +342,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 if (newRoleDm == null)
                 {
-                    logger.LogWarning("New role {NewRole} not found for user {Email}.", newRole, user.UserId);
+                    logger.LogWarning("New role {NewRole} not found for user {Email}.", newRole, email);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "New role not found")
@@ -351,6 +351,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 // update the user's GroupId to the GroupId of the new role
                 userDm.GroupId = newRoleDm.GroupId;
+                userDm.Admin = newRole is "AppAdmin" or "CompanyAdmin" ? "Y" : "N";
+                
                 await ctx.SaveChangesAsync();
 
                 return Result.Success(MediatR.Unit.Value);

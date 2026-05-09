@@ -11,17 +11,11 @@ namespace CloudAccounting.Infrastructure.Data.Services
         ILogger<AuthorizationService> logger
     )
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
-
-        private readonly ILogger<AuthorizationService> _logger = logger;
-
 
         public async Task<Result<MediatR.Unit>> CreateRoleAsync(string roleName)
         {
             var role = new IdentityRole(roleName);
             await roleManager.CreateAsync(role);
-
-            role = await roleManager.FindByNameAsync(roleName);
 
             GroupsMaster group = new()
             {
@@ -30,19 +24,28 @@ namespace CloudAccounting.Infrastructure.Data.Services
 
             Result<GroupsMaster> result = await groupRepository.CreateGroupAsync(group);
 
+            if (!result.IsSuccess)
+            {
+                logger.LogError("Failed to create group for role {RoleName}. Errors: {Errors}", roleName, result.Error.Message);
+
+                return Result.Failure<MediatR.Unit>(
+                    new Error("AuthorizationService.CreateRoleAsync", "Failed to create group for role")
+                );
+            }
+
             return Result.Success(MediatR.Unit.Value);
         }
 
-        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(User user, string newRole, string currentRole)
+        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole, string currentRole)
         {
             try
             {
                 // get the user by email (user.UserId is email)
-                ApplicationUser? appUser = await _userManager.FindByEmailAsync(user.UserId);
+                ApplicationUser? appUser = await userManager.FindByEmailAsync(email);
 
                 if (appUser == null)
                 {
-                    _logger.LogWarning("User with email {Email} not found", user.UserId);
+                    logger.LogWarning("User with email {Email} not found", email);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", "User not found")
@@ -50,11 +53,11 @@ namespace CloudAccounting.Infrastructure.Data.Services
                 }
 
                 // Remove the user from the current role
-                var result = await _userManager.RemoveFromRoleAsync(appUser, currentRole);
+                var result = await userManager.RemoveFromRoleAsync(appUser, currentRole);
 
                 if (!result.Succeeded)
                 {
-                    _logger.LogError("Failed to remove user {Email} from role {Role}. Errors: {Errors}", user.UserId, currentRole, result.Errors);
+                    logger.LogError("Failed to remove user {Email} from role {Role}. Errors: {Errors}", email, currentRole, result.Errors);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", "Failed to remove user from current role")
@@ -62,11 +65,11 @@ namespace CloudAccounting.Infrastructure.Data.Services
                 }
 
                 // Add the user to the new role
-                var addResult = await _userManager.AddToRoleAsync(appUser, newRole);
+                var addResult = await userManager.AddToRoleAsync(appUser, newRole);
 
                 if (!addResult.Succeeded)
                 {
-                    _logger.LogError("Failed to add user {Email} to role {Role}. Errors: {Errors}", user.UserId, newRole, addResult.Errors);
+                    logger.LogError("Failed to add user {Email} to role {Role}. Errors: {Errors}", email, newRole, addResult.Errors);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", "Failed to add user to new role")
@@ -74,11 +77,11 @@ namespace CloudAccounting.Infrastructure.Data.Services
                 }
 
                 // Update the group assignment in the GL_USER table in thedatabase
-                Result<MediatR.Unit> groupResult = await groupRepository.ChangeUserRoleAssignmentAsync(user, newRole, currentRole);
+                Result<MediatR.Unit> groupResult = await groupRepository.ChangeUserRoleAssignmentAsync(email, newRole, currentRole);
 
                 if (!groupResult.IsSuccess)
                 {
-                    _logger.LogError("Failed to update group assignment for user {Email}. Errors: {Errors}", user.UserId, groupResult.Error.Message);
+                    logger.LogError("Failed to update group assignment for user {Email}. Errors: {Errors}", email, groupResult.Error.Message);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", "Failed to update group assignment")
@@ -90,7 +93,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<MediatR.Unit>(
                     new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", errMsg)

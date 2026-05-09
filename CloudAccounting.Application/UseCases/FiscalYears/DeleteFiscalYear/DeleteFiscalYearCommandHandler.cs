@@ -6,19 +6,16 @@ public class DeleteFiscalYearCommandHandler
     ILogger<DeleteFiscalYearCommandHandler> logger
 ) : ICommandHandler<DeleteFiscalYearCommand, MediatR.Unit>
 {
-    private readonly IFiscalYearRepository _repository = repository;
-    private readonly ILogger<DeleteFiscalYearCommandHandler> _logger = logger;
-
     public async Task<Result<MediatR.Unit>> Handle(DeleteFiscalYearCommand command, CancellationToken token)
     {
-        Result result = await _repository.DeleteFiscalYearAsync(command.CompanyCode, command.FiscalYear);
+        Result result = await repository.DeleteFiscalYearAsync(command.CompanyCode, command.FiscalYear);
 
         if (result.IsFailure)
         {
-            string errorMessage = result.Error.Message ?? "An unknown error occurred while deleting the fiscal year.";
-            _logger.LogWarning("There was a problem deleting the fiscal year: {ERROR}", errorMessage);
+            string errorMessage = result.Error.Message;
+            logger.LogWarning("There was a problem deleting the fiscal year: {ERROR}", errorMessage);
 
-            return Result<MediatR.Unit>.Failure<MediatR.Unit>(
+            return Result.Failure<MediatR.Unit>(
                 new Error("DeleteFiscalYearCommandHandler.Handle", errorMessage)
             );
         }
