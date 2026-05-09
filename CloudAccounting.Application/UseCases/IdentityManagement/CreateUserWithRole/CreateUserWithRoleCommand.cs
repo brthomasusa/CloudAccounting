@@ -6,8 +6,6 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWith
         string Email,
         string Password,
         int CompanyCode,
-        string RoleName,
-        bool IsSystemAdmin,
-        bool IsCompanyAdmin
+        string RoleName
     ) : ICommand<MediatR.Unit>;
 }

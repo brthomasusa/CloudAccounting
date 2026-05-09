@@ -22,7 +22,7 @@ namespace CloudAccounting.Web.EndPoints.IdentityManagement.Authorization
             ILogger<CreateUser> logger
         )
         {
-            Result<Unit>? result = await sender.Send(command);
+            Result<Unit> result = await sender.Send(command);
 
             if (result.IsSuccess)
             {

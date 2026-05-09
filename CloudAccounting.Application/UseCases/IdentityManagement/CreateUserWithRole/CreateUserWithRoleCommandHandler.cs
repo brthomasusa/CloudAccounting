@@ -8,29 +8,24 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWith
         ILogger<CreateUserWithRoleCommandHandler> logger
     ) : ICommandHandler<CreateUserWithRoleCommand, MediatR.Unit>
     {
-        private readonly AuthenticationService _authenticationService = authenticationService;
-        private readonly ILogger<CreateUserWithRoleCommandHandler> _logger = logger;
-
         public async Task<Result<MediatR.Unit>> Handle(CreateUserWithRoleCommand request, CancellationToken cancellationToken)
         {
-            Result<User> result = await _authenticationService.CreateUserWithRoleAsync(
+            Result<User> result = await authenticationService.CreateUserWithRoleAsync(
                 request.Email,
                 request.Password,
                 request.CompanyCode,
-                request.RoleName,
-                request.IsSystemAdmin,
-                request.IsCompanyAdmin
+                request.RoleName
             );
 
             if (result.IsFailure)
             {
                 string errMsg = result.Error.Message;
-                _logger.LogError("Error creating user with role: {Message}", errMsg);
+                logger.LogError("Error creating user with role: {Message}", errMsg);
 
-                return Result<MediatR.Unit>.Failure<MediatR.Unit>(new Error("CreateUserWithRoleCommandHandler.Handle", errMsg));
+                return Result.Failure<MediatR.Unit>(new Error("CreateUserWithRoleCommandHandler.Handle", errMsg));
             }
 
-            return Result<MediatR.Unit>.Success(MediatR.Unit.Value);
+            return Result.Success(MediatR.Unit.Value);
         }
     }
 }

@@ -20,32 +20,32 @@ namespace CloudAccounting.Infrastructure.Data.Services
         ILogger<AuthenticationService> logger
     )
     {
-        private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IGroupRepository _groupRepository = groupRepository;
+        // private readonly UserManager<ApplicationUser> userManager = userManager;
+        // private readonly IGroupRepository groupRepository = groupRepository;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-        private readonly ILogger<AuthenticationService> _logger = logger;
+        // private readonly ILogger<AuthenticationService> logger = logger;
 
         public async Task<Result<LoginResponseModel>> LoginAsync(string userName, string password)
         {
             try
             {
-                ApplicationUser? user = await _userManager.FindByEmailAsync(userName);
+                ApplicationUser? user = await userManager.FindByEmailAsync(userName);
 
-                if (user != null && await _userManager.CheckPasswordAsync(user!, password))
+                if (user != null && await userManager.CheckPasswordAsync(user, password))
                 {
                     return await GetAccessToken(user);
                 }
 
-                return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                return Result.Failure<LoginResponseModel>(
                     new Error("IdentityMgmtRepository.LoginUserAsync", "Invalid login attempt")
                 );
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                return Result.Failure<LoginResponseModel>(
                     new Error("IdentityMgmtRepository.LoginUserAsync", errMsg)
                 );
             }
@@ -53,12 +53,12 @@ namespace CloudAccounting.Infrastructure.Data.Services
 
         public async Task<Result<LoginResponseModel>> LoginWithRefreshTokenAsync(string refreshToken)
         {
-            ApplicationUser? user = await _userManager.Users
+            ApplicationUser? user = await userManager.Users
                 .SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
 
             if (user == null || user.RefreshTokenExpiresAtUtc <= DateTime.UtcNow)
             {
-                return Result<LoginResponseModel>.Failure<LoginResponseModel>(
+                return Result.Failure<LoginResponseModel>(
                     new Error("IdentityMgmtRepository.GetRefreshTokenAsync", "Invalid refresh token")
                 );
             }
@@ -68,58 +68,56 @@ namespace CloudAccounting.Infrastructure.Data.Services
 
         public async Task<Result<User>> CreateUserWithRoleAsync
         (
-            string Email,
-            string Password,
-            int CompanyCode,
-            string RoleName,
-            bool IsSystemAdmin,
-            bool IsCompanyAdmin
+            string email,
+            string password,
+            int companyCode,
+            string roleName
         )
         {
             try
             {
                 ApplicationUser user = new()
                 {
-                    UserName = Email,
-                    NormalizedUserName = Email.ToUpper(),
-                    Email = Email,
-                    NormalizedEmail = Email.ToUpper(),
+                    UserName = email,
+                    NormalizedUserName = email.ToUpper(),
+                    Email = email,
+                    NormalizedEmail = email.ToUpper(),
                     PhoneNumber = string.Empty,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = false,
                     LockoutEnabled = false,
-                    CompanyCode = CompanyCode,
-                    IsAdministrator = IsSystemAdmin || IsCompanyAdmin
+                    CompanyCode = companyCode,
+                    IsAdministrator = roleName is "AppAdmin" or "CompanyAdmin"
                 };
 
-                var result = await _userManager.CreateAsync(user, Password);
-                await _userManager.AddToRoleAsync(user, RoleName);
+                var result = await userManager.CreateAsync(user, password);
+                await userManager.AddToRoleAsync(user, roleName);
 
                 if (!result.Succeeded)
                 {
                     string errMsg = string.Join(", ", result.Errors.Select(e => e.Description));
-                    _logger.LogError("Error creating user with role: {Message}", errMsg);
+                    logger.LogError("Error creating user with role: {Message}", errMsg);
 
-                    return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+                    return Result.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
                 }
 
-                Result<User> mapResult = await MapApplicationUserToUser(user, RoleName);
+                Result<User> mapResult = await MapApplicationUserToUser(user, roleName);
 
                 if (mapResult.IsSuccess)
                 {
-                    return Result<User>.Success(mapResult.Value);
+                    return Result.Success(mapResult.Value);
                 }
                 else
                 {
-                    return Result<User>.Failure<User>(mapResult.Error);
+                    return Result.Failure<User>(mapResult.Error);
                 }
             }
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<User>.Failure<User>(
+                return Result.Failure<User>(
                     new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg)
                 );
             }
@@ -127,7 +125,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
 
         private async Task<LoginResponseModel> GetAccessToken(ApplicationUser user)
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var userRoles = await userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
             {
@@ -152,7 +150,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
             user.RefreshToken = refreshTokenValue;
             user.RefreshTokenExpiresAtUtc = DateTime.UtcNow.AddDays(7);
 
-            await _userManager.UpdateAsync(user);
+            await userManager.UpdateAsync(user);
 
             return new LoginResponseModel
             {
@@ -170,30 +168,30 @@ namespace CloudAccounting.Infrastructure.Data.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        private async Task<Result<User>> MapApplicationUserToUser(ApplicationUser user, string RoleName)
+        private async Task<Result<User>> MapApplicationUserToUser(ApplicationUser user, string roleName)
         {
             User userProfile = new()
             {
                 UserId = user.Email!,
                 CompanyCode = user.CompanyCode,
                 Admin = user.IsAdministrator ? "Y" : "N",
-                GroupTitle = RoleName
+                GroupTitle = roleName
             };
 
-            Result<User> groupResult = await _groupRepository.CreateUserAsync(userProfile);
+            Result<User> groupResult = await groupRepository.CreateUserAsync(userProfile);
 
             if (groupResult.IsSuccess)
             {
-                return Result<User>.Success(userProfile);
+                return Result.Success(userProfile);
             }
             else
             {
-                string errMsg = string.Format("Unable to create user with email {0}: {1}", user.Email, groupResult.Error.Message);
-                _logger.LogWarning(errMsg);
+                string errMsg = $"Unable to create user with email {user.Email}: {groupResult.Error.Message}";
+                logger.LogWarning(errMsg);
 
-                var deleteResult = await _userManager.DeleteAsync(user);
+               _ = await userManager.DeleteAsync(user);
 
-                return Result<User>.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
+                return Result.Failure<User>(new Error("AuthenticationService.CreateUserWithRoleAsync", errMsg));
             }
         }
     }
