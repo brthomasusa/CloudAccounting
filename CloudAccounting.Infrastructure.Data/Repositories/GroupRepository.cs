@@ -325,18 +325,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                // get the user by email (user.UserId is email)
-                // var userDm = await ctx.UserModels.FindAsync(email);
-
-                // if (userDm == null)
-                // {
-                //     logger.LogWarning("User with email {Email} not found for role change.", email);
-
-                //     return Result.Failure<MediatR.Unit>(
-                //         new Error("GroupRepository.ChangeUserRoleAssignmentAsync", "User not found")
-                //     );
-                // }
-
                 // get the new role
                 var newRoleDm = await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle == newRole);
 
@@ -354,11 +342,6 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                                     .ExecuteUpdateAsync(setters => setters
                                         .SetProperty(u => u.GroupId, newRoleDm.GroupId)
                                         .SetProperty(u => u.Admin, newRole is "AppAdmin" or "CompanyAdmin" ? "Y" : "N"));
-
-                // userDm.GroupId = newRoleDm.GroupId;
-                // userDm.Admin = newRole is "AppAdmin" or "CompanyAdmin" ? "Y" : "N";
-                
-                // await ctx.SaveChangesAsync();
 
                 return Result.Success(MediatR.Unit.Value);
             }
