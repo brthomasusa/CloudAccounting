@@ -21,7 +21,7 @@ namespace CloudAccounting.Core.Repositories
 
         Task<Result<User>> UpdateUserAsync(User user);
 
-        Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole, string currentRole);
+        Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole);
 
         Task<Result<bool>> IsUniqueGroupNameForCreate(string groupName);
 

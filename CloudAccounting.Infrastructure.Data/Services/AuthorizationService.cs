@@ -36,7 +36,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
             return Result.Success(MediatR.Unit.Value);
         }
 
-        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole, string currentRole)
+        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole)
         {
             try
             {
@@ -52,12 +52,13 @@ namespace CloudAccounting.Infrastructure.Data.Services
                     );
                 }
 
-                // Remove the user from the current role
-                var result = await userManager.RemoveFromRoleAsync(appUser, currentRole);
+                // Remove the user from all roles
+                var roles = await userManager.GetRolesAsync(appUser);
+                var result = await userManager.RemoveFromRolesAsync(appUser, roles);
 
                 if (!result.Succeeded)
                 {
-                    logger.LogError("Failed to remove user {Email} from role {Role}. Errors: {Errors}", email, currentRole, result.Errors);
+                    logger.LogError("Failed to remove user {Email} from roles {Roles}. Errors: {Errors}", email, string.Join(", ", roles), result.Errors);
 
                     return Result.Failure<MediatR.Unit>(
                         new Error("AuthorizationService.ChangeUserRoleAssignmentAsync", "Failed to remove user from current role")
@@ -77,7 +78,7 @@ namespace CloudAccounting.Infrastructure.Data.Services
                 }
 
                 // Update the group assignment in the GL_USER table in thedatabase
-                Result<MediatR.Unit> groupResult = await groupRepository.ChangeUserRoleAssignmentAsync(email, newRole, currentRole);
+                Result<MediatR.Unit> groupResult = await groupRepository.ChangeUserRoleAssignmentAsync(email, newRole);
 
                 if (!groupResult.IsSuccess)
                 {

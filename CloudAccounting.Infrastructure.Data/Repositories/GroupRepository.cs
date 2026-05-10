@@ -321,7 +321,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole, string currentRole)
+        public async Task<Result<MediatR.Unit>> ChangeUserRoleAssignmentAsync(string email, string newRole)
         {
             try
             {
