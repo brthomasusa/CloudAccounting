@@ -11,6 +11,8 @@ using CloudAccounting.Application.UseCases.IdentityManagement.LoginWithRefreshTo
 using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
+using CloudAccounting.Application.UseCases.IdentityManagement.UpdateUserRole;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -31,7 +33,8 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<LoginCommand>, LoginCommandValidator>()
                 .AddScoped<IValidator<LoginWithRefreshTokenCommand>, LoginWithRefreshTokenCommandValidator>()
                 .AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>()
-                .AddScoped<IValidator<CreateUserWithRoleCommand>, CreateUserWithRoleCommandValidator>();
+                .AddScoped<IValidator<CreateUserWithRoleCommand>, CreateUserWithRoleCommandValidator>()
+                .AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandValidator>();
 
         }
 

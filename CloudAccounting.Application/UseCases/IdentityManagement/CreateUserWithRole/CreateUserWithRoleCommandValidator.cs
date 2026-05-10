@@ -22,11 +22,11 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWith
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Invalid email format.")
-                .MustAsync(async (email, cancellationToken) =>
+                .MustAsync(async (email, _) =>
                 {
                     var user = await _userManager.FindByEmailAsync(email);
-                    return user == null;
-                }).WithMessage("This email already exists.");
+                    return user != null;
+                }).WithMessage("This email does not exist.");
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required.")
@@ -34,7 +34,7 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWith
 
             RuleFor(x => x.CompanyCode)
                 .GreaterThan(0).WithMessage("Company code must be greater than 0.")
-                .MustAsync(async (companyCode, cancellationToken) =>
+                .MustAsync(async (companyCode, _) =>
                 {
                     Result<bool> result = await _repository.IsExistingCompany(companyCode);
                     return result != null && result.Value;
@@ -43,7 +43,7 @@ namespace CloudAccounting.Application.UseCases.IdentityManagement.CreateUserWith
             RuleFor(x => x.RoleName)
                 .NotEmpty().WithMessage("Role name is required.")
                 .MaximumLength(50).WithMessage("Role name cannot exceed 50 characters.")
-                .MustAsync(async (roleName, cancellationToken) =>
+                .MustAsync(async (roleName, _) =>
                 {
                     IdentityRole? existingRole = await roleManager.FindByNameAsync(roleName);
                     return existingRole != null;
