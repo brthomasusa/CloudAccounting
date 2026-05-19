@@ -13,7 +13,9 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
                 .Produces(500);
         }
 
-        public static async Task<IResult> RetrieveFiscalYear(int companyCode, int fiscalYear, ISender sender, ILogger<GetFiscalYears> logger)
+        [Authorize(Roles = "CompanyAdmin")]
+        public static async Task<IResult> RetrieveFiscalYear(int companyCode, int fiscalYear, ISender sender,
+            ILogger<GetFiscalYears> logger)
         {
             GetFiscalYearQuery query = new(companyCode, fiscalYear);
             Result<FiscalYearDto>? result = await sender.Send(query);

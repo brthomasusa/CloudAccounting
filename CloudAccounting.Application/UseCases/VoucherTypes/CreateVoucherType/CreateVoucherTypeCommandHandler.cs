@@ -23,7 +23,7 @@ namespace CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType
                 {
                     string errMsg = result.Error.Message;
                     _logger.LogError("{Message}", errMsg);
-                    return Result<VoucherTypeDto>.Failure<VoucherTypeDto>(new Error("CreateVoucherTypeCommandHandler.Handle", errMsg));
+                    return Result.Failure<VoucherTypeDto>(new Error("CreateVoucherTypeCommandHandler.Handle", errMsg));
                 }
 
                 return result.Value.Adapt<VoucherTypeDto>();
@@ -32,7 +32,7 @@ namespace CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
-                return Result<VoucherTypeDto>.Failure<VoucherTypeDto>(new Error("CreateVoucherTypeCommandHandler.Handle", errMsg));
+                return Result.Failure<VoucherTypeDto>(new Error("CreateVoucherTypeCommandHandler.Handle", errMsg));
             }
         }
     }

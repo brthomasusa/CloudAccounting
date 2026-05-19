@@ -13,7 +13,9 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
                 .Produces(500);
         }
 
-        public static async Task<IResult> GetAllVoucherTypesFromQuery(ISender sender, ILogger<GetAllVoucherTypes> logger)
+        [Authorize(Roles = "CompanyAdmin")]
+        public static async Task<IResult> GetAllVoucherTypesFromQuery(ISender sender,
+            ILogger<GetAllVoucherTypes> logger)
         {
             GetAllVoucherTypesQuery query = new();
             Result<List<VoucherTypeDto>>? result = await sender.Send(query);
@@ -27,6 +29,5 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
             logger.LogWarning("There was a problem getting all voucher types: {ERROR}", msg);
             return Results.NotFound(msg);
         }
-
     }
 }

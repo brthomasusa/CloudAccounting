@@ -13,6 +13,7 @@ public class GetAllCompanies : IEndpoint
             .Produces(500);
     }
 
+    [Authorize(Roles = "AppAdmin, CompanyAdmin")]
     public static async Task<IResult> GetAllCompaniesFromQuery(ISender sender, ILogger<GetAllCompanies> logger)
     {
         GetAllCompaniesQuery query = new(1, 10);

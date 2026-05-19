@@ -1,16 +1,14 @@
 namespace CloudAccounting.Core.Models;
 
-public partial class CostCenter
+public class CostCenter
 {
     public int CompanyCode { get; set; }
 
     public string CostCenterCode { get; set; } = null!;
 
-    public string? CostCenterTitle { get; set; }
+    public string CostCenterTitle { get; set; } = null!;
 
-    public bool? CostCenterLevel { get; set; }
-
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
+    public byte CostCenterLevel { get; set; }
 
     public virtual ICollection<TransactionDetail> TransactionDetails { get; set; } = [];
 }

@@ -13,6 +13,7 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
                 .Produces(500);
         }
 
+        [Authorize(Roles = "CompanyAdmin")]
         public static async Task<IResult> GetVoucherTypeByIdFromQuery(
             int voucherCode,
             ISender sender,
@@ -28,7 +29,8 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
             }
 
             string msg = result.Error.Message;
-            logger.LogWarning("There was a problem getting the voucher type with code {VOUCHER_CODE}: {ERROR}", voucherCode, msg);
+            logger.LogWarning("There was a problem getting the voucher type with code {VOUCHER_CODE}: {ERROR}",
+                voucherCode, msg);
             return Results.NotFound(msg);
         }
     }

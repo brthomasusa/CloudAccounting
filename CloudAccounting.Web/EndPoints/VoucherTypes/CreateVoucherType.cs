@@ -13,6 +13,7 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
                 .Produces(500);
         }
 
+        [Authorize(Roles = "CompanyAdmin")]
         public static async Task<IResult> CreateVoucherTypeFromCommand(
             CreateVoucherTypeCommand command,
             ISender sender,

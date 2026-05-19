@@ -14,9 +14,9 @@ public static class DependencyInjection
         services.AddCors(options =>
         {
             options.AddPolicy("CloudAccounting.Web.Policy", builder =>
-            builder.AllowAnyOrigin()
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
             );
         });
 
@@ -42,11 +42,14 @@ public static class DependencyInjection
 
     public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
     {
-        ServiceDescriptor[] serviceDescriptors = [.. assembly
+        ServiceDescriptor[] serviceDescriptors =
+        [
+            .. assembly
                 .DefinedTypes
                 .Where(type => type is { IsAbstract: false, IsInterface: false } &&
-                            type.IsAssignableTo(typeof(IEndpoint)))
-                .Select(type => ServiceDescriptor.Transient(typeof(IEndpoint), type))];
+                               type.IsAssignableTo(typeof(IEndpoint)))
+                .Select(type => ServiceDescriptor.Transient(typeof(IEndpoint), type))
+        ];
 
         services.TryAddEnumerable(serviceDescriptors);
 
@@ -90,6 +93,7 @@ public static class DependencyInjection
             .AddScoped<IIdentityMgmtRepository, IdentityMgmtRepository>()
             .AddScoped<AuthenticationService>()
             .AddScoped<AuthorizationService>()
-            .AddScoped<IGroupRepository, GroupRepository>();
+            .AddScoped<IGroupRepository, GroupRepository>()
+            .AddScoped<ICostCenterRepository, CostCenterRepository>(); // 
     }
 }

@@ -4,7 +4,6 @@ using CloudAccounting.Infrastructure.Data.Data;
 using CloudAccounting.Infrastructure.Data.Options;
 using CloudAccounting.Web.Authorization;
 using CloudAccounting.Web.Middleware;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -106,9 +105,9 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
-    app.UseSerilogRequestLogging();
+    
     app.UseMiddleware<ExceptionHandlingMiddleware>();
+    app.UseSerilogRequestLogging();
     app.UseHttpsRedirection();
     app.UseResponseCaching();
     app.UseAuthentication();

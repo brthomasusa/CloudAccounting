@@ -12,7 +12,9 @@ using CloudAccounting.Application.UseCases.VoucherTypes.CreateVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.DeleteVoucherType;
 using CloudAccounting.Application.UseCases.VoucherTypes.UpdateVoucherType;
 using CloudAccounting.Application.UseCases.IdentityManagement.UpdateUserRole;
-
+using CloudAccounting.Application.UseCases.CostCenters.CreateCostCenter;
+using CloudAccounting.Application.UseCases.CostCenters.UpdateCostCenter;
+using CloudAccounting.Application.UseCases.CostCenters.DeleteCostCenters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -34,8 +36,10 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<LoginWithRefreshTokenCommand>, LoginWithRefreshTokenCommandValidator>()
                 .AddScoped<IValidator<CreateRoleCommand>, CreateRoleCommandValidator>()
                 .AddScoped<IValidator<CreateUserWithRoleCommand>, CreateUserWithRoleCommandValidator>()
-                .AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandValidator>();
-
+                .AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandValidator>()
+                .AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>()
+                .AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>()
+                .AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
         }
 
         public static void AddMediatr(this IServiceCollection services)

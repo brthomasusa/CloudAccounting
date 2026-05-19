@@ -12,6 +12,7 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
                 .Produces(500);
         }
 
+        [Authorize(Roles = "CompanyAdmin")]
         public static async Task<IResult> DeleteFiscalYearAsync
         (
             [FromBody] DeleteFiscalYearCommand command,
@@ -19,7 +20,9 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
             ILogger<DeleteFiscalYear> logger
         )
         {
-            logger.LogInformation("Received request to delete fiscal year {FISCALYEARID} for company with code {COMPANYCODE}", command.FiscalYear, command.CompanyCode);
+            logger.LogInformation(
+                "Received request to delete fiscal year {FISCALYEARID} for company with code {COMPANYCODE}",
+                command.FiscalYear, command.CompanyCode);
             Result<MediatR.Unit> result = await sender.Send(command);
 
             if (result.IsSuccess)

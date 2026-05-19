@@ -13,7 +13,9 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
                 .Produces(500);
         }
 
-        public static async Task<IResult> CreateFiscalYear([FromBody] CreateFiscalYearCommand command, ISender sender, ILogger<CreateNewFiscalYear> logger)
+        [Authorize(Roles = "CompanyAdmin")]
+        public static async Task<IResult> CreateFiscalYear([FromBody] CreateFiscalYearCommand command, ISender sender,
+            ILogger<CreateNewFiscalYear> logger)
         {
             Result<FiscalYearDto>? result = await sender.Send(command);
 

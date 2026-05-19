@@ -13,6 +13,7 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
                 .Produces(500);
         }
 
+        [Authorize(Roles = "CompanyAdmin")]
         public static async Task<IResult> UpdateVoucherTypeFromCommand(
             UpdateVoucherTypeCommand command,
             ISender sender,
@@ -27,7 +28,8 @@ namespace CloudAccounting.Web.EndPoints.VoucherTypes
             }
 
             string msg = result.Error.Message;
-            logger.LogWarning("There was a problem updating the voucher type with code {VOUCHER_CODE}: {ERROR}", command.VoucherCode, msg);
+            logger.LogWarning("There was a problem updating the voucher type with code {VOUCHER_CODE}: {ERROR}",
+                command.VoucherCode, msg);
             return Results.BadRequest(msg);
         }
     }

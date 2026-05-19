@@ -13,7 +13,9 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
                 .Produces(500);
         }
 
-        public static async Task<IResult> RetrieveFiscalYear(int companyCode, ISender sender, ILogger<GetMostRecentFiscalYear> logger)
+        [Authorize(Roles = "CompanyAdmin")]
+        public static async Task<IResult> RetrieveFiscalYear(int companyCode, ISender sender,
+            ILogger<GetMostRecentFiscalYear> logger)
         {
             GetMostRecentFiscalYearQuery query = new(companyCode);
             Result<FiscalYearDto>? result = await sender.Send(query);
@@ -23,9 +25,9 @@ namespace CloudAccounting.Web.EndPoints.FiscalYears
                 return Results.Ok(result.Value);
             }
 
-            logger.LogWarning("There was a problem retrieving the most recentfiscal year information: {ERROR}", result.Error.Message);
+            logger.LogWarning("There was a problem retrieving the most recentfiscal year information: {ERROR}",
+                result.Error.Message);
             return result!.ToNotFoundProblemDetails();
         }
-
     }
 }
