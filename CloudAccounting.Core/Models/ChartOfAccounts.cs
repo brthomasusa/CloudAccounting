@@ -1,6 +1,6 @@
 namespace CloudAccounting.Core.Models;
 
-public partial class ChartOfAccounts
+public class ChartOfAccounts
 {
     public int CompanyCode { get; set; }
 
@@ -10,13 +10,11 @@ public partial class ChartOfAccounts
 
     public int? AccountLevel { get; set; }
 
-    public string? AccountClassification { get; set; }
+    public string? AccountClassification { get; set; } // Null, Asset, Liability, Equity, Revenue, Expense
 
-    public string? AccountType { get; set; }
+    public string? AccountType { get; set; } // Null, Other, or Bank
 
     public string? CostCenterCode { get; set; }
-
-    public virtual Company CompanyCodeNavigation { get; set; } = null!;
 
     public virtual ICollection<BankOpeningStatement> BankOpeningStatements { get; set; } = [];
 

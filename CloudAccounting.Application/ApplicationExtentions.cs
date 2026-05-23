@@ -15,6 +15,7 @@ using CloudAccounting.Application.UseCases.IdentityManagement.UpdateUserRole;
 using CloudAccounting.Application.UseCases.CostCenters.CreateCostCenter;
 using CloudAccounting.Application.UseCases.CostCenters.UpdateCostCenter;
 using CloudAccounting.Application.UseCases.CostCenters.DeleteCostCenters;
+using CloudAccounting.Application.UseCases.Coa.Create;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -39,7 +40,8 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandValidator>()
                 .AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>()
                 .AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>()
-                .AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>();
+                .AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>()
+                .AddScoped<IValidator<CreateChartOfAccountCommand>, CreateChartOfAccountCommandValidator>();
         }
 
         public static void AddMediatr(this IServiceCollection services)
