@@ -9,26 +9,37 @@ public class ChartOfAccountRepository(
     ILogger<ChartOfAccountRepository> logger
 ) : IChartOfAccountRepository
 {
-    public async Task<Result<List<ChartOfAccounts>>> RetrieveAllAsync(int companyCode)
+    public async Task<Result<PagedResponse<ChartOfAccounts>>> RetrieveAllAsync
+    (
+        int pageNumber,
+        int pageSize,
+        int companyCode
+    )
     {
         try
         {
-            var dataModels = await ctx.ChartOfAccounts
-                .Where(coa => coa.CompanyCode == companyCode)
-                .OrderBy(coa => coa.AccountCode)
+            var query = ctx.ChartOfAccounts.AsNoTracking();
+            var totalRecords = await query.CountAsync();
+
+            var dataModels = await query
+                .OrderBy(p => p.AccountCode)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            List<ChartOfAccounts> results = [];
+            var results = new List<ChartOfAccounts>();
             dataModels.ForEach(dm => results.Add(dm.Adapt<ChartOfAccounts>()));
 
-            return Result.Success(results);
+            var pagedResponse = new PagedResponse<ChartOfAccounts>(results, pageNumber, pageSize, totalRecords);
+
+            return Result.Success(pagedResponse);
         }
         catch (Exception ex)
         {
             var errMsg = Helpers.GetInnerExceptionMessage(ex);
             logger.LogError(ex, "{Message}", errMsg);
 
-            return Result.Failure<List<ChartOfAccounts>>(new Error("ChartOfAccountRepository.RetrieveAllAsync",
+            return Result.Failure<PagedResponse<ChartOfAccounts>>(new Error("ChartOfAccountRepository.RetrieveAllAsync",
                 errMsg));
         }
     }
@@ -38,6 +49,7 @@ public class ChartOfAccountRepository(
         try
         {
             var dataModel = await ctx.ChartOfAccounts
+                .AsNoTracking()
                 .SingleOrDefaultAsync(c => c.CompanyCode == companyCode && c.AccountCode == accountCode);
 
             if (dataModel == null)
@@ -84,8 +96,6 @@ public class ChartOfAccountRepository(
             await ctx.ChartOfAccounts.Where(x => x.CompanyCode == c.CompanyCode && x.AccountCode == c.AccountCode)
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(x => x.AccountTitle, c.AccountTitle)
-                    .SetProperty(x => x.AccountLevel, c.AccountLevel == null ? null : (byte?)c.AccountLevel)
-                    .SetProperty(x => x.AccountClassification, c.AccountClassification)
                     .SetProperty(x => x.AccountType, c.AccountType)
                     .SetProperty(x => x.CostCenterCode, c.CostCenterCode)
                 );

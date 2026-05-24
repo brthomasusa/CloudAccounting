@@ -2,7 +2,7 @@ namespace CloudAccounting.Core.Repositories;
 
 public interface IChartOfAccountRepository
 {
-	Task<Result<List<ChartOfAccounts>>> RetrieveAllAsync(int companyCode);
+	Task<Result<PagedResponse<ChartOfAccounts>>> RetrieveAllAsync(int pageNumber, int pageSize, int companyCode);
 
 	Task<Result<ChartOfAccounts>> RetrieveAsync(int companyCode, string accountCode);
 

@@ -198,7 +198,7 @@ public class CoaCommandValidatorTests(DatabaseFixture fixture) : IAsyncLifetime
             LevelThree = "002",
             LevelFour = "00003",
             AccountTitle = "Test Account",
-            AccountType = "Asset",
+            AccountType = "Other",
             CostCenterCode = "09001"
         };
     }

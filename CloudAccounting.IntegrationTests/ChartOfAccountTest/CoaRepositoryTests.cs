@@ -20,13 +20,16 @@ public class CoaRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
     {
         // Arrange
         await ReseedTestDb.ReseedTestDbAsync(_context);
+        int pageNumber = 1;
+        int pageSize = 10;
+        int companyCode = 1;
 
         // Act
-        var result = await _repo.RetrieveAllAsync(1);
+        var result = await _repo.RetrieveAllAsync(pageNumber, pageSize, companyCode);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.NotEmpty(result.Value);
+        Assert.NotEmpty(result.Value.Data);
     }
 
     [Fact]
@@ -34,17 +37,7 @@ public class CoaRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
     {
         // Arrange
         await ReseedTestDb.ReseedTestDbAsync(_context);
-
-        var coa = new ChartOfAccounts
-        {
-            CompanyCode = 1,
-            AccountCode = "ZZ999",
-            AccountTitle = "Integration Test Account",
-            AccountLevel = 5,
-            AccountClassification = "A",
-            AccountType = "Asset",
-            CostCenterCode = null
-        };
+        var coa = CreateValidCoa();
 
         // Act - Create
         var createResult = await _repo.CreateAsync(coa);
@@ -54,11 +47,11 @@ public class CoaRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
         Assert.Equal(coa.AccountCode, createResult.Value.AccountCode);
 
         // Act - Retrieve
-        var retrieveResult = await _repo.RetrieveAsync(1, "ZZ999");
+        var retrieveResult = await _repo.RetrieveAsync(1, "30100200003");
 
         // Assert - Retrieve
         Assert.True(retrieveResult.IsSuccess);
-        Assert.Equal("Integration Test Account", retrieveResult.Value.AccountTitle);
+        Assert.Equal("Test Account", retrieveResult.Value.AccountTitle);
 
         // Act - Update
         retrieveResult.Value.AccountTitle = "Updated Title";
@@ -125,5 +118,19 @@ public class CoaRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
 
         Assert.True(shortCheck.IsSuccess);
         Assert.False(shortCheck.Value);
+    }
+
+    private ChartOfAccounts CreateValidCoa()
+    {
+        return new ChartOfAccounts
+        {
+            CompanyCode = 1,
+            AccountCode = "30100200003",
+            AccountTitle = "Test Account",
+            AccountLevel = 4,
+            AccountClassification = "Assets",
+            AccountType = "Other",
+            CostCenterCode = "09001"
+        };
     }
 }
