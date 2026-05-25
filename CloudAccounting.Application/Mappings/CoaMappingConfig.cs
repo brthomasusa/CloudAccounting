@@ -1,5 +1,4 @@
 using CloudAccounting.Application.UseCases.Coa.Create;
-using CloudAccounting.Shared.Coa;
 
 namespace CloudAccounting.Application.Mappings;
 
@@ -12,21 +11,21 @@ public class CoaMappingConfig : IRegister
             .Map(dest => dest.CompanyCode, src => src.CompanyCode)
             .Map(dest => dest.AccountCode, src => $"{src.LevelOne}{src.LevelTwo}{src.LevelThree}{src.LevelFour}")
             .Map(dest => dest.AccountTitle, src => src.AccountTitle)
-            .Map(dest => dest.AccountLevel, src => GetCoaLevel(src.LevelOne))
+            .Map(dest => dest.AccountLevel,
+                src => GetCoaLevel($"{src.LevelOne}{src.LevelTwo}{src.LevelThree}{src.LevelFour}"))
             .Map(dest => dest.AccountClassification, src => GetClassification(src.LevelOne))
             .Map(dest => dest.AccountType, src => src.AccountType)
             .Map(dest => dest.CostCenterCode, src => src.CostCenterCode);
     }
 
-    private static int GetCoaLevel(string levelOne)
+    private static int GetCoaLevel(string acctCode)
     {
-        return levelOne switch
+        return acctCode.Length switch
         {
-            "1" => 1,
-            "2" => 2,
-            "3" => 3,
-            "4" => 4,
-            "5" => 5,
+            1 => 1,
+            3 => 2,
+            6 => 3,
+            11 => 4,
             _ => throw new ArgumentException("Invalid Level One code. Must be 1-5.")
         };
     }

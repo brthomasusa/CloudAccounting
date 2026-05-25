@@ -44,6 +44,51 @@ public class ChartOfAccountRepository(
         }
     }
 
+    public async Task<Result<PagedResponse<ChartOfAccounts>>> RetrieveAllAsync
+    (
+        int pageNumber,
+        int pageSize,
+        int companyCode,
+        string? searchTerm
+    )
+    {
+        try
+        {
+            var query = ctx.ChartOfAccounts.AsNoTracking()
+                .Where(c => c.CompanyCode == companyCode);
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var searchPattern = $"{searchTerm}%";
+                // query = query.Where(c => c.AccountCode.Contains(searchTerm));
+                query = query.Where(c => EF.Functions.Like(c.AccountCode, searchPattern));
+            }
+
+            var totalRecords = await query.CountAsync();
+
+            var dataModels = await query
+                .OrderBy(p => p.AccountCode)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var results = new List<ChartOfAccounts>();
+            dataModels.ForEach(dm => results.Add(dm.Adapt<ChartOfAccounts>()));
+
+            var pagedResponse = new PagedResponse<ChartOfAccounts>(results, pageNumber, pageSize, totalRecords);
+
+            return Result.Success(pagedResponse);
+        }
+        catch (Exception ex)
+        {
+            var errMsg = Helpers.GetInnerExceptionMessage(ex);
+            logger.LogError(ex, "{Message}", errMsg);
+
+            return Result.Failure<PagedResponse<ChartOfAccounts>>(new Error("ChartOfAccountRepository.RetrieveAllAsync",
+                errMsg));
+        }
+    }
+
     public async Task<Result<ChartOfAccounts>> RetrieveAsync(int companyCode, string accountCode)
     {
         try

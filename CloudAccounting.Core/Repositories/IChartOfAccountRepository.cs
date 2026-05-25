@@ -4,6 +4,9 @@ public interface IChartOfAccountRepository
 {
 	Task<Result<PagedResponse<ChartOfAccounts>>> RetrieveAllAsync(int pageNumber, int pageSize, int companyCode);
 
+	Task<Result<PagedResponse<ChartOfAccounts>>> RetrieveAllAsync(int pageNumber, int pageSize, int companyCode,
+		string? searchTerm);
+
 	Task<Result<ChartOfAccounts>> RetrieveAsync(int companyCode, string accountCode);
 
 	Task<Result<ChartOfAccounts>> CreateAsync(ChartOfAccounts c);

@@ -33,6 +33,24 @@ public class CoaRepositoryTests(DatabaseFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task RetrieveAllAsync_ShouldReturnMultiple_WithSearchTerm()
+    {
+        // Arrange
+        await ReseedTestDb.ReseedTestDbAsync(_context);
+        const int pageNumber = 1;
+        const int pageSize = 10;
+        const int companyCode = 1;
+        const string searchTerm = "1";
+
+        // Act
+        var result = await _repo.RetrieveAllAsync(pageNumber, pageSize, companyCode, searchTerm);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotEmpty(result.Value.Data);
+    }
+
+    [Fact]
     public async Task CreateRetrieveUpdateDelete_AccountLifecycle_Works()
     {
         // Arrange
