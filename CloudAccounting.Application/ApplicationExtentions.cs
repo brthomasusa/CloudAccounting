@@ -16,6 +16,8 @@ using CloudAccounting.Application.UseCases.CostCenters.CreateCostCenter;
 using CloudAccounting.Application.UseCases.CostCenters.UpdateCostCenter;
 using CloudAccounting.Application.UseCases.CostCenters.DeleteCostCenters;
 using CloudAccounting.Application.UseCases.Coa.Create;
+using CloudAccounting.Application.UseCases.Coa.Delete;
+using CloudAccounting.Application.UseCases.Coa.Update;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -41,7 +43,9 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<CreateCostCenterCommand>, CreateCostCenterCommandValidator>()
                 .AddScoped<IValidator<UpdateCostCenterCommand>, UpdateCostCenterCommandValidator>()
                 .AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>()
-                .AddScoped<IValidator<CreateChartOfAccountCommand>, CreateChartOfAccountCommandValidator>();
+                .AddScoped<IValidator<CreateChartOfAccountCommand>, CreateChartOfAccountCommandValidator>()
+                .AddScoped<IValidator<UpdateChartOfAccountCommand>, UpdateChartOfAccountCommandValidator>()
+                .AddScoped<IValidator<DeleteChartOfAccountCommand>, DeleteChartOfAccountCommandValidator>();
         }
 
         public static void AddMediatr(this IServiceCollection services)
