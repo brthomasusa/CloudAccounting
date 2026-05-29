@@ -1,5 +1,4 @@
 using CloudAccounting.Application.UseCases.CostCenters.CreateCostCenter;
-using CloudAccounting.Shared;
 
 namespace CloudAccounting.Web.EndPoints.CostCenters;
 
