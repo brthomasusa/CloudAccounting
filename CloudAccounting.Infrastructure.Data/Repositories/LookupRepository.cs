@@ -2,8 +2,7 @@ using CloudAccounting.Infrastructure.Data.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
-    public class LookupRepository
-    (
+    public class LookupRepository(
         AppDbContext context,
         ILogger<LookupRepository> logger
     ) : ILookupRepository
@@ -30,8 +29,34 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<List<CompanyLookupItem>>.Failure<List<CompanyLookupItem>>(
+                return Result.Failure<List<CompanyLookupItem>>(
                     new Error("LookupRepository.RetrieveAllAsync", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<List<CostCenterLookupItem>>> RetrieveCostCentersAsync(int companyCode)
+        {
+            try
+            {
+                List<CostCenterLookupItem> costCenters = await _context.CostCenters
+                    .Where(cc => cc.CompanyCode == companyCode)
+                    .Select(cc => new CostCenterLookupItem
+                    {
+                        CostCenterCode = cc.CostCenterCode,
+                        CostCenterTitle = cc.CostCenterTitle
+                    })
+                    .ToListAsync();
+
+                return costCenters;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure<List<CostCenterLookupItem>>(
+                    new Error("LookupRepository.RetrieveCostCentersAsync", errMsg)
                 );
             }
         }

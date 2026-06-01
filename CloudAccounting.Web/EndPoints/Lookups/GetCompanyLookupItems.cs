@@ -11,15 +11,16 @@ namespace CloudAccounting.Web.EndPoints.Lookups
                 .Produces(401)
                 .Produces(403)
                 .Produces(404)
-                .Produces<List<CompanyLookupItem>>(200).RequireAuthorization()
+                .Produces<List<CompanyLookupItem>>().RequireAuthorization()
                 .Produces(500); // .Produces<List<CompanyLookupItem>>(200).RequireAuthorization()
         }
 
         // [Authorize(Roles = "AppAdmin")]
-        public static async Task<IResult> GetCompanyAllLookupItems(ISender sender, ILogger<GetCompanyLookupItems> logger)
+        public static async Task<IResult> GetCompanyAllLookupItems(ISender sender,
+            ILogger<GetCompanyLookupItems> logger)
         {
             GetCompanyLookupItemsQuery query = new();
-            Result<List<CompanyLookupItem>>? result = await sender.Send(query);
+            Result<List<CompanyLookupItem>> result = await sender.Send(query);
 
             if (result.IsSuccess)
             {
@@ -30,6 +31,5 @@ namespace CloudAccounting.Web.EndPoints.Lookups
             logger.LogWarning("There was a problem getting all company lookup items: {ERROR}", msg);
             return Results.NotFound(msg);
         }
-
     }
 }
