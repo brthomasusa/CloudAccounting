@@ -40,7 +40,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 List<CostCenterLookupItem> costCenters = await _context.CostCenters
-                    .Where(cc => cc.CompanyCode == companyCode)
+                    .Where(cc => cc.CompanyCode == companyCode && cc.CostCenterLevel == 2)
+                    .OrderBy(cc => cc.CostCenterCode)
                     .Select(cc => new CostCenterLookupItem
                     {
                         CostCenterCode = cc.CostCenterCode,
