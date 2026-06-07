@@ -21,6 +21,8 @@ namespace CloudAccounting.Core.Repositories
 
         Task<Result<bool>> IsValidCompanyCode(int companyCode);
 
+        Task<Result<bool>> IsValidFiscalYearNumber(int companyCode, int fiscalYearNumber);
+
         Task<Result<bool>> IsUniqueFiscalYearNumber(int companyCode, int fiscalYearNumber);
     }
 }

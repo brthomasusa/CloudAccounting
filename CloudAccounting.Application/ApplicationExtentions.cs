@@ -18,6 +18,7 @@ using CloudAccounting.Application.UseCases.CostCenters.DeleteCostCenters;
 using CloudAccounting.Application.UseCases.Coa.Create;
 using CloudAccounting.Application.UseCases.Coa.Delete;
 using CloudAccounting.Application.UseCases.Coa.Update;
+using CloudAccounting.Application.UseCases.IdentityManagement.UpdateUserFiscalPeriod;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudAccounting.Application
@@ -45,7 +46,8 @@ namespace CloudAccounting.Application
                 .AddScoped<IValidator<DeleteCostCenterCommand>, DeleteCostCenterCommandValidator>()
                 .AddScoped<IValidator<CreateChartOfAccountCommand>, CreateChartOfAccountCommandValidator>()
                 .AddScoped<IValidator<UpdateChartOfAccountCommand>, UpdateChartOfAccountCommandValidator>()
-                .AddScoped<IValidator<DeleteChartOfAccountCommand>, DeleteChartOfAccountCommandValidator>();
+                .AddScoped<IValidator<DeleteChartOfAccountCommand>, DeleteChartOfAccountCommandValidator>()
+                .AddScoped<IValidator<UpdateUserFiscalPeriodCommand>, UpdateUserFiscalPeriodCommandValidator>();
         }
 
         public static void AddMediatr(this IServiceCollection services)

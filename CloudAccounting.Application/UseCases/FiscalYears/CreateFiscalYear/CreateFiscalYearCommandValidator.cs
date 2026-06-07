@@ -9,16 +9,17 @@ public class CreateFiscalYearCommandValidator : AbstractValidator<CreateFiscalYe
         _repository = repository;
 
         RuleFor(fiscalYear => fiscalYear.CompanyCode)
-                                        .GreaterThan(0).WithMessage("Missing company code.")
-                                        .MustAsync(ValidateCompanyCode).WithMessage("The company code is not valid.");
+            .GreaterThan(0).WithMessage("Missing company code.")
+            .MustAsync(ValidateCompanyCode).WithMessage("The company code is not valid.");
 
         RuleFor(fiscalYear => fiscalYear.FiscalYear)
-                                        .GreaterThan(0).WithMessage("Missing fiscal year.")
-                                        .MustAsync(ValidateFiscalYearNumber).WithMessage("The fiscal year number already exists for this company.");
+            .GreaterThan(0).WithMessage("Missing fiscal year.")
+            .MustAsync(ValidateFiscalYearNumber).WithMessage("The fiscal year number already exists for this company.");
 
         RuleFor(fiscalYear => fiscalYear.StartDate)
-                                        .NotNull().WithMessage("Missing fiscal year start date.")
-                                        .MustAsync(ValidateFiscalYearStartDate).WithMessage("The start date overlaps with an existing fiscal year for this company.");
+            .NotNull().WithMessage("Missing fiscal year start date.")
+            .MustAsync(ValidateFiscalYearStartDate)
+            .WithMessage("The start date overlaps with an existing fiscal year for this company.");
     }
 
     private async Task<bool> ValidateCompanyCode(int companyCode, CancellationToken cancellationToken)
@@ -28,14 +29,16 @@ public class CreateFiscalYearCommandValidator : AbstractValidator<CreateFiscalYe
         return result.Value;
     }
 
-    private async Task<bool> ValidateFiscalYearNumber(CreateFiscalYearCommand command, int fiscalYear, CancellationToken cancellationToken)
+    private async Task<bool> ValidateFiscalYearNumber(CreateFiscalYearCommand command, int fiscalYear,
+        CancellationToken cancellationToken)
     {
         Result<bool> result = await _repository.IsUniqueFiscalYearNumber(command.CompanyCode, command.FiscalYear);
 
         return result.Value;
     }
 
-    private async Task<bool> ValidateFiscalYearStartDate(CreateFiscalYearCommand command, DateTime startDate, CancellationToken cancellationToken)
+    private async Task<bool> ValidateFiscalYearStartDate(CreateFiscalYearCommand command, DateTime startDate,
+        CancellationToken cancellationToken)
     {
         Result<DateTime> result = await _repository.EarliestNextFiscalYearStartDate(command.CompanyCode);
 

@@ -4,8 +4,7 @@ using CloudAccounting.Infrastructure.Data.Data;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
-    public class FiscalYearRepository
-    (
+    public class FiscalYearRepository(
         AppDbContext ctx,
         ILogger<FiscalYearRepository> logger
     ) : IFiscalYearRepository
@@ -21,18 +20,19 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string companyName = companyNameResult.IsSuccess ? companyNameResult.Value : "Unknown Company";
 
                 int transactionCount = await _db.TranMasters
-                                                .CountAsync(t => t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
+                    .CountAsync(t => t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
 
                 List<FiscalYearDM>? fiscalPeriods =
                     await _db.FiscalYears
-                             .Include(c => c.CompanyCodeNavigation)
-                             .Where(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber)
-                             .OrderBy(fy => fy.CompanyMonthId)
-                             .ToListAsync();
+                        .Include(c => c.CompanyCodeNavigation)
+                        .Where(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber)
+                        .OrderBy(fy => fy.CompanyMonthId)
+                        .ToListAsync();
 
                 List<FiscalPeriod> periods = [];
                 fiscalPeriods.ForEach(p =>
-                    periods.Add(new FiscalPeriod(p.CompanyMonthId, p.CompanyMonthName!, p.PeriodFrom!.Value, p.PeriodTo!.Value, p.MonthClosed!.Value))
+                    periods.Add(new FiscalPeriod(p.CompanyMonthId, p.CompanyMonthName!, p.PeriodFrom!.Value,
+                        p.PeriodTo!.Value, p.MonthClosed!.Value))
                 );
 
                 if (fiscalPeriods is null || fiscalPeriods.Count == 0)
@@ -85,8 +85,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 int? mostRecentFiscalYearNumber = await _db.FiscalYears
-                                                           .Where(fy => fy.CompanyCode == companyCode)
-                                                           .MaxAsync(fy => (int?)fy.CompanyYear);
+                    .Where(fy => fy.CompanyCode == companyCode)
+                    .MaxAsync(fy => (int?)fy.CompanyYear);
 
                 if (mostRecentFiscalYearNumber is null)
                 {
@@ -124,7 +124,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 bool doesInitYearExist =
-                    await _db.FiscalYears.AnyAsync(f => f.CompanyCode == fiscalYear.CompanyCode && f.InitialYear == true);
+                    await _db.FiscalYears.AnyAsync(f =>
+                        f.CompanyCode == fiscalYear.CompanyCode && f.InitialYear == true);
 
                 List<FiscalYearDM> dataModels =
                     MapFiscalYearToFiscalYearDMList(fiscalYear, !doesInitYearExist);
@@ -150,7 +151,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 await _db.FiscalYears.Where(c => c.CompanyCode == companyCode && c.CompanyYear == fiscalYear)
-                                     .ExecuteDeleteAsync();
+                    .ExecuteDeleteAsync();
 
                 return Result.Success();
             }
@@ -168,7 +169,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 bool doesFiscalYearHaveTransactions =
-                    await _db.TranMasters.AnyAsync(t => t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
+                    await _db.TranMasters.AnyAsync(t =>
+                        t.CompanyCode == companyCode && t.CompanyYear == fiscalYearNumber);
 
                 return doesFiscalYearHaveTransactions == false;
             }
@@ -188,10 +190,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var query = await _db.FiscalYears
-                                     .Where(fy => fy.CompanyCode == companyCode)
-                                     .OrderByDescending(fy => fy.PeriodTo)
-                                     .Take(1)
-                                     .ToListAsync();
+                    .Where(fy => fy.CompanyCode == companyCode)
+                    .OrderByDescending(fy => fy.PeriodTo)
+                    .Take(1)
+                    .ToListAsync();
 
                 if (query is not null && query.Count > 0)
                 {
@@ -217,13 +219,14 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 string? companyName = await _db.Companies
-                                               .Where(c => c.CompanyCode == companyCode)
-                                               .Select(c => c.CompanyName)
-                                               .SingleOrDefaultAsync();
+                    .Where(c => c.CompanyCode == companyCode)
+                    .Select(c => c.CompanyName)
+                    .SingleOrDefaultAsync();
                 if (companyName is null)
                 {
                     return Result<string>.Failure<string>(
-                        new Error("FiscalYearRepository.GetCompanyName", "There was a problem retrieving the company name!"));
+                        new Error("FiscalYearRepository.GetCompanyName",
+                            "There was a problem retrieving the company name!"));
                 }
 
                 return companyName;
@@ -244,9 +247,9 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var query = await _db.FiscalYears
-                                     .Where(c => c.CompanyCode == companyCode && c.InitialYear == true)
-                                     .Select(c => c.CompanyYear)
-                                     .ToListAsync();
+                    .Where(c => c.CompanyCode == companyCode && c.InitialYear == true)
+                    .Select(c => c.CompanyYear)
+                    .ToListAsync();
 
                 return query is not null && query.Count > 0;
             }
@@ -274,8 +277,28 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
                 _logger.LogError(ex, "{Message}", errMsg);
 
-                return Result<bool>.Failure<bool>(
+                return Result.Failure<bool>(
                     new Error("FiscalYearRepository.IsValidCompanyCode", errMsg)
+                );
+            }
+        }
+
+        public async Task<Result<bool>> IsValidFiscalYearNumber(int companyCode, int fiscalYearNumber)
+        {
+            try
+            {
+                var fiscalYear = await _db.FiscalYears
+                    .AnyAsync(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber);
+
+                return fiscalYear;
+            }
+            catch (Exception ex)
+            {
+                string errMsg = Helpers.GetInnerExceptionMessage(ex);
+                _logger.LogError(ex, "{Message}", errMsg);
+
+                return Result.Failure<bool>(
+                    new Error("FiscalYearRepository.IsValidFiscalYearNumber", errMsg)
                 );
             }
         }
@@ -285,7 +308,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 bool doesExist = await _db.FiscalYears
-                                          .AnyAsync(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber);
+                    .AnyAsync(fy => fy.CompanyCode == companyCode && fy.CompanyYear == fiscalYearNumber);
 
                 return !doesExist;
             }

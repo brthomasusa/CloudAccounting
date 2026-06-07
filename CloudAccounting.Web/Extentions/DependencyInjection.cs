@@ -95,6 +95,7 @@ public static class DependencyInjection
             .AddScoped<AuthorizationService>()
             .AddScoped<IGroupRepository, GroupRepository>()
             .AddScoped<ICostCenterRepository, CostCenterRepository>()
-            .AddScoped<IChartOfAccountRepository, ChartOfAccountRepository>(); // 
+            .AddScoped<IChartOfAccountRepository, ChartOfAccountRepository>()
+            .AddScoped<IUserRepository, UserRepository>(); // 
     }
 }
