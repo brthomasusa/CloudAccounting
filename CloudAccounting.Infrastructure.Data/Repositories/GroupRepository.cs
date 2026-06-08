@@ -4,8 +4,7 @@ using CloudAccounting.Infrastructure.Data.Models;
 
 namespace CloudAccounting.Infrastructure.Data.Repositories
 {
-    public class GroupRepository
-    (
+    public class GroupRepository(
         AppDbContext ctx,
         IMemoryCache memoryCache,
         ILogger<GroupRepository> logger
@@ -23,10 +22,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 List<GroupsMaster> groups = [];
 
-                dataModels.ForEach(dm =>
-                {
-                    groups.Add(dm.Adapt<GroupsMaster>());
-                });
+                dataModels.ForEach(dm => { groups.Add(dm.Adapt<GroupsMaster>()); });
 
                 return groups;
             }
@@ -77,7 +73,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                GroupsMasterDM? dataModel = await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle!.ToUpper() == groupName.ToUpper());
+                GroupsMasterDM? dataModel =
+                    await ctx.GroupsMasters.SingleOrDefaultAsync(g => g.GroupTitle!.ToUpper() == groupName.ToUpper());
 
                 if (dataModel != null)
                 {
@@ -168,24 +165,28 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var query = await (from grpMaster in ctx.GroupsMasters
-                                   join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
-                                   join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
-                                   where userModel.UserId.ToUpper() == email.ToUpper()
-                                   select new User
-                                   {
-                                       UserId = userModel.UserId,
-                                       CompanyCode = (int)userModel.CompanyCode!,
-                                       CompanyName = company.CompanyName,
-                                       CompanyYear = (short)userModel.CompanyYear!,
-                                       CompanyMonthId = (byte)userModel.CompanyMonthId!,
-                                       CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
-                                       GroupId = (short)userModel.GroupId!,
-                                       Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
-                                       GroupTitle = grpMaster.GroupTitle!
-                                   }).SingleOrDefaultAsync();
+                    join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                    join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                    where userModel.UserId.ToUpper() == email.ToUpper()
+                    select new User
+                    {
+                        UserId = userModel.UserId,
+                        CompanyCode = (int)userModel.CompanyCode!,
+                        CompanyName = company.CompanyName,
+                        CompanyYear = (short)userModel.CompanyYear!,
+                        CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                        CompanyMonthName = string.Empty,
+                        GroupId = (short)userModel.GroupId!,
+                        Admin =
+                            grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                        GroupTitle = grpMaster.GroupTitle!
+                    }).SingleOrDefaultAsync();
 
                 if (query != null)
                 {
+                    query.CompanyMonthName =
+                        await GetFiscalYearMonthName(query.CompanyCode, query.CompanyYear, query.CompanyMonthId);
+
                     return query;
                 }
 
@@ -209,24 +210,31 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var list = await (from grpMaster in ctx.GroupsMasters
-                                  join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
-                                  join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
-                                  where userModel.CompanyCode == companyCode
-                                  select new User
-                                  {
-                                      UserId = userModel.UserId,
-                                      CompanyCode = (int)userModel.CompanyCode!,
-                                      CompanyName = company.CompanyName,
-                                      CompanyYear = (short)userModel.CompanyYear!,
-                                      CompanyMonthId = (byte)userModel.CompanyMonthId!,
-                                      CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
-                                      GroupId = (short)userModel.GroupId!,
-                                      Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
-                                      GroupTitle = grpMaster.GroupTitle!
-                                  }).ToListAsync();
+                    join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                    join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                    where userModel.CompanyCode == companyCode
+                    select new User
+                    {
+                        UserId = userModel.UserId,
+                        CompanyCode = (int)userModel.CompanyCode!,
+                        CompanyName = company.CompanyName,
+                        CompanyYear = (short)userModel.CompanyYear!,
+                        CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                        CompanyMonthName = string.Empty,
+                        GroupId = (short)userModel.GroupId!,
+                        Admin =
+                            grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                        GroupTitle = grpMaster.GroupTitle!
+                    }).ToListAsync();
 
                 if (list.Count != 0)
                 {
+                    foreach (var u in list)
+                    {
+                        u.CompanyMonthName =
+                            await GetFiscalYearMonthName(u.CompanyCode, u.CompanyYear, u.CompanyMonthId);
+                    }
+
                     return list;
                 }
 
@@ -250,29 +258,37 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var list = await (from grpMaster in ctx.GroupsMasters
-                                  join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
-                                  join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
-                                  where userModel.CompanyCode == companyCode && userModel.GroupId == groupId
-                                  select new User
-                                  {
-                                      UserId = userModel.UserId,
-                                      CompanyCode = (int)userModel.CompanyCode!,
-                                      CompanyName = company.CompanyName,
-                                      CompanyYear = (short)userModel.CompanyYear!,
-                                      CompanyMonthId = (byte)userModel.CompanyMonthId!,
-                                      CompanyMonthName = GetMonthName((int)userModel.CompanyMonthId!),
-                                      GroupId = (short)userModel.GroupId!,
-                                      Admin = grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
-                                      GroupTitle = grpMaster.GroupTitle!
-                                  }).ToListAsync();
+                    join userModel in ctx.UserModels on grpMaster.GroupId equals userModel.GroupId
+                    join company in ctx.Companies on userModel.CompanyCode equals company.CompanyCode
+                    where userModel.CompanyCode == companyCode && userModel.GroupId == groupId
+                    select new User
+                    {
+                        UserId = userModel.UserId,
+                        CompanyCode = (int)userModel.CompanyCode!,
+                        CompanyName = company.CompanyName,
+                        CompanyYear = (short)userModel.CompanyYear!,
+                        CompanyMonthId = (byte)userModel.CompanyMonthId!,
+                        CompanyMonthName = string.Empty,
+                        GroupId = (short)userModel.GroupId!,
+                        Admin =
+                            grpMaster.GroupTitle == "AppAdmin" || grpMaster.GroupTitle == "CompanyAdmin" ? "Y" : "N",
+                        GroupTitle = grpMaster.GroupTitle!
+                    }).ToListAsync();
 
                 if (list.Count != 0)
                 {
+                    foreach (var u in list)
+                    {
+                        u.CompanyMonthName =
+                            await GetFiscalYearMonthName(u.CompanyCode, u.CompanyYear, u.CompanyMonthId);
+                    }
+
                     return list;
                 }
 
                 return Result.Failure<List<User>>(
-                    new Error("GroupRepository.RetrieveUserByCompanyAndGroupAsync", "No users found for the specified company and group.")
+                    new Error("GroupRepository.RetrieveUserByCompanyAndGroupAsync",
+                        "No users found for the specified company and group.")
                 );
             }
             catch (Exception ex)
@@ -308,7 +324,10 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 await ctx.SaveChangesAsync();
 
-                return existingUser.Adapt<User>();
+                user.CompanyMonthName =
+                    await GetFiscalYearMonthName(user.CompanyCode, user.CompanyYear, user.CompanyMonthId);
+
+                return user;
             }
             catch (Exception ex)
             {
@@ -339,9 +358,9 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
 
                 // update the user's GroupId to the GroupId of the new role
                 await ctx.UserModels.Where(u => u.UserId == email)
-                                    .ExecuteUpdateAsync(setters => setters
-                                        .SetProperty(u => u.GroupId, newRoleDm.GroupId)
-                                        .SetProperty(u => u.Admin, newRole is "AppAdmin" or "CompanyAdmin" ? "Y" : "N"));
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(u => u.GroupId, newRoleDm.GroupId)
+                        .SetProperty(u => u.Admin, newRole is "AppAdmin" or "CompanyAdmin" ? "Y" : "N"));
 
                 return Result.Success(MediatR.Unit.Value);
             }
@@ -394,22 +413,15 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             }
         }
 
-        private static string GetMonthName(int monthNumber)
-            => monthNumber switch
-            {
-                1 => "January",
-                2 => "February",
-                3 => "March",
-                4 => "April",
-                5 => "May",
-                6 => "June",
-                7 => "July",
-                8 => "August",
-                9 => "September",
-                10 => "October",
-                11 => "November",
-                12 => "December",
-                _ => "Invalid month"
-            };
+        private async Task<string> GetFiscalYearMonthName(int companyCode, int fiscalYear, int monthNumber)
+        {
+            var result =
+                await ctx.FiscalYears.SingleOrDefaultAsync(fym =>
+                    fym.CompanyMonthId == monthNumber &&
+                    fym.CompanyCode == companyCode &&
+                    fym.CompanyYear == fiscalYear);
+
+            return result != null ? result.CompanyMonthName! : "Invalid month";
+        }
     }
 }
