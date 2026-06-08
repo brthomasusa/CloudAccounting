@@ -67,7 +67,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 var uniqueYears = await _context.FiscalYears
-                    .Where(fy => fy.CompanyCode == companyCode)
+                    .Where(fy => fy.CompanyCode == companyCode && fy.YearClosed == false)
                     .OrderBy(fy => fy.CompanyYear)
                     .Select(fy => new FiscalYearLookupItem
                     {
@@ -95,7 +95,8 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             try
             {
                 List<FiscalPeriodLookupItem> fiscalPeriods = await _context.FiscalYears
-                    .Where(fp => fp.CompanyCode == companyCode && fp.CompanyYear == companyYear)
+                    .Where(fp =>
+                        fp.CompanyCode == companyCode && fp.CompanyYear == companyYear && fp.MonthClosed == false)
                     .OrderBy(fp => fp.CompanyMonthId)
                     .Select(fp => new FiscalPeriodLookupItem
                     {
