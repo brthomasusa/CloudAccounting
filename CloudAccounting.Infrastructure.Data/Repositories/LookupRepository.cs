@@ -7,14 +7,11 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         ILogger<LookupRepository> logger
     ) : ILookupRepository
     {
-        private readonly AppDbContext _context = context;
-        private readonly ILogger<LookupRepository> _logger = logger;
-
         public async Task<Result<List<CompanyLookupItem>>> RetrieveAllAsync()
         {
             try
             {
-                List<CompanyLookupItem> companies = await _context.Companies
+                List<CompanyLookupItem> companies = await context.Companies
                     .Select(c => new CompanyLookupItem
                     {
                         CompanyCode = c.CompanyCode,
@@ -27,7 +24,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<CompanyLookupItem>>(
                     new Error("LookupRepository.RetrieveAllAsync", errMsg)
@@ -39,7 +36,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                List<CostCenterLookupItem> costCenters = await _context.CostCenters
+                List<CostCenterLookupItem> costCenters = await context.CostCenters
                     .Where(cc => cc.CompanyCode == companyCode && cc.CostCenterLevel == 2)
                     .OrderBy(cc => cc.CostCenterCode)
                     .Select(cc => new CostCenterLookupItem
@@ -54,7 +51,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<CostCenterLookupItem>>(
                     new Error("LookupRepository.RetrieveCostCentersAsync", errMsg)
@@ -66,7 +63,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                var uniqueYears = await _context.FiscalYears
+                var uniqueYears = await context.FiscalYears
                     .Where(fy => fy.CompanyCode == companyCode && fy.YearClosed == false)
                     .OrderBy(fy => fy.CompanyYear)
                     .Select(fy => new FiscalYearLookupItem
@@ -81,7 +78,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<FiscalYearLookupItem>>(
                     new Error("LookupRepository.RetrieveFiscalYearsAsync", errMsg)
@@ -94,7 +91,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                List<FiscalPeriodLookupItem> fiscalPeriods = await _context.FiscalYears
+                List<FiscalPeriodLookupItem> fiscalPeriods = await context.FiscalYears
                     .Where(fp =>
                         fp.CompanyCode == companyCode && fp.CompanyYear == companyYear && fp.MonthClosed == false)
                     .OrderBy(fp => fp.CompanyMonthId)
@@ -110,7 +107,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<FiscalPeriodLookupItem>>(
                     new Error("LookupRepository.RetrieveFiscalPeriodsAsync", errMsg)
@@ -122,7 +119,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                List<VoucherTypeLookupItem> voucherTypes = await _context.Vouchers
+                List<VoucherTypeLookupItem> voucherTypes = await context.Vouchers
                     .OrderBy(vt => vt.VoucherCode)
                     .Select(vt => new VoucherTypeLookupItem
                     {
@@ -136,7 +133,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<VoucherTypeLookupItem>>(
                     new Error("LookupRepository.RetrieveCVoucherTypesAsync", errMsg)
@@ -148,7 +145,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
         {
             try
             {
-                List<CoaLookupItem> coaItems = await _context.ChartOfAccounts
+                List<CoaLookupItem> coaItems = await context.ChartOfAccounts
                     .Where(coa => coa.CompanyCode == companyCode && coa.AccountLevel == 4)
                     .OrderBy(coa => coa.AccountCode)
                     .Select(coa => new CoaLookupItem
@@ -163,7 +160,7 @@ namespace CloudAccounting.Infrastructure.Data.Repositories
             catch (Exception ex)
             {
                 string errMsg = Helpers.GetInnerExceptionMessage(ex);
-                _logger.LogError(ex, "{Message}", errMsg);
+                logger.LogError(ex, "{Message}", errMsg);
 
                 return Result.Failure<List<CoaLookupItem>>(
                     new Error("LookupRepository.RetrieveLedgerAccountsAsync", errMsg)
